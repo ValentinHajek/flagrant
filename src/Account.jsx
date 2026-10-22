@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api, setSession, syncHistory } from "./api.js";
 import { Stamp } from "./brand.jsx";
+import { flagUrl } from "./quiz.js";
 import { saveHistory } from "./stats.js";
 import { save } from "./storage.js";
 
@@ -24,7 +25,8 @@ function useAction() {
   return [state, run];
 }
 
-function LoggedOut({ notice }) {
+// Connexion par lien e-mail. Aussi affichée sur l'accueil quand on n'est pas connecté.
+export function LoginForm({ notice }) {
   const [email, setEmail] = useState("");
   const [sentTo, setSentTo] = useState(null);
   const [{ busy, error }, run] = useAction();
@@ -164,7 +166,7 @@ export function AccountCard(props) {
   return (
     <section className={`${card} flex flex-col gap-4 p-5`}>
       <h3 className="font-display text-xl uppercase text-night">Compte & amis</h3>
-      {props.account ? <LoggedIn {...props} /> : <LoggedOut notice={props.notice} />}
+      {props.account ? <LoggedIn {...props} /> : <LoginForm notice={props.notice} />}
     </section>
   );
 }
@@ -210,6 +212,49 @@ export function Duel({ mine, theirs, myName, rival, onClose }) {
           </div>
         ))}
       </div>
+    </section>
+  );
+}
+
+// Duel pays par pays : qui sèche quoi. Les chiffres « 1/2 » = ratés / fois tombé.
+export function CountryDuel({ cmp, rivalName, byCode, mode }) {
+  const lists = [
+    ["Vous séchez tous les deux", cmp.both],
+    ["Ton avantage", cmp.mine],
+    [`L'avantage de ${rivalName}`, cmp.theirs],
+  ];
+  return (
+    <section className="flex flex-col gap-3">
+      <h3 className="font-display text-xl uppercase text-night">Pays par pays</h3>
+      <div className="grid gap-3 sm:grid-cols-3">
+        {lists.map(([title, rows]) => (
+          <div key={title} className={`${card} flex flex-col gap-2 p-4 shadow-none`}>
+            <div className="text-sm font-semibold uppercase tracking-[0.14em] text-muted">{title}</div>
+            {rows.length === 0 && <p className="text-sm font-medium text-muted">Rien pour l'instant.</p>}
+            {rows.map((r) => {
+              const c = byCode.get(r.code);
+              if (!c) return null;
+              return (
+                <div key={r.code} className="flex items-center gap-2">
+                  {mode === "tld" ? (
+                    <span className="w-10 shrink-0 text-center font-display text-lg text-ink">{c.tld}</span>
+                  ) : (
+                    <img src={flagUrl(c)} alt="" className="h-6 w-9 shrink-0 rounded-[2px] object-cover ring-1 ring-night/20" />
+                  )}
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-semibold">{c.nom}</div>
+                    {/* Chiffres d'abord : si la ligne est trop longue, c'est le prénom qui est coupé */}
+                    <div className="truncate text-[11px] font-semibold text-muted tabular-nums" title={`ratés : toi ${r.mine.miss}/${r.mine.seen}, ${rivalName} ${r.theirs.miss}/${r.theirs.seen}`}>
+                      {r.mine.miss}/{r.mine.seen} toi · {r.theirs.miss}/{r.theirs.seen} {rivalName.split(" ")[0]}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+      <p className="text-xs font-medium text-muted">Chiffres : ratés / fois tombé.</p>
     </section>
   );
 }

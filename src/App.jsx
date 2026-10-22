@@ -92,7 +92,7 @@ export default function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <main className="mx-auto max-w-2xl px-4 pb-16 pt-6 sm:px-10 sm:pt-10">
+      <main className={`mx-auto px-4 pb-16 pt-6 sm:px-10 sm:pt-10 ${screen === "stats" ? "max-w-5xl" : "max-w-2xl"}`}>
         {error && <p className="font-semibold text-fluo">Impossible de charger {error}. Recharge la page.</p>}
         {all && (
           <AnimatePresence mode="wait">
