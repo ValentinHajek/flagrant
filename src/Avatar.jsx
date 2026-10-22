@@ -131,10 +131,23 @@ function Top({ id }) {
 }
 
 /* ---------- Cheveux ---------- */
+// Derrière le corps (dessiné avant le haut) : remplit l'espace entre le cou et les mèches, le col passe par-dessus.
+function HairBehind({ style, color }) {
+  if (style !== "long") return null;
+  return <path d="M37,48 C33,30 46,22 60,22 C74,22 87,30 83,48 C88,62 90,80 88,100 L32,100 C30,80 32,62 37,48 Z" fill={color} {...line} />;
+}
+
+// Par-dessus les épaules, derrière la tête.
 function HairBack({ style, color }) {
-  // Longs : une seule masse derrière la tête et le cou, jusqu'aux épaules (pas deux mèches avec un vide au milieu)
+  // Longs : deux pans pleins qui tombent jusqu'aux épaules (pointes arrondies)
   if (style === "long")
-    return <path d="M37,48 C33,30 46,22 60,22 C74,22 87,30 83,48 C89,64 91,88 88,106 Q74,110 60,108 Q46,110 32,106 C29,88 31,64 37,48 Z" fill={color} {...line} />;
+    return (
+      <path
+        d="M37,48 C33,64 30,88 32,106 Q38,111 45,106 C46,96 46,84 47,74 L73,74 C74,84 74,96 75,106 Q82,111 88,106 C90,88 87,64 83,48 C87,30 74,22 60,22 C46,22 33,30 37,48 Z"
+        fill={color}
+        {...line}
+      />
+    );
   // Couettes : deux mèches attachées en haut des tempes, qui retombent sur les épaules
   if (style === "couettes")
     return (
@@ -492,6 +505,7 @@ export default function Avatar({ look = DEFAULT_LOOK, size = 96, mood = "happy",
       <g clipPath={`url(#${clip})`}>
         <g transform={mirror ? "translate(120 0) scale(-1 1)" : undefined}>
           {BACKGROUNDS[l.bg] ?? BACKGROUNDS.none}
+          <HairBehind style={l.hair} color={l.hairColor} />
           <Top id={l.top} />
           <HairBack style={l.hair} color={l.hairColor} />
           <path d="M52,72 H68 V92 Q60,96 52,92 Z" fill={l.skin} {...line} />
