@@ -10,6 +10,7 @@ const thin = { ...line, strokeWidth: 1.2 };
 const BODY = "M12,124 C14,100 34,89 60,89 C86,89 106,100 108,124 Z";
 const CAP = "M37,52 C35,33 46,26 60,26 C75,26 85,33 83,52 C80,44 74,39 66,40 C62,36 54,35 50,38 C44,40 40,45 37,52 Z";
 // Dessus du mulet : le même contour que CAP, mais avec du volume sur le crâne
+const LONG_TOP = "M37,74 C34,64 34,55 37,48 C33,30 46,22 60,22 C74,22 87,30 83,48 C86,55 86,64 83,74 C80,64 79,54 77,47 C70,44 62,41 56,35 C52,42 45,45 43,48 C41,56 40,65 37,74 Z"; // même contour que les pans de derrière
 const MULLET_TOP = "M37,52 C33,30 45,17 60,18 C75,17 87,30 83,52 C80,43 75,38 67,38 C63,34 55,33 50,36 C44,38 40,44 37,52 Z";
 
 /* ---------- Fonds ---------- */
@@ -187,6 +188,10 @@ function HairFront({ style, color, hatted }) {
   switch (style) {
     case "mulet":
       return <path d={hatted ? CAP : MULLET_TOP} {...p} />;
+    // Mi-longs et longs : raie sur le côté, les mèches encadrent le visage et rejoignent les pans de derrière.
+    case "mi-long":
+    case "long":
+      return <path d={hatted ? CAP : LONG_TOP} {...p} />;
     case "boucles":
       return (
         <g {...p}>
@@ -211,7 +216,7 @@ function HairFront({ style, color, hatted }) {
     case "chauve":
       return <path d="M45,37 Q51,32 58,32" fill="none" stroke={CARD} strokeWidth="2.6" strokeLinecap="round" opacity=".75" />; // reflet sur le crâne
     default:
-      return <path d={CAP} {...p} />; // court, et le dessus des cheveux mi-longs, longs et du mulet
+      return <path d={CAP} {...p} />; // court
   }
 }
 
