@@ -226,7 +226,7 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
         {API_ENABLED && getSession() && (
           <ChallengeButton
             mode={mode}
-            n={Math.min(questionCount(all, mode, territories, count), DUEL_MAX)}
+            n={(m) => Math.min(questionCount(all, m, territories, count), DUEL_MAX)}
             disabled={loading}
             onChallenge={onChallenge}
             onStats={onStats}

@@ -64,12 +64,14 @@ export function DuelInbox({ duels, onPlay, onDecline }) {
   );
 }
 
-// « Défier un ami » : la série part avec le mode et le nombre de questions choisis sur l'accueil.
+// « Défier un ami » : mode au choix (celui de l'accueil au départ), nombre de questions de l'accueil. n(mode) → questions.
 export function ChallengeButton({ mode, n, disabled, onChallenge, onStats }) {
   const ref = useRef(null);
   const [friends, setFriends] = useState(null);
+  const [choice, setChoice] = useState(mode);
   const [{ busy, error }, run] = useAction();
   const open = () => {
+    setChoice(mode);
     ref.current.showModal();
     api("/me")
       .then((r) => setFriends(r.friends))
@@ -77,7 +79,7 @@ export function ChallengeButton({ mode, n, disabled, onChallenge, onStats }) {
   };
   const pick = (f) =>
     run(async () => {
-      await onChallenge(f);
+      await onChallenge(f, choice);
       ref.current?.close();
     });
   return (
@@ -96,10 +98,24 @@ export function ChallengeButton({ mode, n, disabled, onChallenge, onStats }) {
             <h2 id="duel-pick" className="font-display text-3xl uppercase text-ink">
               Défier un ami
             </h2>
-            <p className="text-sm font-medium text-muted">
-              {MODE_NAMES[mode]} · {n} questions. Même série pour vous deux : tu joues tout de suite, ton adversaire quand ça l'arrange.
-            </p>
+            <p className="text-sm font-medium text-muted">Même série pour vous deux : tu joues tout de suite, ton adversaire quand ça l'arrange.</p>
           </div>
+          <div role="radiogroup" aria-label="Mode du défi" className="flex flex-wrap gap-2">
+            {Object.entries(MODE_NAMES).map(([id, label]) => (
+              <button
+                key={id}
+                role="radio"
+                aria-checked={choice === id}
+                onClick={() => setChoice(id)}
+                className={`cursor-pointer rounded-full border-2 border-night px-3.5 py-1 text-sm font-semibold transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-fluo ${choice === id ? "bg-night text-paper" : "bg-paper text-ink hover:bg-paper-deep"}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <p className="-mt-2 text-sm font-semibold text-ink">
+            {MODE_NAMES[choice]} · {n(choice)} questions
+          </p>
           {friends === null ? (
             <p className="font-medium text-muted">Chargement de tes amis…</p>
           ) : friends.length ? (
