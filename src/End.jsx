@@ -1,5 +1,5 @@
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Avatar from "./Avatar.jsx";
 import { InkTitle, Kicker, Stamp, Tampon } from "./brand.jsx";
 import { fmtKm } from "./geo.js";
@@ -108,11 +108,17 @@ export default function End({ results, all = [], best, isRecord, reward, look, o
   const max = results.length * PTS_CASH;
   const verdict = VERDICTS.find(([min]) => score / max >= min)[1];
   const againRef = useRef(null);
+  const zoomRef = useRef(null);
+  const [zoom, setZoom] = useState(null); // { country, type } : la réponse donnée, affichée en grand
 
   useEffect(() => {
     window.scrollTo(0, 0);
     againRef.current?.focus({ preventScroll: true });
   }, []);
+
+  useEffect(() => {
+    if (zoom) zoomRef.current?.showModal();
+  }, [zoom]);
 
   const [top, mid] = results[0].type === "map" ? ["Pile", "Proche"] : ["Cash", "Carré"];
   const stats = [
@@ -190,15 +196,22 @@ export default function End({ results, all = [], best, isRecord, reward, look, o
                 )}
                 <div className="min-w-0">
                   <div className="truncate font-semibold">{r.country.nom}</div>
-                  <div className={`flex items-center gap-2 text-sm font-medium ${color}`}>
-                    <span className="truncate">{label}</span>
-                    {wrong &&
-                      (r.type === "tld" ? (
+                  {wrong ? (
+                    <button
+                      onClick={() => setZoom({ country: wrong, type: r.type })}
+                      aria-label={`${label} : voir en grand`}
+                      className={`flex max-w-full cursor-pointer items-center gap-2 text-sm font-medium underline decoration-dotted underline-offset-2 hover:decoration-solid focus-visible:outline-2 focus-visible:outline-fluo ${color}`}
+                    >
+                      <span className="truncate">{label}</span>
+                      {r.type === "tld" ? (
                         <span className="shrink-0 font-display text-base">{wrong.tld}</span>
                       ) : (
-                        <img src={flagUrl(wrong)} alt={`Drapeau : ${wrong.nom}`} className="h-4 w-6 shrink-0 rounded-[2px] object-cover ring-1 ring-night/20" />
-                      ))}
-                  </div>
+                        <img src={flagUrl(wrong)} alt="" className="h-4 w-6 shrink-0 rounded-[2px] object-cover ring-1 ring-night/20" />
+                      )}
+                    </button>
+                  ) : (
+                    <div className={`truncate text-sm font-medium ${color}`}>{label}</div>
+                  )}
                 </div>
                 <span className={`ml-auto font-display text-2xl ${r.points ? "text-ink" : "text-fluo"}`}>+{r.points}</span>
               </motion.li>
@@ -206,6 +219,26 @@ export default function End({ results, all = [], best, isRecord, reward, look, o
           })}
         </ul>
       </div>
+
+      {/* Clic sur le fond ou Échap : ferme */}
+      <dialog
+        ref={zoomRef}
+        onClose={() => setZoom(null)}
+        onClick={(e) => e.target === zoomRef.current && zoomRef.current.close()}
+        className="m-auto w-[min(92vw,640px)] rounded-[20px] border-[2.5px] border-night bg-paper p-6 shadow-print backdrop:bg-night/60"
+      >
+        {zoom && (
+          <div className="flex flex-col items-center gap-4">
+            {zoom.type === "tld" ? (
+              <span className="font-display text-[clamp(5rem,22vw,9rem)] leading-none text-ink">{zoom.country.tld}</span>
+            ) : (
+              <img src={flagUrl(zoom.country)} alt={`Drapeau : ${zoom.country.nom}`} className="max-h-[60vh] w-full rounded-md object-contain ring-2 ring-night/15" />
+            )}
+            <div className="font-display text-2xl uppercase text-night">{zoom.country.nom}</div>
+            <Stamp variant="ghost" onClick={() => zoomRef.current.close()}>Fermer</Stamp>
+          </div>
+        )}
+      </dialog>
     </div>
   );
 }

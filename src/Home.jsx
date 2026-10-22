@@ -99,9 +99,6 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
       <motion.div variants={rise} className="flex flex-col gap-4 sm:pt-4">
         <Kicker>{questionCount(all, mode, territories, count)} questions · {SECONDS} s par question</Kicker>
         <InkTitle className="text-[clamp(4.5rem,19vw,9.5rem)]">Flagrant.</InkTitle>
-        <p className="max-w-md text-lg font-medium text-muted">
-          Pris en flagrant délit de drapeau. Reconnais le pays au premier coup d'œil, comme sur GeoGuessr.
-        </p>
       </motion.div>
 
       <motion.fieldset variants={rise} className="flex flex-col gap-3">
