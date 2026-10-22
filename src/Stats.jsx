@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AccountCard, CountryDuel, Duel } from "./Account.jsx";
 import { API_ENABLED, api, getSession, syncHistory } from "./api.js";
+import { DuelRecord } from "./Duels.jsx";
 import { InkTitle, Kicker, Logo, Stamp } from "./brand.jsx";
 import { flagUrl } from "./quiz.js";
 import { compareCountries, loadHistory, summarize } from "./stats.js";
@@ -259,7 +260,7 @@ function DuelChart({ mine, theirs, myName, rivalName }) {
   );
 }
 
-export default function Stats({ all, mode: initialMode, notice, history, setHistory, look, onLoggedOut, onBack, onPlay }) {
+export default function Stats({ all, mode: initialMode, notice, history, setHistory, look, duels, onChallenge, onPlayDuel, onLoggedOut, onBack, onPlay }) {
   const [mode, setMode] = useState(initialMode);
   const [n, setN] = useState(0); // 0 = toutes les parties
   const [account, setAccount] = useState(null); // { me, friends } une fois connecté
@@ -343,6 +344,7 @@ export default function Stats({ all, mode: initialMode, notice, history, setHist
             ))}
           </div>
 
+          {rival && <DuelRecord duels={duels.filter((x) => x.rival.id === rival.id)} rival={rival} mode={mode} onChallenge={onChallenge} onPlay={onPlayDuel} />}
           {rival && <Duel mine={s} theirs={rs} myName={myName} myLook={look} rival={rival} onClose={() => setRival(null)} />}
 
           {!s ? (

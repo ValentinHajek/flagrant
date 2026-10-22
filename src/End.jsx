@@ -2,6 +2,7 @@ import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import Avatar from "./Avatar.jsx";
 import { Seal } from "./Badges.jsx";
+import { DuelResult } from "./Duels.jsx";
 import { InkTitle, Kicker, Stamp, Tampon } from "./brand.jsx";
 import { fmtKm } from "./geo.js";
 import { ITEMS } from "./items.js";
@@ -197,7 +198,7 @@ function Rewards({ reward: { before, after, gain }, badges, look, mood, onWardro
   );
 }
 
-export default function End({ results, all = [], best, isRecord, reward, look, onAgain, onMenu, onStats, onWardrobe, onBadges }) {
+export default function End({ results, all = [], best, isRecord, reward, duel, look, onAgain, onMenu, onStats, onWardrobe, onBadges }) {
   const score = results.reduce((s, r) => s + r.points, 0);
   const max = results.length * PTS_CASH;
   const verdict = VERDICTS.find(([min]) => score / max >= min)[1];
@@ -254,6 +255,8 @@ export default function End({ results, all = [], best, isRecord, reward, look, o
         <p className="text-xl font-medium text-muted">{verdict}</p>
         {!isRecord && best > 0 && <p className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">Record : {best} / {max}</p>}
       </div>
+
+      {duel && <DuelResult duel={duel} score={score} look={look} />}
 
       <div className="grid grid-cols-3 gap-3">
         {stats.map(([label, n, color], k) => (

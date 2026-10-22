@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { PTS_CARRE, PTS_CASH } from "./quiz.js";
-import { compareCountries, summarize, toEntry } from "./stats.js";
+import { compareCountries, duelRecord, summarize, toEntry, withLocalPlays } from "./stats.js";
 
 const country = (code) => ({ code });
 const game = (mode, score, max, missed = [], hit = []) => ({ mode, score, max, n: max / 3, top: 0, mid: 0, missed, hit });
@@ -54,4 +54,20 @@ assert.deepEqual([duel.both[0].mine.miss, duel.both[0].theirs.miss], [1, 2]);
 // Période : seulement les n dernières parties du mode
 assert.equal(summarize(h, "flag", 2).games, 2);
 assert.deepEqual(compareCountries(moi, ami, "flag", 1).both, []);
+// Défis : la partie jouée ici compte avant la synchro, puis le bilan de ton point de vue.
+const res = (score) => ({ score, max: 50, at: 1 });
+const duels = withLocalPlays(
+  [
+    { id: "a", me: res(30), them: res(20) },
+    { id: "b", me: null, them: res(40) },
+    { id: "c", me: res(10), them: res(10) },
+    { id: "d", me: null, them: null },
+    { id: "e", me: res(5), them: null },
+  ],
+  [{ id: "g1", duel: "b", score: 45, max: 50, at: 2 }, { id: "g2", duel: "b", score: 0, max: 50, at: 3 }, { id: "g3", score: 50, max: 50, at: 4 }]
+);
+assert.deepEqual(duels[1].me, { score: 45, max: 50, at: 2 }, "première partie liée au défi");
+assert.equal(duels[3].me, null);
+assert.deepEqual(duelRecord(duels), { wins: 2, draws: 1, losses: 0 });
+
 console.log("stats OK");

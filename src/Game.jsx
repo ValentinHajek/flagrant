@@ -139,7 +139,7 @@ export default function Game({ all, map, quiz, onFinish, onQuit }) {
 
   const openCarre = () => {
     if (result || choices) return;
-    setChoices(shuffle([q.country, ...distractors(q.country, scope)]));
+    setChoices(shuffle([q.country, ...(q.choices ?? distractors(q.country, scope))])); // défi : les leurres tirés par le lanceur
   };
 
   // Chrono de la question : démarre quand l'indice est visible, s'arrête à la réponse.

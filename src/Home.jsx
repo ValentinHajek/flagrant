@@ -4,8 +4,9 @@ import { LoginForm } from "./Account.jsx";
 import { API_ENABLED, getSession } from "./api.js";
 import Avatar from "./Avatar.jsx";
 import { Glyph, InkTitle, Kicker, Logo, Marquee, Medal, Motif, Stamp, Tampon } from "./brand.jsx";
+import { ChallengeButton, DuelInbox } from "./Duels.jsx";
 import { BADGES } from "./progress.js";
-import { COUNTS, MAP_PILE_KM, MAP_PROCHE_KM, PTS_CARRE, PTS_CASH, SECONDS, flagUrl, questionCount, shuffle } from "./quiz.js";
+import { COUNTS, DUEL_MAX, MAP_PILE_KM, MAP_PROCHE_KM, PTS_CARRE, PTS_CASH, SECONDS, flagUrl, questionCount, shuffle } from "./quiz.js";
 import { enableSound, sound, soundEnabled } from "./sound.js";
 import { bestKey, load } from "./storage.js";
 
@@ -62,7 +63,7 @@ const rise = {
   animate: { opacity: 1, y: 0, rotate: 0, transition: { type: "spring", stiffness: 260, damping: 22 } },
 };
 
-export default function Home({ all, settings, setSettings, onStart, loading, onStats, look, progress, onWardrobe, onBadges, notice, history }) {
+export default function Home({ all, settings, setSettings, onStart, loading, onStats, look, progress, onWardrobe, onBadges, notice, history, duels, onChallenge, onPlayDuel, onDeclineDuel }) {
   const { mode, territories, count } = settings;
   const ribbon = useMemo(() => shuffle(all.filter((c) => c.souverain && c.tld)).slice(0, 18), [all]);
   const [soundOn, setSoundOn] = useState(soundEnabled);
@@ -121,6 +122,12 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
           <Tampon size={15} className="text-fluo" />
         </button>
       </motion.header>
+
+      {getSession() && (
+        <motion.div variants={rise}>
+          <DuelInbox duels={duels} onPlay={onPlayDuel} onDecline={onDeclineDuel} />
+        </motion.div>
+      )}
 
       <motion.div variants={rise} className="flex flex-col gap-4 sm:pt-4">
         <Kicker>{questionCount(all, mode, territories, count)} questions · {SECONDS} s par question</Kicker>
@@ -209,6 +216,15 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
         <Stamp className="w-full py-4 text-2xl" onClick={onStart} disabled={loading}>
           {loading ? "Chargement de la carte…" : "C'est parti →"}
         </Stamp>
+        {API_ENABLED && getSession() && (
+          <ChallengeButton
+            mode={mode}
+            n={Math.min(questionCount(all, mode, territories, count), DUEL_MAX)}
+            disabled={loading}
+            onChallenge={onChallenge}
+            onStats={onStats}
+          />
+        )}
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-muted">
           {mode === "map" ? (
             <>

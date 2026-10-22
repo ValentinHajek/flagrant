@@ -22,6 +22,9 @@ export function db() {
         d.collection("users").createIndex({ email: 1 }, { unique: true }),
         d.collection("users").createIndex({ friendCode: 1 }, { unique: true }),
         d.collection("games").createIndex({ userId: 1, at: -1 }),
+        d.collection("games").createIndex({ duel: 1 }, { sparse: true }),
+        d.collection("duels").createIndex({ from: 1, createdAt: -1 }),
+        d.collection("duels").createIndex({ to: 1, createdAt: -1 }),
         ...["logins", "sessions", "limits"].map((c) => d.collection(c).createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 })),
       ]);
       return d;
@@ -153,10 +156,11 @@ export function cleanGame(g) {
     g.hit.length === g.top + g.mid &&
     g.hit.length + g.missed.length === g.n &&
     [...g.hit, ...g.missed].every(isCode) &&
-    (g.streak === undefined || int(g.streak, 0, g.hit.length));
+    (g.streak === undefined || int(g.streak, 0, g.hit.length)) &&
+    (g.duel === undefined || (typeof g.duel === "string" && /^[\w-]{8,64}$/.test(g.duel)));
   if (!ok) return null;
   const { id, at, mode, n, score, max, top, mid, hit, missed } = g;
-  return { _id: id, at, mode, territories: g.territories === true, n, score, max, top, mid, hit, missed, streak: g.streak ?? 0 };
+  return { _id: id, at, mode, territories: g.territories === true, n, score, max, top, mid, hit, missed, streak: g.streak ?? 0, ...(g.duel && { duel: g.duel }) };
 }
 
 // Lien de connexion par e-mail. Sans SMTP (dev local), le lien s'affiche dans la console du serveur.

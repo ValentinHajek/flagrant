@@ -33,6 +33,21 @@ function bestStreak(results) {
   return max;
 }
 
+// Défis : une partie jouée sur cet appareil compte déjà, même pas encore synchronisée (la première seulement).
+export function withLocalPlays(duels, history) {
+  const played = new Map();
+  for (const g of history) if (g.duel && !played.has(g.duel)) played.set(g.duel, { score: g.score, max: g.max, at: g.at });
+  return duels.map((x) => (x.me || !played.has(x.id) ? x : { ...x, me: played.get(x.id) }));
+}
+
+// Bilan des défis terminés (les deux ont joué), de ton point de vue.
+export function duelRecord(duels) {
+  const done = duels.filter((x) => x.me && x.them);
+  const wins = done.filter((x) => x.me.score > x.them.score).length;
+  const losses = done.filter((x) => x.me.score < x.them.score).length;
+  return { wins, draws: done.length - wins - losses, losses };
+}
+
 export const loadHistory = () => {
   const h = load(KEY, []);
   return Array.isArray(h) ? h.filter((g) => g && g.max > 0 && Number.isFinite(g.score)) : [];

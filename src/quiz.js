@@ -39,6 +39,19 @@ export function buildQuiz(all, mode, territories, count) {
   return { scope, questions };
 }
 
+// Défi entre amis : la série (questions et leurres du carré) est tirée une fois par le lanceur, puis rejouée à l'identique.
+export const DUEL_MAX = 50;
+export const toSeries = ({ questions, scope }) =>
+  questions.map(({ country, type }) => ({ code: country.code, type, ...(type !== "map" && { choices: distractors(country, scope).map((c) => c.code) }) }));
+
+// null si un pays de la série manque à cette version des données.
+export function fromSeries(all, territories, series) {
+  const byCode = new Map(all.map((c) => [c.code, c]));
+  const questions = series.map(({ code, type, choices }) => ({ country: byCode.get(code), type, choices: choices?.map((c) => byCode.get(c)) }));
+  if (questions.some((q) => !q.country || q.choices?.some((c) => !c))) return null;
+  return { scope: all.filter((c) => territories || c.souverain), questions };
+}
+
 // 3 leurres, en priorité voisins (même sous-région) pour que le carré reste dur.
 export function distractors(target, scope) {
   const others = scope.filter((c) => c !== target);

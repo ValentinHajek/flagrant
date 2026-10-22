@@ -7,7 +7,7 @@ import { PTS_CARRE, PTS_CASH } from "./quiz.js";
 import { XpBar } from "./Wardrobe.jsx";
 
 const card = "rounded-[20px] border-[2.5px] border-night bg-paper";
-const MODE_NAMES = { flag: "Drapeaux", tld: "Extensions", mix: "Mix", map: "Carte" };
+export const MODE_NAMES = { flag: "Drapeaux", tld: "Extensions", mix: "Mix", map: "Carte" };
 
 // Les règles de gameReward (progress.js), en clair.
 const EARN = [

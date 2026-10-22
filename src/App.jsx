@@ -1,5 +1,5 @@
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Badges from "./Badges.jsx";
 import End from "./End.jsx";
 import Game from "./Game.jsx";
@@ -9,9 +9,9 @@ import Home from "./Home.jsx";
 import { loadProfile, saveProfile, syncProfile } from "./profile.js";
 import { computeProgress } from "./progress.js";
 import Stats from "./Stats.jsx";
-import { COUNTS, DEFAULT_COUNT, MODES, buildQuiz } from "./quiz.js";
+import { COUNTS, DEFAULT_COUNT, DUEL_MAX, MODES, buildQuiz, fromSeries, toSeries } from "./quiz.js";
 import { sound } from "./sound.js";
-import { loadHistory, recordGame, toEntry } from "./stats.js";
+import { loadHistory, recordGame, toEntry, withLocalPlays } from "./stats.js";
 import { bestKey, load, save } from "./storage.js";
 import Wardrobe from "./Wardrobe.jsx";
 
@@ -88,15 +88,29 @@ export default function App() {
       });
   }, []);
 
-  // La carte (≈ 240 Ko) n'est chargée que si on choisit le mode carte.
+  // La carte (≈ 240 Ko) n'est chargée que si on choisit le mode carte, ou pour jouer un défi sur la carte.
   const needMap = settings.mode === "map";
-  useEffect(() => {
-    if (!needMap || map) return;
-    fetch(`${import.meta.env.BASE_URL}data/world.json`)
+  const mapLoad = useRef(null);
+  const loadMap = () =>
+    (mapLoad.current ??= fetch(`${import.meta.env.BASE_URL}data/world.json`)
       .then((r) => r.json())
       .then((topo) => setMap(parseWorld(topo)))
-      .catch(() => setError("la carte"));
-  }, [needMap, map]);
+      .catch((e) => {
+        mapLoad.current = null;
+        setError("la carte");
+        throw e;
+      }));
+  useEffect(() => {
+    if (needMap) loadMap().catch(() => {});
+  }, [needMap]);
+
+  // Défis entre amis : relus en arrivant sur l'accueil ou les stats. Une partie pas encore synchronisée compte déjà.
+  const [serverDuels, setServerDuels] = useState([]);
+  const duels = useMemo(() => withLocalPlays(serverDuels, history), [serverDuels, history]);
+  const refreshDuels = () => getSession() && api("/duels").then((r) => setServerDuels(r.duels)).catch(() => {});
+  useEffect(() => {
+    if (screen === "home" || screen === "stats") refreshDuels();
+  }, [screen]);
 
   const openWardrobe = (item = null) => {
     setFocus(item);
@@ -119,18 +133,41 @@ export default function App() {
     setScreen("game");
   };
 
+  // Défi : la série vient du serveur (ou vient d'y partir) ; mêmes questions et mêmes leurres pour les deux joueurs.
+  const playDuel = async (duel) => {
+    const quiz = fromSeries(all, duel.territories, duel.questions);
+    if (!quiz) throw new Error("Ce défi contient des pays inconnus de cette version : recharge la page");
+    if (duel.mode === "map") await loadMap();
+    sound("depart");
+    setQuiz({ ...quiz, id: Date.now(), duel });
+    setScreen("game");
+  };
+  const challenge = async (friend, mode = settings.mode) => {
+    const { territories, count } = settings;
+    const questions = toSeries(buildQuiz(all, mode, territories, count === "all" ? DUEL_MAX : count));
+    const { id } = await api("/duels", { method: "POST", body: { friend: friend.id, mode, territories, questions } });
+    await playDuel({ id, mode, territories, n: questions.length, rival: friend, me: null, them: null, questions });
+  };
+  const declineDuel = async (duel) => {
+    await api(`/duels?id=${duel.id}`, { method: "DELETE" });
+    setServerDuels((list) => list.map((x) => (x.id === duel.id ? { ...x, declined: true } : x)));
+  };
+
   const finish = (results) => {
-    const key = bestKey(settings.mode, settings.territories, settings.count);
+    const { duel } = quiz;
+    // Un défi se range avec les parties de son mode, même s'il diffère des réglages de l'accueil.
+    const game = duel ? { mode: duel.mode, territories: duel.territories, count: results.length } : settings;
+    const key = bestKey(game.mode, game.territories, game.count);
     const best = load(key, 0);
     const score = results.reduce((s, r) => s + r.points, 0);
     if (score > best) save(key, score);
-    const entry = toEntry(settings, results);
+    const entry = { ...toEntry(game, results), ...(duel && { duel: duel.id }) };
     recordGame(entry);
     const next = loadHistory();
     setHistory(next);
-    if (getSession()) syncHistory().catch(() => {}); // sinon, ce sera envoyé à la prochaine synchro
+    if (getSession()) syncHistory().then(() => duel && refreshDuels()).catch(() => {}); // sinon, ce sera envoyé à la prochaine synchro
     const after = computeProgress(next, profile.owned);
-    setEnd({ results, best, isRecord: score > best && score > 0, reward: { before: progress, after, gain: after.perGame.get(entry.id) } });
+    setEnd({ results, best, isRecord: score > best && score > 0, reward: { before: progress, after, gain: after.perGame.get(entry.id) }, duel });
     setScreen("end");
   };
 
@@ -155,6 +192,10 @@ export default function App() {
                   onBadges={openBadges}
                   notice={notice}
                   history={history}
+                  duels={duels}
+                  onChallenge={challenge}
+                  onPlayDuel={playDuel}
+                  onDeclineDuel={declineDuel}
                 />
               )}
               {screen === "game" && <Game all={all} map={map} quiz={quiz} onFinish={finish} onQuit={() => setScreen("home")} />}
@@ -184,7 +225,11 @@ export default function App() {
                   history={history}
                   setHistory={setHistory}
                   look={profile.look}
+                  duels={duels}
+                  onChallenge={challenge}
+                  onPlayDuel={playDuel}
                   onLoggedOut={() => {
+                    setServerDuels([]);
                     setHistory(loadHistory());
                     setProfileState(loadProfile());
                     setScreen("home");

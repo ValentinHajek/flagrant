@@ -19,6 +19,7 @@ const api = {
   games: await import("../api/games.js"),
   friends: await import("../api/friends.js"),
   shop: await import("../api/shop.js"),
+  duels: await import("../api/duels.js"),
 };
 
 async function call(name, method, { query = "", body, token, headers = {} } = {}) {
@@ -104,6 +105,29 @@ try {
   assert.deepEqual([dressed.data.me.look.hat, dressed.data.me.look.hair], ["cap", "boucles"]);
   await call("friends", "POST", { token: c.session, body: { code: b.me.friendCode } });
   assert.equal((await call("me", "GET", { token: b.session })).data.friends.find((f) => f.pseudo === "Chloe").look.hat, "cap", "tenue visible des amis");
+
+  // Défis : seulement entre amis, même série pour les deux, score = première partie liée au défi.
+  const series = ["FR", "BE", "DE", "IT", "ES"].map((code) => ({ code, type: "flag", choices: ["PT", "NL", "LU"].map((x) => (x === code ? "CH" : x)) }));
+  const challenge = (token, friend, over = {}) => call("duels", "POST", { token, body: { friend, mode: "flag", territories: false, questions: series, ...over } });
+  assert.equal((await challenge(a.session, c.me.id)).status, 403, "pas un ami");
+  assert.equal((await challenge(a.session, b.me.id, { questions: series.slice(0, 4) })).status, 400, "série trop courte");
+  assert.equal((await challenge(a.session, b.me.id, { questions: [...series.slice(1), series[1]] })).status, 400, "pays en double");
+  assert.equal((await challenge(a.session, b.me.id, { mode: "map" })).status, 400, "pas de carré sur la carte");
+  const duelId = (await challenge(a.session, b.me.id)).data.id;
+  const toB = (await call("duels", "GET", { token: b.session })).data.duels[0];
+  assert.deepEqual([toB.id, toB.mine, toB.rival.pseudo, toB.me, toB.them, toB.questions.length], [duelId, false, "Val le Pro", null, null, 5], "B reçoit l'invitation");
+  const duelGame = (score, top, over = {}) =>
+    game({ duel: duelId, n: 5, score, max: 25, top, mid: 0, hit: ["FR", "BE", "DE", "IT", "ES"].slice(0, top), missed: ["FR", "BE", "DE", "IT", "ES"].slice(top), streak: top, ...over });
+  await call("games", "POST", { token: a.session, body: { games: [duelGame(20, 4)] } });
+  await call("games", "POST", { token: b.session, body: { games: [duelGame(25, 5, { hit: ["FR", "BE", "DE", "IT", "PT"] }), duelGame(15, 3)] } }); // la 1re ne porte pas sur la série
+  await call("games", "POST", { token: b.session, body: { games: [duelGame(25, 5, { at: Date.now() + 1000 })] } }); // rejouer ne compte pas
+  const fromA = (await call("duels", "GET", { token: a.session })).data.duels[0];
+  assert.deepEqual([fromA.mine, fromA.me.score, fromA.them.score, fromA.questions], [true, 20, 15, undefined], "scores des deux côtés, série plus envoyée");
+  assert.equal((await call("duels", "DELETE", { token: b.session, query: `?id=${duelId}` })).status, 400, "déjà joué : plus refusable");
+  const refused = (await challenge(a.session, b.me.id)).data.id;
+  assert.equal((await call("duels", "DELETE", { token: a.session, query: `?id=${refused}` })).status, 404, "seul l'invité refuse");
+  assert.equal((await call("duels", "DELETE", { token: b.session, query: `?id=${refused}` })).status, 200);
+  assert.equal((await call("duels", "GET", { token: a.session })).data.duels[0].declined, true);
 
   // CORS : en-têtes seulement pour l'origine autorisée.
   const ok = await call("me", "GET", { token: a.session, headers: { origin: "https://valentinhajek.github.io" } });

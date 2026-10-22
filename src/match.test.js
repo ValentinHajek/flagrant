@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { closest, isCorrect } from "./match.js";
-import { COUNTS, buildQuiz, distractors, eligible, questionCount } from "./quiz.js";
+import { COUNTS, buildQuiz, distractors, eligible, fromSeries, questionCount, toSeries } from "./quiz.js";
 
 const all = JSON.parse(readFileSync(new URL("../public/data/countries.json", import.meta.url)));
 const get = (code) => all.find((c) => c.code === code);
@@ -68,6 +68,17 @@ for (const mode of ["flag", "tld", "mix"]) {
     }
   }
 }
+
+// Défi : la série envoyée au serveur redonne exactement les mêmes questions et les mêmes leurres.
+for (const mode of ["mix", "map"]) {
+  const quiz = buildQuiz(all, mode, true, 20);
+  const series = toSeries(quiz);
+  assert.ok(series.every((q) => (mode === "map" ? !q.choices : q.choices.length === 3)), `${mode} : leurres seulement hors carte`);
+  const again = fromSeries(all, true, JSON.parse(JSON.stringify(series))); // aller-retour par le serveur
+  assert.deepEqual(again.questions.map((q) => [q.country, q.type]), quiz.questions.map((q) => [q.country, q.type]));
+  assert.deepEqual(again.questions.map((q) => q.choices?.map((c) => c.code)), series.map((q) => q.choices));
+}
+assert.equal(fromSeries(all, false, [{ code: "QQ", type: "flag", choices: ["FR", "BE", "DE"] }]), null, "pays inconnu de cette version");
 console.log("quiz OK");
 
 // Pays désigné par une mauvaise réponse (drapeau du récap)
