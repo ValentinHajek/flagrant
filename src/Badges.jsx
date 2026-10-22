@@ -19,10 +19,11 @@ const EARN = [
 ];
 
 // Le tampon du badge : encré quand il est débloqué, en pointillés sinon.
-const Seal = ({ text, got }) => (
+// big : version géante de l'écran « badge débloqué ».
+export const Seal = ({ text, got, big }) => (
   <span
     aria-hidden
-    className={`grid size-14 shrink-0 -rotate-8 place-items-center rounded-full border-[3px] font-display text-base leading-none ${got ? "border-fluo text-fluo shadow-[inset_0_0_0_3px_var(--color-paper),inset_0_0_0_4.5px_var(--color-fluo)]" : "border-dashed border-night/25 text-night/35"}`}
+    className={`grid shrink-0 -rotate-8 place-items-center rounded-full font-display leading-none ${big ? "size-28 border-[5px] text-3xl" : "size-14 border-[3px] text-base"} ${got ? `border-fluo text-fluo ${big ? "shadow-[inset_0_0_0_5px_var(--color-paper),inset_0_0_0_8px_var(--color-fluo)]" : "shadow-[inset_0_0_0_3px_var(--color-paper),inset_0_0_0_4.5px_var(--color-fluo)]"}` : "border-dashed border-night/25 text-night/35"}`}
   >
     {text}
   </span>

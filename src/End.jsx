@@ -1,6 +1,7 @@
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import Avatar from "./Avatar.jsx";
+import { Seal } from "./Badges.jsx";
 import { InkTitle, Kicker, Stamp, Tampon } from "./brand.jsx";
 import { fmtKm } from "./geo.js";
 import { ITEMS } from "./items.js";
@@ -33,9 +34,92 @@ function CountUp({ to, delay = 0 }) {
   return <motion.span>{shown}</motion.span>;
 }
 
+// Confettis du badge débloqué : des petits carrés aux encres de la DA, en étoile autour du tampon.
+const BITS = Array.from({ length: 14 }, (_, k) => {
+  const a = (k / 14) * Math.PI * 2;
+  const d = 95 + (k % 3) * 25;
+  return { x: Math.cos(a) * d, y: Math.sin(a) * d, rotate: (k % 2 ? 1 : -1) * (90 + k * 20), color: ["bg-fluo", "bg-ink", "bg-leaf", "bg-[#f2b632]"][k % 4] };
+});
+
+// Badge débloqué par la partie : en grand au milieu de l'écran, un coup de tampon et des confettis.
+// Plusieurs badges d'un coup : ils défilent l'un après l'autre.
+function BadgeUnlocked({ badges, look }) {
+  const ref = useRef(null);
+  const [k, setK] = useState(0);
+  const b = badges[k];
+  useEffect(() => {
+    if (!b) return;
+    const t = setTimeout(() => ref.current?.showModal(), k === 0 ? 1300 : 150); // après le décompte du score
+    return () => clearTimeout(t);
+  }, [k]);
+  if (!b) return null;
+  const gift = ITEMS.find((i) => i.badge === b.id);
+  return (
+    <dialog
+      ref={ref}
+      onClose={() => setK(k + 1)}
+      onClick={(e) => e.target === ref.current && ref.current.close()}
+      aria-labelledby="badge-unlocked"
+      className="m-auto w-[min(92vw,420px)] overflow-visible border-0 bg-transparent p-0 backdrop:bg-night/60"
+    >
+      <motion.div
+        key={b.id}
+        initial={{ opacity: 0, scale: 0.7, y: 40 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        className="flex flex-col items-center gap-3 rounded-[24px] border-[2.5px] border-night bg-paper px-6 py-7 text-center shadow-print-fluo"
+      >
+        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-ink">Badge débloqué !</p>
+        <div className="relative my-2 grid place-items-center">
+          {BITS.map((p, i) => (
+            <motion.span
+              key={i}
+              aria-hidden
+              className={`absolute size-2.5 rounded-[2px] ${p.color}`}
+              initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
+              animate={{ x: p.x, y: p.y, scale: [0, 1, 1], opacity: [1, 1, 0], rotate: p.rotate }}
+              transition={{ delay: 0.45, duration: 1, ease: "easeOut" }}
+            />
+          ))}
+          <motion.span
+            aria-hidden
+            className="absolute size-28 rounded-full border-4 border-fluo"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: [0.8, 1.9], opacity: [0.7, 0] }}
+            transition={{ delay: 0.42, duration: 0.7, ease: "easeOut" }}
+          />
+          <motion.div initial={{ scale: 2.6, rotate: -30, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ delay: 0.25, type: "spring", stiffness: 480, damping: 14 }}>
+            <Seal text={b.seal} got big />
+          </motion.div>
+        </div>
+        <h2 id="badge-unlocked" className="font-display text-4xl uppercase leading-none text-ink">
+          {b.name}
+        </h2>
+        <p className="text-sm font-medium text-muted">{b.desc}</p>
+        <p className="flex items-center gap-1.5 font-display text-2xl text-ink">
+          +{b.reward}
+          <Tampon size={20} className="text-fluo" />
+          <span className="sr-only">tampons</span>
+        </p>
+        {gift && (
+          <div className="flex items-center gap-3 rounded-2xl border-2 border-dashed border-night/20 px-3 py-2 text-left">
+            <Avatar look={{ ...look, [gift.slot]: gift.id }} size={48} />
+            <span className="text-sm font-semibold leading-tight">
+              Article exclusif offert : {gift.name}
+              <span className="block text-xs font-medium text-muted">À récupérer au vestiaire</span>
+            </span>
+          </div>
+        )}
+        <Stamp autoFocus onClick={() => ref.current.close()} className="mt-2 px-8">
+          {k < badges.length - 1 ? `Suivant (${k + 1}/${badges.length})` : "Trop bien !"}
+        </Stamp>
+      </motion.div>
+    </dialog>
+  );
+}
+
 // Ce que la partie rapporte : tampons (détail des bonus), expérience, badges et articles débloqués.
-function Rewards({ reward: { before, after, gain }, look, mood, onWardrobe, onBadges }) {
-  const badges = after.badges.filter((id) => !before.badges.includes(id)).map((id) => BADGE.get(id));
+function Rewards({ reward: { before, after, gain }, badges, look, mood, onWardrobe, onBadges }) {
   const unlocked = ITEMS.filter((i) => (i.badge ? badges.some((b) => b.id === i.badge) : i.level > before.level && i.level <= after.level));
   const lines = [
     ["Score", gain.score],
@@ -115,6 +199,7 @@ export default function End({ results, all = [], best, isRecord, reward, look, o
   const verdict = VERDICTS.find(([min]) => score / max >= min)[1];
   const againRef = useRef(null);
   const zoomRef = useRef(null);
+  const newBadges = reward ? reward.after.badges.filter((id) => !reward.before.badges.includes(id)).map((id) => BADGE.get(id)) : [];
   const [zoom, setZoom] = useState(null); // { country, type } : la réponse donnée, affichée en grand
 
   useEffect(() => {
@@ -172,7 +257,8 @@ export default function End({ results, all = [], best, isRecord, reward, look, o
         ))}
       </div>
 
-      {reward && <Rewards reward={reward} look={look} mood={score / max >= 0.6 ? "happy" : score / max >= 0.3 ? "neutral" : "sad"} onWardrobe={onWardrobe} onBadges={onBadges} />}
+      {reward && <Rewards reward={reward} badges={newBadges} look={look} mood={score / max >= 0.6 ? "happy" : score / max >= 0.3 ? "neutral" : "sad"} onWardrobe={onWardrobe} onBadges={onBadges} />}
+      {newBadges.length > 0 && <BadgeUnlocked badges={newBadges} look={look} />}
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <Stamp ref={againRef} onClick={onAgain} className="flex-1 py-4 text-xl">Rejouer</Stamp>
