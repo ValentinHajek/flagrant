@@ -32,7 +32,7 @@ export default function App() {
   const [end, setEnd] = useState(null);
 
   useEffect(() => {
-    fetch("/data/countries.json")
+    fetch(`${import.meta.env.BASE_URL}data/countries.json`)
       .then((r) => r.json())
       .then(setAll)
       .catch(() => setError(true));
