@@ -133,8 +133,9 @@ function Top({ id }) {
 /* ---------- Cheveux ---------- */
 // Derrière le corps (dessiné avant le haut) : remplit l'espace entre le cou et les mèches, le col passe par-dessus.
 function HairBehind({ style, color }) {
-  if (style !== "long") return null;
-  return <path d="M37,48 C33,30 46,22 60,22 C74,22 87,30 83,48 C88,62 90,80 88,100 L32,100 C30,80 32,62 37,48 Z" fill={color} {...line} />;
+  if (style === "long") return <path d="M37,48 C33,30 46,22 60,22 C74,22 87,30 83,48 C88,62 90,80 88,100 L32,100 C30,80 32,62 37,48 Z" fill={color} {...line} />;
+  if (style === "mi-long") return <path d="M37,48 C33,30 46,22 60,22 C74,22 87,30 83,48 C87,60 88,72 86,82 L34,82 C32,72 33,60 37,48 Z" fill={color} {...line} />;
+  return null;
 }
 
 // Par-dessus les épaules, derrière la tête.
@@ -144,6 +145,25 @@ function HairBack({ style, color }) {
     return (
       <path
         d="M37,48 C33,64 30,88 32,106 Q38,111 45,106 C46,96 46,84 47,74 L73,74 C74,84 74,96 75,106 Q82,111 88,106 C90,88 87,64 83,48 C87,30 74,22 60,22 C46,22 33,30 37,48 Z"
+        fill={color}
+        {...line}
+      />
+    );
+  // Mi-longs : les mêmes pans que les longs, coupés au niveau du menton
+  if (style === "mi-long")
+    return (
+      <path
+        d="M37,48 C34,60 31,72 33,83 Q39,89 46,84 C46,80 47,77 47,74 L73,74 C73,77 74,80 74,84 Q81,89 87,83 C89,72 86,60 83,48 C87,30 74,22 60,22 C46,22 33,30 37,48 Z"
+        fill={color}
+        {...line}
+      />
+    );
+  // Mulet : côtés courts (caché derrière le visage), la nuque longue ressort sous la mâchoire et tombe
+  // sur les épaules, en contournant le col
+  if (style === "mulet")
+    return (
+      <path
+        d="M47,60 C46,68 46,74 45,80 C42,86 37,92 33,97 Q41,101 49,97 C51,93 53,90 55,88 L65,88 C67,90 69,93 71,97 Q79,101 87,97 C83,92 78,86 75,80 C74,74 74,68 73,60 Z"
         fill={color}
         {...line}
       />
@@ -162,16 +182,6 @@ function HairBack({ style, color }) {
 function HairFront({ style, color }) {
   const p = { fill: color, ...line };
   switch (style) {
-    case "rase":
-      return <path d="M38,47 C38,34 48,28 60,28 C72,28 82,34 82,47 C76,40 68,37 60,37 C52,37 44,40 38,47 Z" {...p} opacity=".9" />;
-    case "mi-long":
-      return (
-        <>
-          <path d="M37,50 C33,58 33,68 37,75 L42,73 C40,65 40,57 42,50 Z" {...p} />
-          <path d="M83,50 C87,58 87,68 83,75 L78,73 C80,65 80,57 78,50 Z" {...p} />
-          <path d={CAP} {...p} />
-        </>
-      );
     case "boucles":
       return (
         <g {...p}>
@@ -196,7 +206,7 @@ function HairFront({ style, color }) {
     case "chauve":
       return <path d="M45,37 Q51,32 58,32" fill="none" stroke={CARD} strokeWidth="2.6" strokeLinecap="round" opacity=".75" />; // reflet sur le crâne
     default:
-      return <path d={CAP} {...p} />; // court, et le haut des cheveux longs
+      return <path d={CAP} {...p} />; // court, et le dessus des cheveux mi-longs, longs et du mulet
   }
 }
 

@@ -66,4 +66,5 @@ assert.deepEqual(cleanLook({ skin: "<script>", hat: "crown", glasses: "round", t
 assert.equal(BASE.hair.length, 8);
 assert.equal(BASE.eyes.length, 4);
 assert.deepEqual(cleanLook({ hair: "chauve", eyes: "clin" }, []), { ...DEFAULT_LOOK, hair: "chauve", eyes: "clin" });
+assert.equal(cleanLook({ hair: "rase" }, []).hair, DEFAULT_LOOK.hair, "l'ancienne coupe Rasé (remplacée par le mulet) revient à la coupe par défaut");
 console.log("progress OK");
