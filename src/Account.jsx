@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api, setSession, syncHistory } from "./api.js";
+import Avatar from "./Avatar.jsx";
 import { Stamp } from "./brand.jsx";
 import { flagUrl } from "./quiz.js";
 import { saveHistory } from "./stats.js";
@@ -11,7 +12,7 @@ const field =
 const pc = (x) => `${Math.round(x * 100)} %`;
 
 // Petit formulaire « une action » : gère l'attente et le message d'erreur.
-function useAction() {
+export function useAction() {
   const [state, setState] = useState({ busy: false, error: null });
   const run = async (fn) => {
     setState({ busy: true, error: null });
@@ -55,7 +56,7 @@ export function LoginForm({ notice }) {
   );
 }
 
-function LoggedIn({ account, setAccount, rivalId, onPickRival, onLoggedOut }) {
+function LoggedIn({ account, setAccount, look, rivalId, onPickRival, onLoggedOut }) {
   const { me, friends } = account;
   const [code, setCode] = useState("");
   // null = pas en cours d'édition. Ouvert d'office tant que le pseudo est celui tiré de l'e-mail.
@@ -83,7 +84,8 @@ function LoggedIn({ account, setAccount, rivalId, onPickRival, onLoggedOut }) {
     await navigator.clipboard?.writeText(me.friendCode).catch(() => {});
     setCopied(true);
   };
-  // Déconnexion : on synchronise d'abord, puis on vide l'historique local pour ne pas mélanger deux comptes.
+  // Déconnexion : on synchronise d'abord, puis on vide l'historique et le vestiaire locaux pour ne pas
+  // mélanger deux comptes (seule l'apparence de base de l'avatar reste).
   const logout = () =>
     run(async () => {
       await syncHistory();
@@ -91,6 +93,7 @@ function LoggedIn({ account, setAccount, rivalId, onPickRival, onLoggedOut }) {
       setSession(null);
       saveHistory([]);
       save("synced", []);
+      save("owned", []);
       onLoggedOut();
     });
 
@@ -98,9 +101,9 @@ function LoggedIn({ account, setAccount, rivalId, onPickRival, onLoggedOut }) {
     <>
       {pseudo === null ? (
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">Pseudo</span>
+          <Avatar look={look} size={44} />
           <span className="font-display text-2xl text-ink">{me.pseudo}</span>
-          <Stamp variant="ghost" onClick={() => setPseudo(me.pseudo)} className="px-3 py-1 text-xs">
+          <Stamp variant="ghost" onClick={() => setPseudo(me.pseudo)} aria-label="Changer de pseudo" className="px-3 py-1 text-xs">
             Changer
           </Stamp>
         </div>
@@ -147,8 +150,9 @@ function LoggedIn({ account, setAccount, rivalId, onPickRival, onLoggedOut }) {
               key={f.id}
               onClick={() => onPickRival(f)}
               aria-pressed={rivalId === f.id}
-              className={`cursor-pointer rounded-full border-2 border-ink px-3 py-1 font-semibold transition-colors ${rivalId === f.id ? "bg-ink text-paper" : "text-ink hover:bg-ink/10"}`}
+              className={`flex cursor-pointer items-center gap-1.5 rounded-full border-2 border-ink py-0.5 pl-0.5 pr-3 font-semibold transition-colors ${rivalId === f.id ? "bg-ink text-paper" : "text-ink hover:bg-ink/10"}`}
             >
+              <Avatar look={f.look} size={26} />
               {f.pseudo}
             </button>
           ))}
@@ -172,7 +176,7 @@ export function AccountCard(props) {
 }
 
 // Toi contre ton ami sur le mode affiché. Étoile verte sur le meilleur de chaque ligne (sauf le nombre de parties).
-export function Duel({ mine, theirs, myName, rival, onClose }) {
+export function Duel({ mine, theirs, myName, myLook, rival, onClose }) {
   const rows = [
     ["Moyenne", (s) => s.avg, pc, true],
     ["Meilleure", (s) => s.best.score / s.best.max, pc, true],
@@ -202,8 +206,16 @@ export function Duel({ mine, theirs, myName, rival, onClose }) {
       {!theirs && <p className="text-sm font-medium text-muted">{rival.pseudo} n'a pas encore joué dans ce mode.</p>}
       <div className="grid grid-cols-[1fr_auto_auto] items-baseline gap-x-6 gap-y-2">
         <span />
-        <span className="text-right text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">{myName}</span>
-        <span className="text-right text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">{rival.pseudo}</span>
+        {/* Face-à-face : l'avatar de l'ami est retourné pour regarder vers le tien */}
+        {[
+          [myName, myLook, false],
+          [rival.pseudo, rival.look, true],
+        ].map(([name, look, mirror]) => (
+          <span key={mirror} className="flex flex-col items-end gap-1 text-right text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
+            <Avatar look={look} size={48} mirror={mirror} />
+            {name}
+          </span>
+        ))}
         {rows.map((row) => (
           <div key={row[0]} className="contents">
             <span className="text-sm font-semibold uppercase tracking-[0.14em] text-muted">{row[0]}</span>

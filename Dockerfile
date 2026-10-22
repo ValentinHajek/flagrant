@@ -19,7 +19,7 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --prod && npm uninstall -g pnpm
 COPY --from=build /app/dist ./dist
 COPY api ./api
-COPY src/quiz.js ./src/quiz.js
+COPY src/quiz.js src/items.js src/progress.js ./src/
 COPY scripts/server.mjs ./scripts/server.mjs
 USER node
 EXPOSE 8080

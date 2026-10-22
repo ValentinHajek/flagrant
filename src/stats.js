@@ -18,7 +18,19 @@ export function toEntry(settings, results) {
     mid: results.filter((r) => r.points && r.points < PTS_CASH).length,
     hit: results.filter((r) => r.points).map((r) => r.country.code),
     missed: results.filter((r) => !r.points).map((r) => r.country.code),
+    streak: bestStreak(results),
   };
+}
+
+// Meilleure série de bonnes réponses d'affilée (bonus de série, badge « Série de feu »).
+function bestStreak(results) {
+  let run = 0;
+  let max = 0;
+  for (const r of results) {
+    run = r.points ? run + 1 : 0;
+    max = Math.max(max, run);
+  }
+  return max;
 }
 
 export const loadHistory = () => {
@@ -48,11 +60,17 @@ function tallyCountries(games) {
   return tally;
 }
 
+// Parties d'un mode, limitées aux n dernières (n absent : toutes).
+const ofMode = (games, mode, n) => {
+  const g = games.filter((x) => x.mode === mode);
+  return n ? g.slice(-n) : g;
+};
+
 // Duel pays par pays, sur les pays tombés chez les deux joueurs dans ce mode.
 // Un pays raté au moins une fois sur deux est « séché ».
-export function compareCountries(mine, theirs, mode) {
-  const a = tallyCountries(mine.filter((g) => g.mode === mode));
-  const b = tallyCountries(theirs.filter((g) => g.mode === mode));
+export function compareCountries(mine, theirs, mode, n) {
+  const a = tallyCountries(ofMode(mine, mode, n));
+  const b = tallyCountries(ofMode(theirs, mode, n));
   const dry = (t) => t.miss / t.seen >= 0.5;
   const rows = [...a.values()].filter((t) => b.has(t.code)).map((t) => ({ code: t.code, mine: t, theirs: b.get(t.code) }));
   const top = (list, score) => list.sort((p, q) => score(q) - score(p)).slice(0, 6);
@@ -64,8 +82,8 @@ export function compareCountries(mine, theirs, mode) {
 }
 
 // Stats d'un mode : les scores sont ramenés en % pour comparer des parties de 10 et de 50 questions.
-export function summarize(history, mode) {
-  const games = history.filter((g) => g.mode === mode);
+export function summarize(history, mode, n) {
+  const games = ofMode(history, mode, n);
   if (!games.length) return null;
   const recent = games.slice(-10);
   const before = games.slice(-20, -10);

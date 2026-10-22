@@ -2,6 +2,7 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { MongoClient } from "mongodb";
 import nodemailer from "nodemailer";
+import { DEFAULT_LOOK, cleanLook } from "../src/items.js";
 import { MODES, PTS_CARRE, PTS_CASH } from "../src/quiz.js";
 
 export class HttpError extends Error {
@@ -99,7 +100,15 @@ const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const friendCode = () => Array.from(randomBytes(6), (b) => ALPHABET[b % 32]).join("");
 
 // pseudoSet : le joueur a choisi son pseudo (sinon c'est celui tiré de l'e-mail, et on lui propose de le changer).
-export const publicMe = (u) => ({ id: u._id, pseudo: u.pseudo, pseudoSet: u.pseudoSet === true, friendCode: u.friendCode, email: u.email });
+export const publicMe = (u) => ({
+  id: u._id,
+  pseudo: u.pseudo,
+  pseudoSet: u.pseudoSet === true,
+  friendCode: u.friendCode,
+  email: u.email,
+  owned: u.owned ?? [],
+  look: cleanLook(u.look, u.owned ?? []),
+});
 
 export async function findOrCreateUser(d, email) {
   const users = d.collection("users");
@@ -108,7 +117,7 @@ export async function findOrCreateUser(d, email) {
   for (let k = 0; k < 5; k++) {
     const existing = await users.findOne({ email });
     if (existing) return existing;
-    const user = { _id: randomUUID(), email, pseudo, pseudoSet: false, friendCode: friendCode(), friends: [], createdAt: new Date() };
+    const user = { _id: randomUUID(), email, pseudo, pseudoSet: false, friendCode: friendCode(), friends: [], owned: [], look: DEFAULT_LOOK, rev: 0, createdAt: new Date() };
     try {
       await users.insertOne(user);
       return user;
@@ -140,10 +149,11 @@ export function cleanGame(g) {
     Array.isArray(g.missed) &&
     g.hit.length === g.top + g.mid &&
     g.hit.length + g.missed.length === g.n &&
-    [...g.hit, ...g.missed].every(isCode);
+    [...g.hit, ...g.missed].every(isCode) &&
+    (g.streak === undefined || int(g.streak, 0, g.hit.length));
   if (!ok) return null;
   const { id, at, mode, n, score, max, top, mid, hit, missed } = g;
-  return { _id: id, at, mode, territories: g.territories === true, n, score, max, top, mid, hit, missed };
+  return { _id: id, at, mode, territories: g.territories === true, n, score, max, top, mid, hit, missed, streak: g.streak ?? 0 };
 }
 
 // Lien de connexion par e-mail. Sans SMTP (dev local), le lien s'affiche dans la console du serveur.

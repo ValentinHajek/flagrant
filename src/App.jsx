@@ -1,14 +1,17 @@
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import End from "./End.jsx";
 import Game from "./Game.jsx";
 import { API_ENABLED, api, getSession, setSession, syncHistory } from "./api.js";
 import { parseWorld } from "./geo.js";
 import Home from "./Home.jsx";
+import { loadProfile, saveProfile, syncProfile } from "./profile.js";
+import { computeProgress } from "./progress.js";
 import Stats from "./Stats.jsx";
 import { COUNTS, DEFAULT_COUNT, MODES, buildQuiz } from "./quiz.js";
-import { recordGame, toEntry } from "./stats.js";
+import { loadHistory, recordGame, toEntry } from "./stats.js";
 import { bestKey, load, save } from "./storage.js";
+import Wardrobe from "./Wardrobe.jsx";
 
 // Entrée « impression » : la feuille arrive légèrement de travers puis se recale.
 const page = {
@@ -36,6 +39,21 @@ export default function App() {
   const [quiz, setQuiz] = useState(null);
   const [end, setEnd] = useState(null);
   const [notice, setNotice] = useState(null);
+  const [history, setHistory] = useState(loadHistory);
+  const [profile, setProfileState] = useState(loadProfile);
+  // shortcut: l'XP se recalcule sur les 500 dernières parties gardées en local ; au-delà, stocker le total d'XP.
+  const progress = useMemo(() => computeProgress(history, profile.owned), [history, profile.owned]);
+
+  const setProfile = (p) => {
+    setProfileState(p);
+    saveProfile(p);
+  };
+  // Connecté : les parties d'abord, puis le vestiaire (le serveur valide les achats faits hors ligne avec toutes les parties).
+  const syncAll = () =>
+    syncHistory()
+      .then(() => setHistory(loadHistory()))
+      .then(() => syncProfile(loadProfile()))
+      .then(setProfile);
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}data/countries.json`)
@@ -45,17 +63,19 @@ export default function App() {
   }, []);
 
   // Retour depuis le lien reçu par e-mail : on échange le jeton contre une session, puis on synchronise.
+  // Déjà connecté : on récupère ce qui a été joué ou acheté sur un autre appareil.
   useEffect(() => {
     const token = new URLSearchParams(location.search).get("login");
-    if (!token || !API_ENABLED) return;
-    window.history.replaceState(null, "", location.pathname); // le jeton ne reste pas dans l'URL ni l'historique
-    api("/session", { method: "POST", body: { token } })
-      .then(({ session }) => {
-        setSession(session);
-        return syncHistory();
-      })
-      .catch((e) => setNotice(e.message))
-      .finally(() => setScreen("stats"));
+    if (token && API_ENABLED) {
+      window.history.replaceState(null, "", location.pathname); // le jeton ne reste pas dans l'URL ni l'historique
+      api("/session", { method: "POST", body: { token } })
+        .then(({ session }) => {
+          setSession(session);
+          return syncAll();
+        })
+        .catch((e) => setNotice(e.message))
+        .finally(() => setScreen("stats"));
+    } else if (getSession()) syncAll().catch(() => {});
   }, []);
 
   // La carte (≈ 240 Ko) n'est chargée que si on choisit le mode carte.
@@ -84,29 +104,61 @@ export default function App() {
     const best = load(key, 0);
     const score = results.reduce((s, r) => s + r.points, 0);
     if (score > best) save(key, score);
-    recordGame(toEntry(settings, results));
+    const entry = toEntry(settings, results);
+    recordGame(entry);
+    const next = loadHistory();
+    setHistory(next);
     if (getSession()) syncHistory().catch(() => {}); // sinon, ce sera envoyé à la prochaine synchro
-    setEnd({ results, best, isRecord: score > best && score > 0 });
+    const after = computeProgress(next, profile.owned);
+    setEnd({ results, best, isRecord: score > best && score > 0, reward: { before: progress, after, gain: after.perGame.get(entry.id) } });
     setScreen("end");
   };
 
   return (
     <MotionConfig reducedMotion="user">
-      <main className={`mx-auto px-4 pb-16 pt-6 sm:px-10 sm:pt-10 ${screen === "stats" ? "max-w-5xl" : "max-w-2xl"}`}>
+      <main className={`mx-auto px-4 pb-16 pt-6 sm:px-10 sm:pt-10 ${screen === "stats" || screen === "wardrobe" ? "max-w-5xl" : "max-w-2xl"}`}>
         {error && <p className="font-semibold text-fluo">Impossible de charger {error}. Recharge la page.</p>}
         {all && (
           <AnimatePresence mode="wait">
             <motion.section key={screen === "game" ? quiz.id : screen} variants={page} initial="initial" animate="animate" exit="exit">
               {screen === "home" && (
-                <Home all={all} settings={settings} setSettings={setSettings} onStart={start} loading={needMap && !map} onStats={() => setScreen("stats")} />
+                <Home
+                  all={all}
+                  settings={settings}
+                  setSettings={setSettings}
+                  onStart={start}
+                  loading={needMap && !map}
+                  onStats={() => setScreen("stats")}
+                  look={profile.look}
+                  progress={progress}
+                  onWardrobe={() => setScreen("wardrobe")}
+                />
               )}
               {screen === "game" && <Game all={all} map={map} quiz={quiz} onFinish={finish} onQuit={() => setScreen("home")} />}
-              {screen === "end" && <End {...end} all={all} onAgain={start} onMenu={() => setScreen("home")} onStats={() => setScreen("stats")} />}
+              {screen === "end" && (
+                <End
+                  {...end}
+                  all={all}
+                  look={profile.look}
+                  onAgain={start}
+                  onMenu={() => setScreen("home")}
+                  onStats={() => setScreen("stats")}
+                  onWardrobe={() => setScreen("wardrobe")}
+                />
+              )}
+              {screen === "wardrobe" && <Wardrobe profile={profile} setProfile={setProfile} progress={progress} onBack={() => setScreen("home")} />}
               {screen === "stats" && (
                 <Stats
                   all={all}
                   mode={settings.mode}
                   notice={notice}
+                  history={history}
+                  setHistory={setHistory}
+                  look={profile.look}
+                  onLoggedOut={() => {
+                    setHistory(loadHistory());
+                    setProfileState(loadProfile());
+                  }}
                   onBack={() => setScreen("home")}
                   onPlay={(mode) => {
                     setSettings({ ...settings, mode });

@@ -12,6 +12,8 @@ const e = toEntry({ mode: "flag", territories: false }, [
 ]);
 assert.deepEqual([e.score, e.max, e.top, e.mid, e.n], [4, 9, 1, 1, 3]);
 assert.deepEqual([e.hit, e.missed], [["FR", "BE"], ["NE"]]);
+assert.equal(e.streak, 2, "meilleure série");
+assert.equal(toEntry({ mode: "flag" }, [3, 0, 3, 1, 3, 0].map((points) => ({ points, country: country("FR") }))).streak, 3);
 assert.ok(e.id && e.at && e.mode === "flag");
 
 // Aucun historique pour ce mode
@@ -48,4 +50,7 @@ assert.deepEqual(duel.both.map((r) => r.code), ["NE"], "séchés des deux côté
 assert.deepEqual(duel.mine.map((r) => r.code), ["FR"], "je connais, l'ami rate");
 assert.deepEqual(duel.theirs.map((r) => r.code), ["TD"], "l'ami connaît, je rate");
 assert.deepEqual([duel.both[0].mine.miss, duel.both[0].theirs.miss], [1, 2]);
+// Période : seulement les n dernières parties du mode
+assert.equal(summarize(h, "flag", 2).games, 2);
+assert.deepEqual(compareCountries(moi, ami, "flag", 1).both, []);
 console.log("stats OK");

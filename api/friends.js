@@ -1,3 +1,4 @@
+import { cleanLook } from "../src/items.js";
 import { HttpError, body, json, limit, preflight, requireUser, route } from "./_lib.js";
 
 export const OPTIONS = preflight;
@@ -13,5 +14,5 @@ export const POST = route(async (request) => {
   const users = d.collection("users");
   await users.updateOne({ _id: user._id }, { $addToSet: { friends: friend._id } });
   await users.updateOne({ _id: friend._id }, { $addToSet: { friends: user._id } });
-  return json(request, { friend: { id: friend._id, pseudo: friend.pseudo } });
+  return json(request, { friend: { id: friend._id, pseudo: friend.pseudo, look: cleanLook(friend.look, friend.owned ?? []) } });
 });

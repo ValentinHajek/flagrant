@@ -60,6 +60,14 @@ export function Stamp({ variant = "primary", className = "", ...props }) {
   );
 }
 
+/* ---------- Tampon : la monnaie du jeu (couleur = currentColor) ---------- */
+export const Tampon = ({ size = 16, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" aria-hidden className={`shrink-0 ${className}`}>
+    <circle cx="10" cy="10" r="8.2" strokeWidth="2.2" />
+    <circle cx="10" cy="10" r="4.6" strokeWidth="1.5" strokeDasharray="2.2 1.6" />
+  </svg>
+);
+
 /* ---------- Motifs flottants (globe, punaise, boussole, fanion) ---------- */
 const MOTIFS = {
   globe: (

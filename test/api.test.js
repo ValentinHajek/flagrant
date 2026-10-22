@@ -2,6 +2,7 @@
 // Usage : MONGODB_URI=mongodb://127.0.0.1:27017 pnpm test:api
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
+import { DEFAULT_LOOK } from "../src/items.js";
 
 process.env.MONGODB_URI ??= "mongodb://127.0.0.1:27017";
 process.env.MONGODB_DB = `flagrant_test_${Date.now()}`;
@@ -17,6 +18,7 @@ const api = {
   me: await import("../api/me.js"),
   games: await import("../api/games.js"),
   friends: await import("../api/friends.js"),
+  shop: await import("../api/shop.js"),
 };
 
 async function call(name, method, { query = "", body, token, headers = {} } = {}) {
@@ -38,7 +40,7 @@ async function signIn(email, ip) {
   return { session: s.data.session, me: s.data.me, token };
 }
 
-const game = (over = {}) => ({ id: randomUUID(), at: Date.now(), mode: "flag", territories: false, n: 3, score: 4, max: 9, top: 1, mid: 1, hit: ["FR", "BE"], missed: ["NE"], ...over });
+const game = (over = {}) => ({ id: randomUUID(), at: Date.now(), mode: "flag", territories: false, n: 3, score: 4, max: 9, top: 1, mid: 1, hit: ["FR", "BE"], missed: ["NE"], streak: 2, ...over });
 
 try {
   // Connexion par lien : e-mail invalide refusé, lien à usage unique, pseudo tiré de l'e-mail.
@@ -71,18 +73,36 @@ try {
 
   // Amis : pas d'accès aux parties d'un inconnu, accès réciproque après ajout par code.
   const b = await signIn("lea@example.com", "2.2.2.2");
-  await call("games", "POST", { token: b.session, body: { games: [game({ mode: "map", score: 3, top: 1, mid: 0, hit: ["IT"], missed: ["MT", "SM"] })] } });
+  await call("games", "POST", { token: b.session, body: { games: [game({ mode: "map", score: 3, top: 1, mid: 0, hit: ["IT"], missed: ["MT", "SM"], streak: 1 })] } });
   assert.equal((await call("games", "GET", { token: a.session, query: `?user=${b.me.id}` })).status, 403);
   assert.equal((await call("friends", "POST", { token: a.session, body: { code: "ZZZZZZ" } })).status, 404);
   assert.equal((await call("friends", "POST", { token: a.session, body: { code: a.me.friendCode } })).status, 400);
   const added = await call("friends", "POST", { token: a.session, body: { code: b.me.friendCode.toLowerCase() } });
-  assert.deepEqual(added.data.friend, { id: b.me.id, pseudo: "Lea" });
+  assert.deepEqual(added.data.friend, { id: b.me.id, pseudo: "Lea", look: DEFAULT_LOOK });
   assert.equal((await call("games", "GET", { token: a.session, query: `?user=${b.me.id}` })).data.games[0].mode, "map");
-  assert.deepEqual((await call("me", "GET", { token: b.session })).data.friends, [{ id: a.me.id, pseudo: "Val le Pro" }], "amitié réciproque");
+  assert.deepEqual((await call("me", "GET", { token: b.session })).data.friends.map(({ id, pseudo }) => ({ id, pseudo })), [{ id: a.me.id, pseudo: "Val le Pro" }], "amitié réciproque");
 
   // Une partie d'un autre joueur ne peut pas être écrasée en réutilisant son id.
   await call("games", "POST", { token: b.session, body: { games: [{ ...g1, score: 0, top: 0, mid: 0, hit: [], missed: ["FR", "BE", "NE"] }] } });
   assert.equal((await call("games", "GET", { token: a.session })).data.games[0].score, 4);
+
+  // Vestiaire : le solde vient des parties enregistrées côté serveur.
+  const c = await signIn("chloe@example.com", "3.3.3.3");
+  assert.deepEqual([c.me.owned, c.me.look.hat], [[], null]);
+  assert.equal((await call("shop", "POST", { token: c.session, body: { item: "cap" } })).data.error, "Pas assez de tampons");
+  const big = (k) => game({ n: 10, score: 30, max: 30, top: 10, mid: 0, hit: Array(10).fill("FR"), missed: [], streak: 10, at: Date.now() - k * 1000 });
+  await call("games", "POST", { token: c.session, body: { games: [big(1), big(2), big(3)] } }); // 3×(30+15+5) + 20 du jour + badges
+  const bought = await call("shop", "POST", { token: c.session, body: { item: "cap" } });
+  assert.deepEqual([bought.status, bought.data.owned], [200, ["cap"]]);
+  assert.equal((await call("shop", "POST", { token: c.session, body: { item: "cap" } })).data.error, "Déjà dans ton vestiaire");
+  assert.equal((await call("shop", "POST", { token: c.session, body: { item: "crown" } })).data.error, "Niveau 10 requis");
+  assert.match((await call("shop", "POST", { token: c.session, body: { item: "astronaut" } })).data.error, /Marathon/);
+  assert.equal((await call("shop", "POST", { token: c.session, body: { item: "laurel" } })).status, 200, "exclusif du badge sans-faute");
+  assert.equal((await call("me", "PATCH", { token: c.session, body: { look: { hat: "crown" } } })).status, 400, "article non possédé");
+  const dressed = await call("me", "PATCH", { token: c.session, body: { look: { hat: "cap", hair: "boucles" } } });
+  assert.deepEqual([dressed.data.me.look.hat, dressed.data.me.look.hair], ["cap", "boucles"]);
+  await call("friends", "POST", { token: c.session, body: { code: b.me.friendCode } });
+  assert.equal((await call("me", "GET", { token: b.session })).data.friends.find((f) => f.pseudo === "Chloe").look.hat, "cap", "tenue visible des amis");
 
   // CORS : en-têtes seulement pour l'origine autorisée.
   const ok = await call("me", "GET", { token: a.session, headers: { origin: "https://valentinhajek.github.io" } });

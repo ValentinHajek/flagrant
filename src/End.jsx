@@ -1,8 +1,12 @@
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useRef } from "react";
-import { InkTitle, Kicker, Stamp } from "./brand.jsx";
+import Avatar from "./Avatar.jsx";
+import { InkTitle, Kicker, Stamp, Tampon } from "./brand.jsx";
 import { fmtKm } from "./geo.js";
+import { ITEMS } from "./items.js";
+import { BADGE } from "./progress.js";
 import { PTS_CASH, flagUrl } from "./quiz.js";
+import { XpBar } from "./Wardrobe.jsx";
 
 const VERDICTS = [
   [0.9, "Flagrant délit de génie."],
@@ -19,19 +23,95 @@ function status(r) {
   return [r.given ? `Tu as dit « ${r.given} »` : "Passé", "text-fluo"];
 }
 
-export default function End({ results, all = [], best, isRecord, onAgain, onMenu, onStats }) {
+function CountUp({ to, delay = 0 }) {
+  const count = useMotionValue(0);
+  const shown = useTransform(count, (v) => Math.round(v));
+  useEffect(() => {
+    const a = animate(count, to, { duration: 1.1, delay, ease: [0.2, 0.9, 0.25, 1] });
+    return () => a.stop();
+  }, []);
+  return <motion.span>{shown}</motion.span>;
+}
+
+// Ce que la partie rapporte : tampons (détail des bonus), expérience, badges et articles débloqués.
+function Rewards({ reward: { before, after, gain }, look, mood, onWardrobe }) {
+  const badges = after.badges.filter((id) => !before.badges.includes(id)).map((id) => BADGE.get(id));
+  const unlocked = ITEMS.filter((i) => (i.badge ? badges.some((b) => b.id === i.badge) : i.level > before.level && i.level <= after.level));
+  const lines = [
+    ["Score", gain.score],
+    ["Bonus sans-faute", gain.perfect],
+    ["Bonus série", gain.streak],
+    ["Tampon du jour", gain.daily],
+    ...badges.map((b) => [`Badge « ${b.name} »`, b.reward]),
+  ].filter(([, n]) => n > 0);
+  const total = lines.reduce((t, [, n]) => t + n, 0);
+  const levelUp = after.level > before.level;
+  const frac = (p) => (p.xp - p.floor) / (p.next - p.floor);
+
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 20, rotate: 1.5 }}
+      animate={{ opacity: 1, y: 0, rotate: 0 }}
+      transition={{ delay: 0.45, type: "spring", stiffness: 240, damping: 22 }}
+      className="relative flex flex-col gap-4 rounded-[20px] border-[2.5px] border-night bg-paper p-4 shadow-print sm:p-5"
+    >
+      {levelUp && (
+        <motion.span
+          initial={{ scale: 2.6, rotate: -30, opacity: 0 }}
+          animate={{ scale: 1, rotate: -6, opacity: 1 }}
+          transition={{ delay: 1.7, type: "spring", stiffness: 480, damping: 16 }}
+          className="absolute -top-4 right-4 rounded-xl border-4 border-leaf bg-paper px-3 py-0.5 font-display text-lg uppercase tracking-wider text-leaf"
+        >
+          Niveau {after.level} !
+        </motion.span>
+      )}
+      <div className="flex items-center gap-4">
+        <Avatar look={look} mood={mood} size={88} />
+        <div className="flex min-w-0 flex-col gap-1.5">
+          <div className="flex items-center gap-2 font-display text-4xl leading-none text-ink tabular-nums">
+            <span>
+              +<CountUp to={total} delay={0.6} />
+            </span>
+            <Tampon size={26} className="text-fluo" />
+            <span className="sr-only">tampons</span>
+          </div>
+          <p className="text-sm font-medium text-muted">
+            {lines.length ? lines.map(([label, n]) => `${label} +${n}`).join(" · ") : "Pas de tampon cette fois. La prochaine sera la bonne !"}
+          </p>
+        </div>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-baseline justify-between gap-3 text-sm font-semibold">
+          <span className="text-ink">
+            Niveau {after.level} · {after.title}
+          </span>
+          <span className="text-muted tabular-nums">
+            {after.xp} / {after.next} XP
+          </span>
+        </div>
+        <XpBar progress={after} from={levelUp ? 0 : frac(before)} delay={0.9} />
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm font-semibold text-night">
+          {unlocked.length ? `Nouveau au vestiaire : ${unlocked.map((i) => i.name).join(", ")}` : `${after.balance} tampons à dépenser`}
+        </p>
+        <Stamp variant="ghost" onClick={onWardrobe} className="px-4 py-1.5 text-sm">
+          Vestiaire →
+        </Stamp>
+      </div>
+    </motion.section>
+  );
+}
+
+export default function End({ results, all = [], best, isRecord, reward, look, onAgain, onMenu, onStats, onWardrobe }) {
   const score = results.reduce((s, r) => s + r.points, 0);
   const max = results.length * PTS_CASH;
   const verdict = VERDICTS.find(([min]) => score / max >= min)[1];
-  const count = useMotionValue(0);
-  const shown = useTransform(count, (v) => Math.round(v));
   const againRef = useRef(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     againRef.current?.focus({ preventScroll: true });
-    const a = animate(count, score, { duration: 1.1, ease: [0.2, 0.9, 0.25, 1] });
-    return () => a.stop();
   }, []);
 
   const [top, mid] = results[0].type === "map" ? ["Pile", "Proche"] : ["Cash", "Carré"];
@@ -47,7 +127,7 @@ export default function End({ results, all = [], best, isRecord, onAgain, onMenu
         <Kicker>Résultat</Kicker>
         <div className="flex items-end gap-3">
           <InkTitle as="h2" className="text-[clamp(5rem,22vw,10rem)] tabular-nums">
-            <motion.span>{shown}</motion.span>
+            <CountUp to={score} />
           </InkTitle>
           <span className="pb-3 font-display text-4xl text-muted">/ {max}</span>
           {isRecord && (
@@ -79,6 +159,8 @@ export default function End({ results, all = [], best, isRecord, onAgain, onMenu
           </motion.div>
         ))}
       </div>
+
+      {reward && <Rewards reward={reward} look={look} mood={score / max >= 0.6 ? "happy" : score / max >= 0.3 ? "neutral" : "sad"} onWardrobe={onWardrobe} />}
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <Stamp ref={againRef} onClick={onAgain} className="flex-1 py-4 text-xl">Rejouer</Stamp>

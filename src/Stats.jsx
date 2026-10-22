@@ -12,6 +12,12 @@ const TABS = [
   ["mix", "Mix"],
   ["map", "Carte"],
 ];
+// Période des stats et du duel : toutes les parties ou seulement les dernières.
+const PERIODS = [
+  [0, "Toutes"],
+  [10, "10 dernières"],
+  [5, "5 dernières"],
+];
 const pc = (x) => `${Math.round(x * 100)} %`;
 const day = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short" });
 const hour = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" });
@@ -253,14 +259,14 @@ function DuelChart({ mine, theirs, myName, rivalName }) {
   );
 }
 
-export default function Stats({ all, mode: initialMode, notice, onBack, onPlay }) {
+export default function Stats({ all, mode: initialMode, notice, history, setHistory, look, onLoggedOut, onBack, onPlay }) {
   const [mode, setMode] = useState(initialMode);
-  const [history, setHistory] = useState(loadHistory);
+  const [n, setN] = useState(0); // 0 = toutes les parties
   const [account, setAccount] = useState(null); // { me, friends } une fois connecté
   const [rival, setRival] = useState(null); // ami choisi pour le duel, avec ses parties
   const byCode = useMemo(() => new Map(all.map((c) => [c.code, c])), [all]);
-  const s = summarize(history, mode);
-  const rs = rival && summarize(rival.games, mode); // stats de l'ami dans ce mode (null s'il n'y a pas joué)
+  const s = summarize(history, mode, n);
+  const rs = rival && summarize(rival.games, mode, n); // stats de l'ami dans ce mode (null s'il n'y a pas joué)
   const myName = account?.me.pseudo ?? "Toi";
   const top = mode === "map" ? "pile" : "cash";
   const trend = s?.trend == null ? null : Math.round(s.trend * 100); // en points ; 0 = stable
@@ -323,7 +329,21 @@ export default function Stats({ all, mode: initialMode, notice, onBack, onPlay }
             ))}
           </div>
 
-          {rival && <Duel mine={s} theirs={rs} myName={myName} rival={rival} onClose={() => setRival(null)} />}
+          <div role="radiogroup" aria-label="Période" className="flex flex-wrap gap-2">
+            {PERIODS.map(([v, label]) => (
+              <button
+                key={v}
+                role="radio"
+                aria-checked={n === v}
+                onClick={() => setN(v)}
+                className={`cursor-pointer rounded-full border-2 border-night px-3.5 py-1 text-sm font-semibold transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-fluo ${n === v ? "bg-night text-paper" : "bg-paper text-ink hover:bg-paper-deep"}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {rival && <Duel mine={s} theirs={rs} myName={myName} myLook={look} rival={rival} onClose={() => setRival(null)} />}
 
           {!s ? (
             <div className={`${card} flex flex-col items-start gap-4 p-6`}>
@@ -338,7 +358,7 @@ export default function Stats({ all, mode: initialMode, notice, onBack, onPlay }
                   k={1}
                   label="Moyenne"
                   value={pc(s.avg)}
-                  sub={trend === null ? "toutes parties" : trend === 0 ? "stable vs avant" : `${trend > 0 ? "▲ +" : "▼ "}${trend} pts vs avant`}
+                  sub={trend === null ? (n ? `${n} dernières` : "toutes parties") : trend === 0 ? "stable vs avant" : `${trend > 0 ? "▲ +" : "▼ "}${trend} pts vs avant`}
               subClass={!trend ? "text-muted" : trend > 0 ? "text-leaf" : "text-fluo"}
                 />
                 <Tile k={2} label="Meilleure" value={pc(s.best.score / s.best.max)} sub={`${s.best.score}/${s.best.max} · ${day.format(s.best.at)}`} />
@@ -369,7 +389,7 @@ export default function Stats({ all, mode: initialMode, notice, onBack, onPlay }
                 )}
               </section>
 
-              {rs && <CountryDuel cmp={compareCountries(history, rival.games, mode)} rivalName={rival.pseudo} byCode={byCode} mode={mode} />}
+              {rs && <CountryDuel cmp={compareCountries(history, rival.games, mode, n)} rivalName={rival.pseudo} byCode={byCode} mode={mode} />}
 
               {!rs && s.toReview.length > 0 && (
                 <section className="flex flex-col gap-3">
@@ -440,13 +460,14 @@ export default function Stats({ all, mode: initialMode, notice, onBack, onPlay }
             <AccountCard
               account={account}
               setAccount={setAccount}
+              look={look}
               notice={notice}
               rivalId={rival?.id}
               onPickRival={pickRival}
               onLoggedOut={() => {
                 setAccount(null);
                 setRival(null);
-                setHistory(loadHistory());
+                onLoggedOut();
               }}
             />
           )}
