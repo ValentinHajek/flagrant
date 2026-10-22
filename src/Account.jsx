@@ -7,8 +7,9 @@ import { saveHistory } from "./stats.js";
 import { save } from "./storage.js";
 
 const card = "rounded-[20px] border-[2.5px] border-night bg-paper shadow-print";
+// w-0 : sans largeur propre (≈ 20 caractères), le champ élargissait la colonne des stats sur téléphone.
 const field =
-  "min-w-0 flex-1 rounded-2xl border-[2.5px] border-night bg-paper px-4 py-2.5 font-semibold text-night outline-none placeholder:text-muted/60 focus:shadow-[3px_3.5px_0_var(--color-fluo)]";
+  "w-0 min-w-0 flex-1 rounded-2xl border-[2.5px] border-night bg-paper px-4 py-2.5 font-semibold text-night outline-none placeholder:text-muted/60 focus:shadow-[3px_3.5px_0_var(--color-fluo)]";
 const pc = (x) => `${Math.round(x * 100)} %`;
 
 // Petit formulaire « une action » : gère l'attente et le message d'erreur.
