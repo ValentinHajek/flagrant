@@ -150,7 +150,7 @@ export const devOutbox = [];
 let transport;
 export async function sendLoginLink(email, link) {
   if (!process.env.SMTP_URL) {
-    if (process.env.VERCEL) throw new HttpError(500, "Envoi d'e-mail non configuré");
+    if (process.env.NODE_ENV === "production") throw new HttpError(500, "Envoi d'e-mail pas encore configuré");
     devOutbox.push({ email, link });
     console.log(`[dev] lien de connexion pour ${email} : ${link}`);
     return;

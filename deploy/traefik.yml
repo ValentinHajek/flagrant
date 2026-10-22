@@ -1,0 +1,19 @@
+# Route de Flagrant, copiée dans /root/sites/traefik/dynamic/flagrant.yml (DOMAINE remplacé au déploiement).
+# Fichier séparé de prod-sites.yml : une erreur ici ne touche pas les routes des sites clients.
+http:
+  routers:
+    r-flagrant:
+      rule: "Host(`DOMAINE`)"
+      entryPoints: [websecure]
+      service: s-flagrant
+      middlewares: [flagrant-compress]
+      tls:
+        certResolver: le
+  middlewares:
+    flagrant-compress:
+      compress: {}
+  services:
+    s-flagrant:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:9210"

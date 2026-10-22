@@ -8,7 +8,7 @@ process.env.MONGODB_DB = `flagrant_test_${Date.now()}`;
 process.env.APP_URL = "http://localhost:4173/";
 process.env.ALLOWED_ORIGINS = "https://valentinhajek.github.io";
 delete process.env.SMTP_URL;
-delete process.env.VERCEL;
+delete process.env.NODE_ENV;
 
 const { db, devOutbox } = await import("../api/_lib.js");
 const api = {

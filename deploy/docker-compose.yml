@@ -1,0 +1,25 @@
+# Flagrant sur hungry-morse : /root/sites/flagrant-deploy/repo (clone du dépôt), secrets dans ../../.env
+name: flagrant
+services:
+  app:
+    build: ..
+    container_name: flagrant-app
+    restart: unless-stopped
+    env_file: ../../.env
+    environment:
+      MONGODB_URI: mongodb://mongo:27017
+      MONGODB_DB: flagrant
+    ports:
+      - "127.0.0.1:9210:8080" # seul Traefik (réseau host) y accède
+    mem_limit: 256m # serveur partagé avec les sites clients : plafonds mémoire
+    depends_on: [mongo]
+  mongo:
+    image: mongo:7
+    container_name: flagrant-mongo
+    restart: unless-stopped
+    command: ["--wiredTigerCacheSizeGB", "0.25"]
+    volumes:
+      - mongo-data:/data/db # aucun port publié : joignable uniquement par l'app
+    mem_limit: 512m
+volumes:
+  mongo-data:

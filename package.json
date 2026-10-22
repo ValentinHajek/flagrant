@@ -8,7 +8,8 @@
     "preview": "vite preview --port 4173",
     "test": "node src/match.test.js && node src/geo.test.js && node src/stats.test.js",
     "test:api": "node test/api.test.js",
-    "dev:api": "node --env-file-if-exists=.env.local scripts/dev-api.mjs"
+    "dev:api": "node --env-file-if-exists=.env.local scripts/server.mjs",
+    "start": "node scripts/server.mjs"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",
@@ -27,5 +28,6 @@
     "@vitejs/plugin-react": "^6.1.2",
     "tailwindcss": "^4.3.3",
     "vite": "^8.3.5"
-  }
+  },
+  "packageManager": "pnpm@10.13.1"
 }
