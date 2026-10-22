@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { ITEM, ITEMS, cleanLook, DEFAULT_LOOK } from "./items.js";
+import { BASE, ITEM, ITEMS, cleanLook, DEFAULT_LOOK } from "./items.js";
 import { BADGE, DAILY_BONUS, cannotBuy, computeProgress, gameReward, levelOf, titleOf } from "./progress.js";
 
 // Niveaux : 50, 150, 300, 500…
@@ -50,4 +50,8 @@ for (const i of ITEMS.filter((i) => i.badge)) assert.ok(BADGE.has(i.badge) && i.
 
 // Tenue : valeurs inconnues et articles non possédés écartés
 assert.deepEqual(cleanLook({ skin: "<script>", hat: "crown", glasses: "round", top: "cap" }, ["round", "cap"]), { ...DEFAULT_LOOK, glasses: "round" });
+// 8 coupes et 4 expressions, acceptées telles quelles (le serveur valide avec la même fonction)
+assert.equal(BASE.hair.length, 8);
+assert.equal(BASE.eyes.length, 4);
+assert.deepEqual(cleanLook({ hair: "chauve", eyes: "clin" }, []), { ...DEFAULT_LOOK, hair: "chauve", eyes: "clin" });
 console.log("progress OK");

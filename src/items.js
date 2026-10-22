@@ -80,13 +80,16 @@ export const BASE = {
     ["long", "Long"],
     ["boucles", "Bouclé"],
     ["chignon", "Chignon"],
+    ["couettes", "Couettes"],
     ["rase", "Rasé"],
+    ["chauve", "Chauve"],
   ],
   hairColor: ["#17140d", "#5a3a22", "#b5652b", "#e8c25a", "#d9d2c4", "#2340c4"],
   eyes: [
     ["ronds", "Ronds"],
     ["rieurs", "Rieurs"],
     ["decides", "Décidés"],
+    ["clin", "Clin d'œil"],
   ],
 };
 

@@ -227,7 +227,7 @@ export default function Wardrobe({ profile, setProfile, progress, focus, onBack,
                     ))}
                   </div>
                 </Field>
-                <Field label="Yeux">
+                <Field label="Expression">
                   <div className={grid}>
                     {BASE.eyes.map(([id, label]) => (
                       <Choice key={id} look={{ ...look, eyes: id, glasses: null }} label={label} selected={look.eyes === id} onClick={() => wear({ eyes: id })} />

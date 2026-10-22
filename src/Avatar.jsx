@@ -132,13 +132,22 @@ function Top({ id }) {
 
 /* ---------- Cheveux ---------- */
 function HairBack({ style, color }) {
-  if (style !== "long") return null;
-  return (
-    <g fill={color} {...line}>
-      <path d="M38,48 C29,66 29,90 33,104 L47,104 C43,90 43,70 45,56 Z" />
-      <path d="M82,48 C91,66 91,90 87,104 L73,104 C77,90 77,70 75,56 Z" />
-    </g>
-  );
+  if (style === "long")
+    return (
+      <g fill={color} {...line}>
+        <path d="M38,48 C29,66 29,90 33,104 L47,104 C43,90 43,70 45,56 Z" />
+        <path d="M82,48 C91,66 91,90 87,104 L73,104 C77,90 77,70 75,56 Z" />
+      </g>
+    );
+  // Couettes : deux mèches attachées en haut des tempes, qui retombent sur les épaules
+  if (style === "couettes")
+    return (
+      <g fill={color} {...line}>
+        <path d="M40,41 C27,40 20,52 22,66 C23,74 28,80 33,83 C30,74 31,64 38,54 Z" />
+        <path d="M80,41 C93,40 100,52 98,66 C97,74 92,80 87,83 C90,74 89,64 82,54 Z" />
+      </g>
+    );
+  return null;
 }
 
 function HairFront({ style, color }) {
@@ -167,6 +176,16 @@ function HairFront({ style, color }) {
           <path d="M37,50 C35,33 46,28 60,28 C74,28 85,33 83,50 C76,40 68,36 60,36 C52,36 44,40 37,50 Z" {...p} />
         </>
       );
+    case "couettes":
+      return (
+        <>
+          <path d={CAP} {...p} />
+          <circle cx="38" cy="43" r="3.4" fill={FLUO} {...thin} />
+          <circle cx="82" cy="43" r="3.4" fill={FLUO} {...thin} />
+        </>
+      );
+    case "chauve":
+      return <path d="M45,37 Q51,32 58,32" fill="none" stroke={CARD} strokeWidth="2.6" strokeLinecap="round" opacity=".75" />; // reflet sur le crâne
     default:
       return <path d={CAP} {...p} />; // court, et le haut des cheveux longs
   }
@@ -174,19 +193,21 @@ function HairFront({ style, color }) {
 
 /* ---------- Visage ---------- */
 function Face({ eyes, mood }) {
-  const eyePair = (render) => <>{render(51)}{render(69)}</>;
+  const closed = (x) => <path key={x} d={`M${x - 4},56 Q${x},51 ${x + 4},56`} fill="none" {...line} strokeWidth="2.4" />;
+  const open = (x) => (
+    <g key={x}>
+      <circle cx={x} cy="55" r={eyes === "decides" ? 2.3 : 2.7} fill={NIGHT} />
+      <circle cx={x + 0.9} cy="54" r=".8" fill={CARD} />
+    </g>
+  );
+  // Yeux gauche puis droit ; clin d'œil = l'œil gauche fermé
+  const [left, right] = eyes === "rieurs" ? [closed, closed] : eyes === "clin" ? [closed, open] : [open, open];
   return (
     <>
       <circle cx="45" cy="63" r="3.6" fill={FLUO} opacity=".35" />
       <circle cx="75" cy="63" r="3.6" fill={FLUO} opacity=".35" />
-      {eyes === "rieurs"
-        ? eyePair((x) => <path key={x} d={`M${x - 4},56 Q${x},51 ${x + 4},56`} fill="none" {...line} strokeWidth="2.4" />)
-        : eyePair((x) => (
-            <g key={x}>
-              <circle cx={x} cy="55" r={eyes === "decides" ? 2.3 : 2.7} fill={NIGHT} />
-              <circle cx={x + 0.9} cy="54" r=".8" fill={CARD} />
-            </g>
-          ))}
+      {left(51)}
+      {right(69)}
       {eyes === "decides" && <path d="M45,48 L55,50 M75,48 L65,50" {...line} />}
       {mood === "sad" ? (
         <path d="M53,70 Q60,63 67,70" fill="none" {...line} />
