@@ -94,6 +94,9 @@ try {
   const big = (k) => game({ n: 10, score: 50, max: 50, top: 10, mid: 0, hit: Array(10).fill("FR"), missed: [], streak: 10, at: Date.now() - k * 1000 });
   const posted = await call("games", "POST", { token: c.session, body: { games: [big(1), big(2), big(3)] } }); // barème à 5 points par flash
   assert.equal(posted.data.accepted, 3);
+  // Combo : borné par le nombre de flash (10 flash d'affilée = 8 au plus)
+  const combo = await call("games", "POST", { token: c.session, body: { games: [big(4), { ...big(5), bonus: 8 }, { ...big(6), bonus: 9 }] } });
+  assert.equal(combo.data.accepted, 2, "bonus 9 impossible avec 10 flash");
   const bought = await call("shop", "POST", { token: c.session, body: { item: "cap" } });
   assert.deepEqual([bought.status, bought.data.owned], [200, ["cap"]]);
   assert.equal((await call("shop", "POST", { token: c.session, body: { item: "cap" } })).data.error, "Déjà dans ton vestiaire");

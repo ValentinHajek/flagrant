@@ -1,4 +1,4 @@
-import { PTS_CASH } from "./quiz.js";
+import { PTS_CASH, total } from "./quiz.js";
 import { load, save } from "./storage.js";
 
 const KEY = "history";
@@ -13,6 +13,7 @@ export function toEntry(settings, results) {
     territories: settings.territories,
     n: results.length,
     score: results.reduce((s, r) => s + r.points, 0),
+    bonus: results.reduce((s, r) => s + (r.bonus ?? 0), 0), // combo
     max: results.length * PTS_CASH,
     top: results.filter((r) => r.points === PTS_CASH).length,
     mid: results.filter((r) => r.points && r.points < PTS_CASH).length,
@@ -36,7 +37,7 @@ function bestStreak(results) {
 // Défis : une partie jouée sur cet appareil compte déjà, même pas encore synchronisée (la première seulement).
 export function withLocalPlays(duels, history) {
   const played = new Map();
-  for (const g of history) if (g.duel && !played.has(g.duel)) played.set(g.duel, { score: g.score, max: g.max, at: g.at });
+  for (const g of history) if (g.duel && !played.has(g.duel)) played.set(g.duel, { score: total(g), max: g.max, at: g.at });
   return duels.map((x) => (x.me || !played.has(x.id) ? x : { ...x, me: played.get(x.id) }));
 }
 

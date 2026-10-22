@@ -1,6 +1,12 @@
 export const SECONDS = 20; // chrono par question
 export const PTS_CASH = 5; // flash (saisie libre) ou pile sur la carte : avant le 22/10/2026, 3 points
 export const PTS_CARRE = 1;
+// Combo : flash (ou « pile ») d'affilée. Bonus au 3e (+1), au 5e (+2), puis +5 tous les 5 (10e, 15e…).
+export const comboBonus = (run) => (run === 3 ? 1 : run === 5 ? 2 : run >= 10 && run % 5 === 0 ? 5 : 0);
+// Bonus maximal pour `top` flash (tous d'affilée) : borne le champ bonus accepté par le serveur.
+export const maxCombo = (top) => Array.from({ length: top }, (_, k) => comboBonus(k + 1)).reduce((a, b) => a + b, 0);
+// Score d'une partie avec son bonus combo (records, tampons, défis). Les % des stats restent sur score / max.
+export const total = (g) => g.score + (g.bonus ?? 0);
 export const COUNTS = [10, 20, 30, 50, "all"];
 export const DEFAULT_COUNT = 20;
 export const MODES = ["flag", "tld", "mix", "map"];

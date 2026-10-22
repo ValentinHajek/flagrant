@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { closest, isCorrect } from "./match.js";
-import { COUNTS, buildQuiz, distractors, eligible, fromSeries, questionCount, toSeries } from "./quiz.js";
+import { COUNTS, buildQuiz, comboBonus, distractors, eligible, fromSeries, maxCombo, questionCount, toSeries, total } from "./quiz.js";
 
 const all = JSON.parse(readFileSync(new URL("../public/data/countries.json", import.meta.url)));
 const get = (code) => all.find((c) => c.code === code);
@@ -79,6 +79,11 @@ for (const mode of ["mix", "map"]) {
   assert.deepEqual(again.questions.map((q) => q.choices?.map((c) => c.code)), series.map((q) => q.choices));
 }
 assert.equal(fromSeries(all, false, [{ code: "QQ", type: "flag", choices: ["FR", "BE", "DE"] }]), null, "pays inconnu de cette version");
+// Combo : +1 au 3e flash d'affilée, +2 au 5e, puis +5 tous les 5
+assert.deepEqual([1, 2, 3, 4, 5, 9, 10, 14, 15].map(comboBonus), [0, 0, 1, 0, 2, 0, 5, 0, 5]);
+assert.deepEqual([0, 2, 3, 5, 10, 20].map(maxCombo), [0, 0, 1, 3, 8, 18]);
+assert.equal(total({ score: 40, bonus: 3 }), 43);
+assert.equal(total({ score: 40 }), 40, "anciennes parties sans bonus");
 console.log("quiz OK");
 
 // Pays désigné par une mauvaise réponse (drapeau du récap)

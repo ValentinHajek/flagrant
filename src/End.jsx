@@ -199,7 +199,8 @@ function Rewards({ reward: { before, after, gain }, badges, look, mood, onWardro
 }
 
 export default function End({ results, all = [], best, isRecord, reward, duel, look, onAgain, onMenu, onStats, onWardrobe, onBadges }) {
-  const score = results.reduce((s, r) => s + r.points, 0);
+  const bonus = results.reduce((s, r) => s + (r.bonus ?? 0), 0);
+  const score = results.reduce((s, r) => s + r.points, 0) + bonus;
   const max = results.length * PTS_CASH;
   const verdict = VERDICTS.find(([min]) => score / max >= min)[1];
   const againRef = useRef(null);
@@ -252,6 +253,7 @@ export default function End({ results, all = [], best, isRecord, reward, duel, l
             </motion.span>
           )}
         </div>
+        {bonus > 0 && <p className="text-sm font-semibold uppercase tracking-[0.18em] text-leaf">Dont +{bonus} de combo</p>}
         <p className="text-xl font-medium text-muted">{verdict}</p>
         {!isRecord && best > 0 && <p className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">Record : {best} / {max}</p>}
       </div>
@@ -321,7 +323,10 @@ export default function End({ results, all = [], best, isRecord, reward, duel, l
                     <div className={`truncate text-sm font-medium ${color}`}>{label}</div>
                   )}
                 </div>
-                <span className={`ml-auto font-display text-2xl ${r.points ? "text-ink" : "text-fluo"}`}>+{r.points}</span>
+                <span className={`ml-auto shrink-0 text-right font-display text-2xl ${r.points ? "text-ink" : "text-fluo"}`}>
+                  +{r.points}
+                  {r.bonus > 0 && <span className="block font-sans text-xs font-semibold text-leaf">combo ×{r.combo} +{r.bonus}</span>}
+                </span>
               </motion.li>
             );
           })}

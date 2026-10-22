@@ -3,7 +3,7 @@ import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { MongoClient } from "mongodb";
 import nodemailer from "nodemailer";
 import { DEFAULT_LOOK, cleanLook } from "../src/items.js";
-import { MODES, PTS_CARRE, PTS_CASH } from "../src/quiz.js";
+import { MODES, PTS_CARRE, PTS_CASH, maxCombo } from "../src/quiz.js";
 
 export class HttpError extends Error {
   constructor(status, message) {
@@ -157,10 +157,11 @@ export function cleanGame(g) {
     g.hit.length + g.missed.length === g.n &&
     [...g.hit, ...g.missed].every(isCode) &&
     (g.streak === undefined || int(g.streak, 0, g.hit.length)) &&
+    (g.bonus === undefined || int(g.bonus, 0, maxCombo(g.top))) && // combo : pas plus que si tous les flash étaient d'affilée
     (g.duel === undefined || (typeof g.duel === "string" && /^[\w-]{8,64}$/.test(g.duel)));
   if (!ok) return null;
   const { id, at, mode, n, score, max, top, mid, hit, missed } = g;
-  return { _id: id, at, mode, territories: g.territories === true, n, score, max, top, mid, hit, missed, streak: g.streak ?? 0, ...(g.duel && { duel: g.duel }) };
+  return { _id: id, at, mode, territories: g.territories === true, n, score, max, top, mid, hit, missed, streak: g.streak ?? 0, ...(g.bonus && { bonus: g.bonus }), ...(g.duel && { duel: g.duel }) };
 }
 
 // Lien de connexion par e-mail. Sans SMTP (dev local), le lien s'affiche dans la console du serveur.

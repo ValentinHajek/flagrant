@@ -6,7 +6,7 @@ import Avatar from "./Avatar.jsx";
 import { Glyph, InkTitle, Kicker, Logo, Marquee, Medal, Motif, Stamp, Tampon } from "./brand.jsx";
 import { ChallengeButton, DuelInbox } from "./Duels.jsx";
 import { BADGES } from "./progress.js";
-import { COUNTS, DUEL_MAX, MAP_PILE_KM, MAP_PROCHE_KM, PTS_CARRE, PTS_CASH, SECONDS, flagUrl, questionCount, shuffle } from "./quiz.js";
+import { COUNTS, DUEL_MAX, MAP_PILE_KM, MAP_PROCHE_KM, PTS_CARRE, PTS_CASH, SECONDS, flagUrl, questionCount, shuffle, total } from "./quiz.js";
 import { enableSound, sound, soundEnabled } from "./sound.js";
 import { bestKey, load } from "./storage.js";
 
@@ -143,7 +143,7 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
             const games = history.filter((g) => g.mode === m.id);
             // Historique (synchronisé entre appareils) + ancien record local, au même format de partie.
             const same = games.filter((g) => !!g.territories === !!territories && g.n === n);
-            const best = Math.max(load(bestKey(m.id, territories, count), 0), ...same.map((g) => g.score));
+            const best = Math.max(load(bestKey(m.id, territories, count), 0), ...same.map(total));
             const max = n * PTS_CASH;
             return (
               <motion.label

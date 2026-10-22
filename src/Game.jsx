@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Logo, Stamp } from "./brand.jsx";
 import { distanceToCountry, fmtKm } from "./geo.js";
 import { closest, isCorrect } from "./match.js";
-import { PTS_CARRE, PTS_CASH, SECONDS, distractors, flagUrl, mapPoints, shuffle } from "./quiz.js";
+import { PTS_CARRE, PTS_CASH, SECONDS, comboBonus, distractors, flagUrl, mapPoints, shuffle } from "./quiz.js";
 import { sound } from "./sound.js";
 import WorldMap from "./WorldMap.jsx";
 
@@ -47,6 +47,7 @@ function ResultStamp({ result }) {
           className={`pointer-events-none absolute right-4 top-4 rounded-xl border-4 bg-paper/85 px-4 py-1 font-display text-3xl uppercase tracking-wider ${STAMP[toneOf(result)]}`}
         >
           {result.points ? `+${result.points}` : result.timeout ? "Trop tard" : "Raté"}
+          {result.bonus > 0 && <div className="text-center text-lg leading-tight tracking-normal">Combo ×{result.combo} +{result.bonus}</div>}
         </motion.div>
       )}
     </AnimatePresence>
@@ -99,7 +100,7 @@ export default function Game({ all, map, quiz, onFinish, onQuit }) {
   const q = questions[i];
   const isMap = q.type === "map";
   const tone = toneOf(result);
-  const score = answers.current.reduce((s, a) => s + (a?.points ?? 0), 0);
+  const score = answers.current.reduce((s, a) => s + (a?.points ?? 0) + (a?.bonus ?? 0), 0);
 
   const next = () => {
     clearTimeout(pending.current);
@@ -122,6 +123,12 @@ export default function Game({ all, map, quiz, onFinish, onQuit }) {
     let n = 0; // bonnes réponses d'affilée juste avant : la note monte avec la série
     while (answers.current[i - n - 1]?.points) n++;
     sound(r.points === PTS_CASH ? "flash" : r.points ? "carre" : "rate", n);
+    if (r.points === PTS_CASH) {
+      let run = 1; // flash d'affilée, celui-ci compris
+      while (answers.current[i - run]?.points === PTS_CASH) run++;
+      r.combo = run;
+      r.bonus = comboBonus(run);
+    }
     answers.current[i] = r;
     setResult(r);
     pending.current = setTimeout(next, r.delay);

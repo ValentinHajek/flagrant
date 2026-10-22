@@ -1,7 +1,7 @@
 // Gamification : tampons gagnés, niveaux, badges et solde. Tout se déduit de l'historique des parties
 // (et des articles achetés), donc le serveur refait exactement le même calcul pour valider les achats.
 import { ITEM } from "./items.js";
-import { MAP_PILE_KM } from "./quiz.js";
+import { MAP_PILE_KM, total } from "./quiz.js";
 
 // Barème divisé par 3 pour les parties jouées depuis le 22 oct. 2026 à 17 h 30 (heure de Paris) :
 // environ 3 parties pour un article à 60. Les parties d'avant gardent l'ancien barème, personne ne perd ses tampons.
@@ -31,7 +31,7 @@ export const titleOf = (level) => TITLES.find(([min]) => level >= min)[1];
 // Récompense d'une partie, hors bonus du jour (qui dépend des autres parties).
 export function gameReward(g) {
   const old = g.at < RESCALE_AT;
-  const score = old ? g.score : Math.round(g.score / 3);
+  const score = old ? g.score : Math.round(total(g) / 3); // bonus combo compris
   const streak = Math.max(0, (g.streak ?? 0) - 5);
   return {
     score,

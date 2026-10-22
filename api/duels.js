@@ -31,7 +31,7 @@ function scores(duel, games) {
   const out = {};
   for (const g of games) {
     if (g.duel !== duel._id || out[g.userId] || [...g.hit, ...g.missed].sort().join() !== codes) continue;
-    out[g.userId] = { score: g.score, max: g.max, at: g.at };
+    out[g.userId] = { score: g.score + (g.bonus ?? 0), max: g.max, at: g.at }; // bonus combo compris
   }
   return out;
 }
@@ -47,7 +47,7 @@ export const GET = route(async (request) => {
     .toArray();
   const games = await d
     .collection("games")
-    .find({ duel: { $in: duels.map((x) => x._id) } }, { projection: { userId: 1, duel: 1, score: 1, max: 1, at: 1, hit: 1, missed: 1 } })
+    .find({ duel: { $in: duels.map((x) => x._id) } }, { projection: { userId: 1, duel: 1, score: 1, max: 1, bonus: 1, at: 1, hit: 1, missed: 1 } })
     .sort({ at: 1 })
     .toArray();
   const ids = [...new Set(duels.map((x) => (x.from === user._id ? x.to : x.from)))];
