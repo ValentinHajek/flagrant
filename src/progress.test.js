@@ -1,14 +1,16 @@
 import assert from "node:assert/strict";
 import { BASE, ITEM, ITEMS, cleanLook, DEFAULT_LOOK } from "./items.js";
-import { BADGE, DAILY_BONUS, cannotBuy, computeProgress, gameReward, levelOf, titleOf } from "./progress.js";
+import { BADGE, DAILY_BONUS, RESCALE_AT, cannotBuy, computeProgress, gameReward, levelOf, titleOf } from "./progress.js";
 
 // Niveaux : 50, 150, 300, 500…
 assert.deepEqual([0, 49, 50, 149, 150, 299, 300, 500].map(levelOf), [1, 1, 2, 2, 3, 3, 4, 5]);
 assert.deepEqual([1, 3, 5, 8, 12, 16, 30].map(titleOf), ["Touriste", "Routard", "Globe-trotter", "Cartographe", "Explorateur", "Légende du GeoGuessr", "Légende du GeoGuessr"]);
 
-// Récompense d'une partie
-assert.deepEqual(gameReward({ n: 10, top: 10, score: 30, streak: 10 }), { score: 30, perfect: 15, streak: 5 });
-assert.deepEqual(gameReward({ n: 9, top: 9, score: 27 }), { score: 27, perfect: 0, streak: 0 }, "sans-faute dès 10 questions");
+// Récompense d'une partie : barème actuel (÷ 3)…
+assert.deepEqual(gameReward({ n: 10, top: 10, score: 30, streak: 10 }), { score: 10, perfect: 5, streak: 1 });
+assert.deepEqual(gameReward({ n: 9, top: 9, score: 27 }), { score: 9, perfect: 0, streak: 0 }, "sans-faute dès 10 questions");
+// …et ancien barème pour les parties jouées avant la bascule
+assert.deepEqual(gameReward({ at: RESCALE_AT - 1, n: 10, top: 10, score: 30, streak: 10 }), { score: 30, perfect: 15, streak: 5 });
 
 let id = 0;
 const g = (at, over = {}) => ({ id: `g${id++}`, at, mode: "flag", n: 3, score: 4, max: 9, top: 1, mid: 1, hit: ["FR", "BE"], missed: ["NE"], streak: 2, ...over });
@@ -18,10 +20,20 @@ const T = (iso) => Date.parse(iso);
 {
   const games = [g(T("2026-10-22T09:00Z")), g(T("2026-10-22T21:00Z")), g(T("2026-10-22T23:30Z"))]; // 23 h30 UTC = 1 h30 à Paris le 23
   const p = computeProgress(games);
-  assert.deepEqual(games.map((x) => p.perGame.get(x.id).daily), [DAILY_BONUS, 0, DAILY_BONUS]);
-  assert.equal(p.xp, 3 * 4 + 2 * DAILY_BONUS + BADGE.get("premier-pas").reward);
+  // 11 h (ancien barème : 4 + 20), 23 h le même jour (nouveau : 1), 1 h 30 le lendemain (nouveau : 1 + tampon du jour)
+  assert.deepEqual(games.map((x) => p.perGame.get(x.id).daily), [20, 0, DAILY_BONUS]);
+  assert.equal(p.xp, 4 + 20 + 1 + 1 + DAILY_BONUS + BADGE.get("premier-pas").reward);
   assert.deepEqual(p.badges, ["premier-pas"]);
   assert.equal(p.balance, p.xp);
+}
+
+// Repère du barème : 3 parties de 20 questions honnêtes (15 cash, 3 carrés) ≈ un article à 60 tampons
+{
+  const at = (h) => RESCALE_AT + 864e5 + h * 36e5;
+  const three = [1, 2, 3].map((h) => g(at(h), { n: 20, score: 48, max: 60, top: 15, mid: 3, hit: Array(18).fill("FR"), missed: ["NE", "TD"], streak: 6 }));
+  const p = computeProgress(three);
+  const total = three.reduce((t, x) => t + p.perGame.get(x.id).total, 0);
+  assert.ok(total >= 50 && total <= 70, `3 parties = ${total} tampons`);
 }
 
 // Badges et solde

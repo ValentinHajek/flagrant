@@ -3,7 +3,11 @@
 import { ITEM } from "./items.js";
 import { MAP_PILE_KM } from "./quiz.js";
 
-export const DAILY_BONUS = 20;
+// Barème divisé par 3 pour les parties jouées depuis le 22 oct. 2026 à 17 h 30 (heure de Paris) :
+// environ 3 parties pour un article à 60. Les parties d'avant gardent l'ancien barème, personne ne perd ses tampons.
+export const RESCALE_AT = Date.UTC(2026, 9, 22, 15, 30);
+export const DAILY_BONUS = 10;
+const OLD_DAILY_BONUS = 20;
 const PARIS_DAY = new Intl.DateTimeFormat("fr-CA", { timeZone: "Europe/Paris" }); // AAAA-MM-JJ
 const dayNumber = (day) => Date.UTC(...day.split("-").map((v, k) => (k === 1 ? v - 1 : +v))) / 864e5;
 
@@ -26,10 +30,13 @@ export const titleOf = (level) => TITLES.find(([min]) => level >= min)[1];
 
 // Récompense d'une partie, hors bonus du jour (qui dépend des autres parties).
 export function gameReward(g) {
+  const old = g.at < RESCALE_AT;
+  const score = old ? g.score : Math.round(g.score / 3);
+  const streak = Math.max(0, (g.streak ?? 0) - 5);
   return {
-    score: g.score,
-    perfect: g.n >= 10 && g.top === g.n ? Math.round(g.score / 2) : 0,
-    streak: Math.max(0, (g.streak ?? 0) - 5),
+    score,
+    perfect: g.n >= 10 && g.top === g.n ? Math.round(score / 2) : 0,
+    streak: old ? streak : Math.floor(streak / 3),
   };
 }
 
@@ -66,7 +73,7 @@ export function computeProgress(games, owned = []) {
   for (const g of [...games].sort((a, b) => a.at - b.at)) {
     const r = gameReward(g);
     const day = PARIS_DAY.format(g.at);
-    const daily = days.has(day) ? 0 : DAILY_BONUS;
+    const daily = days.has(day) ? 0 : g.at < RESCALE_AT ? OLD_DAILY_BONUS : DAILY_BONUS;
     days.add(day);
     const total = r.score + r.perfect + r.streak + daily;
     perGame.set(g.id, { ...r, daily, total });
