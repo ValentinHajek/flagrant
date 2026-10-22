@@ -46,6 +46,7 @@ try {
   const a = await signIn("Val.Hajek@Example.com", "1.1.1.1");
   assert.equal(a.me.email, "val.hajek@example.com");
   assert.equal(a.me.pseudo, "Val Hajek");
+  assert.equal(a.me.pseudoSet, false, "pseudo pas encore choisi");
   assert.match(a.me.friendCode, /^[A-HJ-NP-Z2-9]{6}$/);
   assert.equal((await call("session", "POST", { body: { token: a.token } })).status, 400, "lien déjà utilisé");
   assert.equal((await call("login", "POST", { body: { email: "val.hajek@example.com" }, headers: { "x-forwarded-for": "1.1.1.1" } })).status, 429, "1 lien par minute");
@@ -54,7 +55,9 @@ try {
   assert.equal((await call("me", "GET")).status, 401, "sans session");
   assert.equal((await call("me", "GET", { token: "faux" })).status, 401, "session inconnue");
   assert.equal((await call("me", "PATCH", { token: a.session, body: { pseudo: "x" } })).status, 400);
-  assert.equal((await call("me", "PATCH", { token: a.session, body: { pseudo: "  Val   le Pro " } })).data.me.pseudo, "Val le Pro");
+  const renamed = (await call("me", "PATCH", { token: a.session, body: { pseudo: "  Val   le Pro " } })).data.me;
+  assert.deepEqual([renamed.pseudo, renamed.pseudoSet], ["Val le Pro", true]);
+  assert.equal((await call("me", "GET", { token: a.session })).data.me.pseudoSet, true, "choix du pseudo enregistré");
 
   // Parties : les invalides sont ignorées, l'envoi est idempotent.
   const g1 = game();

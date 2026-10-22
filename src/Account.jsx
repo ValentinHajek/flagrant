@@ -56,7 +56,8 @@ function LoggedOut({ notice }) {
 function LoggedIn({ account, setAccount, rivalId, onPickRival, onLoggedOut }) {
   const { me, friends } = account;
   const [code, setCode] = useState("");
-  const [pseudo, setPseudo] = useState(null); // null = pas en cours d'édition
+  // null = pas en cours d'édition. Ouvert d'office tant que le pseudo est celui tiré de l'e-mail.
+  const [pseudo, setPseudo] = useState(me.pseudoSet ? null : me.pseudo);
   const [copied, setCopied] = useState(false);
   const [{ busy, error }, run] = useAction();
 
@@ -94,20 +95,32 @@ function LoggedIn({ account, setAccount, rivalId, onPickRival, onLoggedOut }) {
   return (
     <>
       {pseudo === null ? (
-        <p className="font-medium text-muted">
-          Connecté : <b className="text-night">{me.pseudo}</b>{" "}
-          <button onClick={() => setPseudo(me.pseudo)} className="cursor-pointer text-sm font-semibold text-ink underline underline-offset-2">
-            modifier
-          </button>
-        </p>
-      ) : (
-        <form onSubmit={savePseudo} className="flex gap-2">
-          <input autoFocus value={pseudo} onChange={(e) => setPseudo(e.target.value)} maxLength={24} aria-label="Pseudo" className={field} />
-          <Stamp type="submit" disabled={busy} className="px-4 py-2 text-sm">
-            OK
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">Pseudo</span>
+          <span className="font-display text-2xl text-ink">{me.pseudo}</span>
+          <Stamp variant="ghost" onClick={() => setPseudo(me.pseudo)} className="px-3 py-1 text-xs">
+            Changer
           </Stamp>
+        </div>
+      ) : (
+        <form onSubmit={savePseudo} className="flex flex-col gap-2">
+          <label htmlFor="pseudo" className="font-semibold text-night">
+            {me.pseudoSet ? "Ton nouveau pseudo" : "Choisis ton pseudo : c'est ce que verront tes amis"}
+          </label>
+          <div className="flex gap-2">
+            <input id="pseudo" autoFocus value={pseudo} onChange={(e) => setPseudo(e.target.value)} maxLength={24} className={field} />
+            <Stamp type="submit" disabled={busy || pseudo.trim().length < 2} className="px-4 py-2 text-sm">
+              OK
+            </Stamp>
+            {me.pseudoSet && (
+              <button type="button" onClick={() => setPseudo(null)} className="cursor-pointer text-sm font-semibold text-muted underline underline-offset-2">
+                Annuler
+              </button>
+            )}
+          </div>
         </form>
       )}
+      <p className="-mt-2 text-sm font-medium text-muted">Connecté avec {me.email}</p>
 
       <div className="flex flex-wrap items-center gap-3">
         <span className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">Ton code ami</span>

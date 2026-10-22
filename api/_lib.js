@@ -98,7 +98,8 @@ export async function limit(d, key, max, seconds) {
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const friendCode = () => Array.from(randomBytes(6), (b) => ALPHABET[b % 32]).join("");
 
-export const publicMe = (u) => ({ id: u._id, pseudo: u.pseudo, friendCode: u.friendCode, email: u.email });
+// pseudoSet : le joueur a choisi son pseudo (sinon c'est celui tiré de l'e-mail, et on lui propose de le changer).
+export const publicMe = (u) => ({ id: u._id, pseudo: u.pseudo, pseudoSet: u.pseudoSet === true, friendCode: u.friendCode, email: u.email });
 
 export async function findOrCreateUser(d, email) {
   const users = d.collection("users");
@@ -107,7 +108,7 @@ export async function findOrCreateUser(d, email) {
   for (let k = 0; k < 5; k++) {
     const existing = await users.findOne({ email });
     if (existing) return existing;
-    const user = { _id: randomUUID(), email, pseudo, friendCode: friendCode(), friends: [], createdAt: new Date() };
+    const user = { _id: randomUUID(), email, pseudo, pseudoSet: false, friendCode: friendCode(), friends: [], createdAt: new Date() };
     try {
       await users.insertOne(user);
       return user;

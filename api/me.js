@@ -12,6 +12,6 @@ export const PATCH = route(async (request) => {
   const { d, user } = await requireUser(request);
   const pseudo = String((await body(request)).pseudo ?? "").replace(/\s+/g, " ").trim();
   if (pseudo.length < 2 || pseudo.length > 24 || /\p{C}/u.test(pseudo)) throw new HttpError(400, "Pseudo : 2 à 24 caractères");
-  await d.collection("users").updateOne({ _id: user._id }, { $set: { pseudo } });
-  return json(request, { me: publicMe({ ...user, pseudo }) });
+  await d.collection("users").updateOne({ _id: user._id }, { $set: { pseudo, pseudoSet: true } });
+  return json(request, { me: publicMe({ ...user, pseudo, pseudoSet: true }) });
 });
