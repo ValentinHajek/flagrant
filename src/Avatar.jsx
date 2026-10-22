@@ -9,6 +9,8 @@ const thin = { ...line, strokeWidth: 1.2 };
 
 const BODY = "M12,124 C14,100 34,89 60,89 C86,89 106,100 108,124 Z";
 const CAP = "M37,52 C35,33 46,26 60,26 C75,26 85,33 83,52 C80,44 74,39 66,40 C62,36 54,35 50,38 C44,40 40,45 37,52 Z";
+// Dessus du mulet : le même contour que CAP, mais avec du volume sur le crâne
+const MULLET_TOP = "M37,52 C33,30 45,17 60,18 C75,17 87,30 83,52 C80,43 75,38 67,38 C63,34 55,33 50,36 C44,38 40,44 37,52 Z";
 
 /* ---------- Fonds ---------- */
 const BACKGROUNDS = {
@@ -158,12 +160,12 @@ function HairBack({ style, color }) {
         {...line}
       />
     );
-  // Mulet : côtés courts (caché derrière le visage), la nuque longue ressort sous la mâchoire et tombe
-  // sur les épaules, en contournant le col
+  // Mulet : côtés courts (caché derrière le visage), la nuque ressort sous la mâchoire et s'arrête au ras
+  // des épaules, pointes relevées, en contournant le col
   if (style === "mulet")
     return (
       <path
-        d="M47,60 C46,68 46,74 45,80 C42,86 37,92 33,97 Q41,101 49,97 C51,93 53,90 55,88 L65,88 C67,90 69,93 71,97 Q79,101 87,97 C83,92 78,86 75,80 C74,74 74,68 73,60 Z"
+        d="M47,60 C46,68 46,74 45,79 C43,83 41,86 39,89 Q45,93 50,89 C51,86 52,84 53,82 L67,82 C68,84 69,86 70,89 Q75,93 81,89 C79,86 77,83 75,79 C74,74 74,68 73,60 Z"
         fill={color}
         {...line}
       />
@@ -179,9 +181,12 @@ function HairBack({ style, color }) {
   return null;
 }
 
-function HairFront({ style, color }) {
+// hatted : un chapeau est porté, on garde un dessus plat pour qu'il ne dépasse pas du couvre-chef.
+function HairFront({ style, color, hatted }) {
   const p = { fill: color, ...line };
   switch (style) {
+    case "mulet":
+      return <path d={hatted ? CAP : MULLET_TOP} {...p} />;
     case "boucles":
       return (
         <g {...p}>
@@ -523,7 +528,7 @@ export default function Avatar({ look = DEFAULT_LOOK, size = 96, mood = "happy",
           <circle cx="82" cy="56" r="5" fill={l.skin} {...line} />
           <ellipse cx="60" cy="54" rx="22" ry="24" fill={l.skin} {...line} />
           <Face eyes={l.eyes} mood={mood} />
-          <HairFront style={l.hair} color={l.hairColor} />
+          <HairFront style={l.hair} color={l.hairColor} hatted={Boolean(l.hat)} />
           <Earrings id={l.earrings} />
           <Glasses id={l.glasses} />
           <Hat id={l.hat} />
