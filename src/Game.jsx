@@ -6,7 +6,7 @@ import { PTS_CARRE, PTS_CASH, SECONDS, distractors, flagUrl, shuffle } from "./q
 
 const DELAY_OK = 1000;
 const DELAY_KO = 2400;
-const LOW = 3; // secondes restantes à partir desquelles le chrono passe en alerte
+const LOW = 5; // secondes restantes à partir desquelles le chrono passe en alerte
 const spring = { type: "spring", stiffness: 320, damping: 24 };
 
 // Éclats d'encre autour de la carte sur une bonne réponse.
@@ -84,7 +84,7 @@ export default function Game({ all, quiz, onFinish, onQuit }) {
   };
 
   // Chrono de la question : démarre quand l'indice est visible, s'arrête à la réponse.
-  // Le carré ne le relance pas, sinon ce serait 10 s gratuites.
+  // Le carré ne le relance pas, sinon ce serait du temps gratuit.
   const onTimeout = useRef();
   onTimeout.current = () => answer("", false, null, true);
   useEffect(() => {

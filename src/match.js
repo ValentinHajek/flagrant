@@ -22,7 +22,7 @@ const names = (c) =>
 // Bonne réponse si le pays le plus proche de la saisie est la cible, dans la tolérance.
 // Empêche "Niger" de valider "Nigéria" ou "Guinée" de valider "Guinée-Bissau".
 // Sinon, un début de nom suffit s'il ne désigne qu'un seul pays ("saint vincent", "papouasie") :
-// indispensable pour les noms à rallonge avec 10 s par question.
+// indispensable pour taper les noms à rallonge avant la fin du chrono.
 export function isCorrect(input, target, all) {
   const q = normalize(input);
   if (!q) return false;

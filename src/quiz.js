@@ -1,4 +1,4 @@
-export const SECONDS = 10; // chrono par question
+export const SECONDS = 20; // chrono par question
 export const PTS_CASH = 3;
 export const PTS_CARRE = 1;
 export const COUNTS = [10, 20, 30, 50, "all"];
