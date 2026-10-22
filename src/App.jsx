@@ -9,7 +9,7 @@ import Home from "./Home.jsx";
 import { loadProfile, saveProfile, syncProfile } from "./profile.js";
 import { computeProgress } from "./progress.js";
 import Stats from "./Stats.jsx";
-import { COUNTS, DEFAULT_COUNT, DUEL_MAX, MODES, buildQuiz, fromSeries, toSeries, total } from "./quiz.js";
+import { COUNTS, DEFAULT_COUNT, DUEL_MAX, MODES, PTS_CASH, buildQuiz, fromSeries, shuffle, toSeries, total } from "./quiz.js";
 import { sound } from "./sound.js";
 import { loadHistory, recordGame, toEntry, withLocalPlays } from "./stats.js";
 import { bestKey, load, save } from "./storage.js";
@@ -153,7 +153,20 @@ export default function App() {
     setServerDuels((list) => list.map((x) => (x.id === duel.id ? { ...x, declined: true } : x)));
   };
 
+  // Révision : on rejoue les erreurs (et les carrés) en boucle jusqu'à tout trouver du premier coup. Ne compte nulle part.
+  const practise = (results, round = 1) => {
+    const questions = shuffle(results.filter((r) => r.points < PTS_CASH).map(({ country, type }) => ({ country, type })));
+    if (!questions.length) {
+      setEnd({ results, practice: round - 1 });
+      return setScreen("end");
+    }
+    sound("depart");
+    setQuiz({ scope: quiz.scope, questions, id: Date.now(), practice: round });
+    setScreen("game");
+  };
+
   const finish = (results) => {
+    if (quiz.practice) return practise(results, quiz.practice + 1);
     const { duel } = quiz;
     // Un défi se range avec les parties de son mode, même s'il diffère des réglages de l'accueil.
     const game = duel ? { mode: duel.mode, territories: duel.territories, count: results.length } : settings;
@@ -205,6 +218,7 @@ export default function App() {
                   all={all}
                   look={profile.look}
                   onAgain={start}
+                  onPractise={() => practise(end.results)}
                   onMenu={() => setScreen("home")}
                   onStats={() => setScreen("stats")}
                   onWardrobe={() => openWardrobe()}

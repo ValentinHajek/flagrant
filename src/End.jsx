@@ -198,7 +198,7 @@ function Rewards({ reward: { before, after, gain }, badges, look, mood, onWardro
   );
 }
 
-export default function End({ results, all = [], best, isRecord, reward, duel, look, onAgain, onMenu, onStats, onWardrobe, onBadges }) {
+export default function End({ results, all = [], best, isRecord, reward, duel, practice, look, onAgain, onPractise, onMenu, onStats, onWardrobe, onBadges }) {
   const bonus = results.reduce((s, r) => s + (r.bonus ?? 0), 0);
   const score = results.reduce((s, r) => s + r.points, 0) + bonus;
   const max = results.length * PTS_CASH;
@@ -225,6 +225,29 @@ export default function End({ results, all = [], best, isRecord, reward, duel, l
   useEffect(() => {
     if (zoom) zoomRef.current?.showModal();
   }, [zoom]);
+
+  const misses = results.filter((r) => r.points < PTS_CASH).length;
+  const buttons = (
+    <div className="flex flex-col gap-3 sm:flex-row">
+      <Stamp ref={againRef} onClick={onAgain} className="flex-1 py-4 text-xl">Rejouer</Stamp>
+      <Stamp variant="ghost" onClick={onMenu} className="py-4">Changer de mode</Stamp>
+      {!practice && <Stamp variant="link" onClick={onStats} className="py-4">Mes stats</Stamp>}
+    </div>
+  );
+
+  if (practice)
+    return (
+      <div className="flex flex-col gap-7">
+        <div className="flex flex-col gap-3">
+          <Kicker>Révision</Kicker>
+          <InkTitle as="h2" className="text-[clamp(4rem,16vw,8rem)]">Tout bon !</InkTitle>
+          <p className="text-xl font-medium text-muted">
+            Tout trouvé du premier coup en {practice} tour{practice > 1 ? "s" : ""}. Juste de l'entraînement : ça ne compte pas dans les stats.
+          </p>
+        </div>
+        {buttons}
+      </div>
+    );
 
   const [top, mid] = results[0].type === "map" ? ["Pile", "Proche"] : ["Flash", "Carré"];
   const stats = [
@@ -278,11 +301,12 @@ export default function End({ results, all = [], best, isRecord, reward, duel, l
       {reward && <Rewards reward={reward} badges={newBadges} look={look} mood={score / max >= 0.6 ? "happy" : score / max >= 0.3 ? "neutral" : "sad"} onWardrobe={onWardrobe} onBadges={onBadges} />}
       {newBadges.length > 0 && <BadgeUnlocked badges={newBadges} look={look} />}
 
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <Stamp ref={againRef} onClick={onAgain} className="flex-1 py-4 text-xl">Rejouer</Stamp>
-        <Stamp variant="ghost" onClick={onMenu} className="py-4">Changer de mode</Stamp>
-        <Stamp variant="link" onClick={onStats} className="py-4">Mes stats</Stamp>
-      </div>
+      {buttons}
+      {misses > 0 && (
+        <Stamp variant="ghost" onClick={onPractise} className="py-3">
+          Réviser mes erreurs ({misses}) · sans points
+        </Stamp>
+      )}
 
       <div className="flex flex-col gap-3">
         <h3 className="font-display text-2xl uppercase text-night">Le récap</h3>

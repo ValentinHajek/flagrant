@@ -123,7 +123,7 @@ export default function Game({ all, map, quiz, onFinish, onQuit }) {
     let n = 0; // bonnes réponses d'affilée juste avant : la note monte avec la série
     while (answers.current[i - n - 1]?.points) n++;
     sound(r.points === PTS_CASH ? "flash" : r.points ? "carre" : "rate", n);
-    if (r.points === PTS_CASH) {
+    if (r.points === PTS_CASH && !quiz.practice) {
       let run = 1; // flash d'affilée, celui-ci compris
       while (answers.current[i - run]?.points === PTS_CASH) run++;
       r.combo = run;
@@ -229,12 +229,19 @@ export default function Game({ all, map, quiz, onFinish, onQuit }) {
           <span className="text-4xl">{secs}</span>
           <span className="text-base text-muted">s</span>
         </motion.div>
+        {quiz.practice ? (
+          <div className="text-right text-xs font-semibold uppercase leading-tight tracking-[0.18em] text-muted">
+            Révision
+            <span className="block text-ink">Tour {quiz.practice}</span>
+          </div>
+        ) : (
         <div className="flex items-baseline gap-1 font-display text-2xl text-ink" aria-live="polite">
           <motion.span key={score} initial={{ scale: 1.8, color: "#ff5a1e" }} animate={{ scale: 1, color: "#2340c4" }} transition={spring} className="inline-block tabular-nums">
             {score}
           </motion.span>
           <span className="text-base text-muted">pts</span>
         </div>
+        )}
       </div>
 
       {/* Chrono de la question + suivi de la partie */}
