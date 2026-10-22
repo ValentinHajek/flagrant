@@ -14,4 +14,5 @@ export function save(key, value) {
   } catch {}
 }
 
-export const bestKey = (mode, territories, count) => `best:${mode}:${territories ? "all" : "sov"}:${count}`;
+// Records au barème à 5 points par flash : ceux d'avant (3 points) ne sont plus comparables, on repart de zéro.
+export const bestKey = (mode, territories, count) => `best5:${mode}:${territories ? "all" : "sov"}:${count}`;

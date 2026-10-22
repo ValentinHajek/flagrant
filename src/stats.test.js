@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { PTS_CARRE, PTS_CASH } from "./quiz.js";
 import { compareCountries, summarize, toEntry } from "./stats.js";
 
 const country = (code) => ({ code });
@@ -6,14 +7,14 @@ const game = (mode, score, max, missed = [], hit = []) => ({ mode, score, max, n
 
 // toEntry : points, compteurs et codes
 const e = toEntry({ mode: "flag", territories: false }, [
-  { points: 3, country: country("FR") },
-  { points: 1, country: country("BE") },
+  { points: PTS_CASH, country: country("FR") },
+  { points: PTS_CARRE, country: country("BE") },
   { points: 0, country: country("NE") },
 ]);
-assert.deepEqual([e.score, e.max, e.top, e.mid, e.n], [4, 9, 1, 1, 3]);
+assert.deepEqual([e.score, e.max, e.top, e.mid, e.n], [PTS_CASH + PTS_CARRE, 3 * PTS_CASH, 1, 1, 3]);
 assert.deepEqual([e.hit, e.missed], [["FR", "BE"], ["NE"]]);
 assert.equal(e.streak, 2, "meilleure série");
-assert.equal(toEntry({ mode: "flag" }, [3, 0, 3, 1, 3, 0].map((points) => ({ points, country: country("FR") }))).streak, 3);
+assert.equal(toEntry({ mode: "flag" }, [PTS_CASH, 0, PTS_CASH, PTS_CARRE, PTS_CASH, 0].map((points) => ({ points, country: country("FR") }))).streak, 3);
 assert.ok(e.id && e.at && e.mode === "flag");
 
 // Aucun historique pour ce mode

@@ -1,5 +1,5 @@
 export const SECONDS = 20; // chrono par question
-export const PTS_CASH = 3;
+export const PTS_CASH = 5; // flash (saisie libre) ou pile sur la carte : avant le 22/10/2026, 3 points
 export const PTS_CARRE = 1;
 export const COUNTS = [10, 20, 30, 50, "all"];
 export const DEFAULT_COUNT = 20;

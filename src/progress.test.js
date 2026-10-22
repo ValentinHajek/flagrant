@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { BASE, ITEM, ITEMS, cleanLook, DEFAULT_LOOK } from "./items.js";
 import { BADGE, DAILY_BONUS, RESCALE_AT, cannotBuy, computeProgress, gameReward, levelOf, titleOf } from "./progress.js";
+import { PTS_CARRE, PTS_CASH } from "./quiz.js";
 
 // Niveaux : 50, 150, 300, 500…
 assert.deepEqual([0, 49, 50, 149, 150, 299, 300, 500].map(levelOf), [1, 1, 2, 2, 3, 3, 4, 5]);
@@ -27,13 +28,15 @@ const T = (iso) => Date.parse(iso);
   assert.equal(p.balance, p.xp);
 }
 
-// Repère du barème : 3 parties de 20 questions honnêtes (15 cash, 3 carrés) ≈ un article à 60 tampons
+// Repère du barème : avec des parties de 20 questions honnêtes (15 flash, 3 carrés), la casquette
+// s'obtient en 5 à 9 parties
 {
+  const cheapest = ITEM.get("cap").price;
   const at = (h) => RESCALE_AT + 864e5 + h * 36e5;
-  const three = [1, 2, 3].map((h) => g(at(h), { n: 20, score: 48, max: 60, top: 15, mid: 3, hit: Array(18).fill("FR"), missed: ["NE", "TD"], streak: 6 }));
-  const p = computeProgress(three);
-  const total = three.reduce((t, x) => t + p.perGame.get(x.id).total, 0);
-  assert.ok(total >= 50 && total <= 70, `3 parties = ${total} tampons`);
+  const honest = (h) => g(at(h), { n: 20, score: 15 * PTS_CASH + 3 * PTS_CARRE, max: 20 * PTS_CASH, top: 15, mid: 3, hit: Array(18).fill("FR"), missed: ["NE", "TD"], streak: 6 });
+  let played = 0;
+  for (const games = []; computeProgress(games).xp < cheapest; ) games.push(honest(++played));
+  assert.ok(played >= 5 && played <= 9, `${played} parties pour un article à ${cheapest}`);
 }
 
 // Badges et solde

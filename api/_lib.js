@@ -130,6 +130,10 @@ export async function findOrCreateUser(d, email) {
 
 // Une partie envoyée par le navigateur : tout est vérifié, y compris la cohérence score / réponses.
 const isCode = (c) => typeof c === "string" && /^[A-Z]{2}$/.test(c);
+// Barème actuel, puis l'ancien (3 points par flash) : une partie jouée avant le changement et pas encore
+// synchronisée doit rester acceptée.
+const SCALES = [[PTS_CASH, PTS_CARRE], [3, 1]];
+
 export function cleanGame(g) {
   const int = (v, min, max) => Number.isInteger(v) && v >= min && v <= max;
   const ok =
@@ -138,10 +142,9 @@ export function cleanGame(g) {
     /^[\w-]{8,64}$/.test(g.id) &&
     MODES.includes(g.mode) &&
     int(g.n, 1, 300) &&
-    g.max === g.n * PTS_CASH &&
     int(g.top, 0, g.n) &&
     int(g.mid, 0, g.n - g.top) &&
-    g.score === g.top * PTS_CASH + g.mid * PTS_CARRE &&
+    SCALES.some(([cash, carre]) => g.max === g.n * cash && g.score === g.top * cash + g.mid * carre) &&
     Number.isFinite(g.at) &&
     g.at > Date.UTC(2026, 0, 1) &&
     g.at < Date.now() + 864e5 &&
