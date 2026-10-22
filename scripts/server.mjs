@@ -16,6 +16,8 @@ const TYPES = {
   ".svg": "image/svg+xml",
   ".png": "image/png",
   ".ico": "image/x-icon",
+  ".txt": "text/plain; charset=utf-8",
+  ".xml": "application/xml; charset=utf-8",
 };
 
 async function serveApi(req, res, url) {
@@ -60,4 +62,4 @@ createServer(async (req, res) => {
     console.error(e);
     if (!res.headersSent) res.writeHead(e instanceof URIError ? 400 : 500).end();
   }
-}).listen(PORT, () => console.log(`Flagrant : http://localhost:${PORT}${STATIC ? "" : "/api"}`));
+}).listen(PORT, () => console.log(`Geoflash : http://localhost:${PORT}${STATIC ? "" : "/api"}`));

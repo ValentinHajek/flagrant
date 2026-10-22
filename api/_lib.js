@@ -170,8 +170,8 @@ export async function sendLoginLink(email, link) {
   await transport.sendMail({
     from: process.env.MAIL_FROM,
     to: email,
-    subject: "Ton lien de connexion Flagrant",
-    text: `Clique pour te connecter à Flagrant (lien valable 15 minutes) :\n${link}\n\nSi tu n'as rien demandé, ignore ce message.`,
-    html: `<p>Clique pour te connecter à <b>Flagrant</b> (lien valable 15 minutes) :</p><p><a href="${link}" style="display:inline-block;padding:12px 20px;border-radius:999px;background:#ff5a1e;color:#fff;font-weight:bold;text-decoration:none">Me connecter</a></p><p style="color:#5c5647">Si tu n'as rien demandé, ignore ce message.</p>`,
+    subject: "Ton lien de connexion Geoflash",
+    text: `Clique pour te connecter à Geoflash (lien valable 15 minutes) :\n${link}\n\nSi tu n'as rien demandé, ignore ce message.`,
+    html: `<p>Clique pour te connecter à <b>Geoflash</b> (lien valable 15 minutes) :</p><p><a href="${link}" style="display:inline-block;padding:12px 20px;border-radius:999px;background:#ff5a1e;color:#fff;font-weight:bold;text-decoration:none">Me connecter</a></p><p style="color:#5c5647">Si tu n'as rien demandé, ignore ce message.</p>`,
   });
 }

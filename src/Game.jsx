@@ -76,7 +76,7 @@ function Verdict({ q, r }) {
     return r.points ? `Pas loin : à ${fmtKm(r.km)}` : <>Raté de <span className="text-fluo">{fmtKm(r.km)}</span></>;
   }
   if (!r.correct) return <>C'était <span className="text-fluo">{q.country.nom}</span></>;
-  return r.given.trim().toLowerCase() === q.country.nom.toLowerCase() ? "Flagrant !" : `Oui : ${q.country.nom}`;
+  return r.given.trim().toLowerCase() === q.country.nom.toLowerCase() ? "Geoflash !" : `Oui : ${q.country.nom}`;
 }
 
 export default function Game({ all, map, quiz, onFinish, onQuit }) {

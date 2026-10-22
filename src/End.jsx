@@ -9,7 +9,7 @@ import { PTS_CASH, flagUrl } from "./quiz.js";
 import { XpBar } from "./Wardrobe.jsx";
 
 const VERDICTS = [
-  [0.9, "Flagrant délit de génie."],
+  [0.9, "Éclair de génie."],
   [0.6, "Solide. Le Kirghizistan tremble."],
   [0.3, "Ça vient. Encore un tour ?"],
   [0, "Le monde est grand. On y retourne ?"],

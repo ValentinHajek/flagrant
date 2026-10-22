@@ -73,7 +73,7 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
 
       <motion.header variants={rise} className="flex items-center gap-2">
         <Logo size={34} />
-        <span className="font-display text-xl uppercase tracking-[0.02em] text-ink max-[380px]:hidden">Flagrant</span>
+        <span className="font-display text-xl uppercase tracking-[0.02em] text-ink max-[380px]:hidden">Geoflash</span>
         <button
           onClick={onStats}
           aria-label="Mes stats"
@@ -107,7 +107,7 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
 
       <motion.div variants={rise} className="flex flex-col gap-4 sm:pt-4">
         <Kicker>{questionCount(all, mode, territories, count)} questions · {SECONDS} s par question</Kicker>
-        <InkTitle className="text-[clamp(4.5rem,19vw,9.5rem)]">Flagrant.</InkTitle>
+        <InkTitle className="text-[clamp(4.5rem,19vw,9.5rem)]">Geoflash.</InkTitle>
       </motion.div>
 
       <motion.fieldset variants={rise} className="flex flex-col gap-3">
