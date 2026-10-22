@@ -3,7 +3,8 @@ import { useMemo } from "react";
 import { LoginForm } from "./Account.jsx";
 import { API_ENABLED, getSession } from "./api.js";
 import Avatar from "./Avatar.jsx";
-import { Glyph, InkTitle, Kicker, Logo, Marquee, Motif, Stamp, Tampon } from "./brand.jsx";
+import { Glyph, InkTitle, Kicker, Logo, Marquee, Medal, Motif, Stamp, Tampon } from "./brand.jsx";
+import { BADGES } from "./progress.js";
 import { COUNTS, MAP_PILE_KM, MAP_PROCHE_KM, PTS_CARRE, PTS_CASH, SECONDS, flagUrl, questionCount, shuffle } from "./quiz.js";
 import { bestKey, load } from "./storage.js";
 
@@ -60,7 +61,7 @@ const rise = {
   animate: { opacity: 1, y: 0, rotate: 0, transition: { type: "spring", stiffness: 260, damping: 22 } },
 };
 
-export default function Home({ all, settings, setSettings, onStart, loading, onStats, look, progress, onWardrobe }) {
+export default function Home({ all, settings, setSettings, onStart, loading, onStats, look, progress, onWardrobe, onBadges }) {
   const { mode, territories, count } = settings;
   const ribbon = useMemo(() => shuffle(all.filter((c) => c.souverain && c.tld)).slice(0, 18), [all]);
 
@@ -72,7 +73,7 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
 
       <motion.header variants={rise} className="flex items-center gap-2">
         <Logo size={34} />
-        <span className="font-display text-xl uppercase tracking-[0.02em] text-ink">Flagrant</span>
+        <span className="font-display text-xl uppercase tracking-[0.02em] text-ink max-[380px]:hidden">Flagrant</span>
         <button
           onClick={onStats}
           aria-label="Mes stats"
@@ -84,6 +85,14 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
             <rect x="11.5" y="1" width="3.5" height="14" rx="1" />
           </svg>
           <span className="hidden sm:inline">Mes stats</span>
+        </button>
+        <button
+          onClick={onBadges}
+          aria-label={`Badges : ${progress.badges.length} sur ${BADGES.length}`}
+          className="flex h-9 cursor-pointer items-center gap-2 rounded-full border-2 border-ink px-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-colors hover:bg-ink hover:text-paper focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-fluo"
+        >
+          <Medal />
+          <span className="hidden sm:inline">Badges</span>
         </button>
         <button
           onClick={onWardrobe}

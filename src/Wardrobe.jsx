@@ -2,13 +2,13 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { useAction } from "./Account.jsx";
 import Avatar from "./Avatar.jsx";
-import { InkTitle, Kicker, Logo, Stamp, Tampon } from "./brand.jsx";
+import { InkTitle, Kicker, Logo, Medal, Stamp, Tampon } from "./brand.jsx";
 import { BASE, ITEM, ITEMS, RARITY, SLOTS } from "./items.js";
 import { buyItem, saveLook } from "./profile.js";
-import { BADGE, BADGES, DAILY_BONUS, cannotBuy } from "./progress.js";
+import { BADGE, DAILY_BONUS, cannotBuy } from "./progress.js";
 
 const card = "rounded-[20px] border-[2.5px] border-night bg-paper";
-const TABS = [["base", "Toi"], ...SLOTS, ["badges", "Badges"]];
+const TABS = [["base", "Toi"], ...SLOTS];
 const HAIR_COLORS = ["Noir", "Châtain", "Roux", "Blond", "Gris", "Bleu"];
 
 // Barre d'expérience du niveau en cours. from : remplissage de départ (0 à 1), pour l'animer après une partie.
@@ -79,57 +79,10 @@ const Field = ({ label, children }) => (
 
 const grid = "grid grid-cols-3 gap-3 sm:grid-cols-4";
 
-function Badges({ progress }) {
-  return (
-    <ul className="grid gap-3 sm:grid-cols-2">
-      {BADGES.map((b) => {
-        const got = progress.badges.includes(b.id);
-        const [cur, max] = (!got && b.goal?.(progress.stats)) || [];
-        const gift = ITEMS.find((i) => i.badge === b.id);
-        return (
-          <li key={b.id} className={`${card} flex items-start gap-3 p-4 ${got ? "shadow-print" : ""}`}>
-            <span className={`grid size-11 shrink-0 -rotate-8 place-items-center rounded-full border-[2.5px] ${got ? "border-fluo text-fluo" : "border-dashed border-night/25 text-night/25"}`}>
-              <Tampon size={22} />
-            </span>
-            <div className="flex min-w-0 flex-1 flex-col gap-1">
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="font-display text-lg uppercase text-ink">{b.name}</span>
-                <span className="flex shrink-0 items-center gap-1 text-sm font-semibold text-muted tabular-nums">
-                  +{b.reward}
-                  <Tampon size={12} />
-                </span>
-              </div>
-              <p className="text-sm font-medium text-muted">{b.desc}</p>
-              {got && <span className="text-xs font-semibold uppercase tracking-[0.16em] text-leaf">Obtenu ✓</span>}
-              {max && (
-                <div className="flex items-center gap-2">
-                  <div
-                    role="progressbar"
-                    aria-label={b.name}
-                    aria-valuemin={0}
-                    aria-valuemax={max}
-                    aria-valuenow={Math.min(cur, max)}
-                    className="h-2 flex-1 overflow-hidden rounded-full bg-paper-deep"
-                  >
-                    <div className="h-full rounded-full bg-ink" style={{ width: `${(Math.min(cur, max) / max) * 100}%` }} />
-                  </div>
-                  <span className="text-xs font-semibold text-muted tabular-nums">
-                    {Math.min(cur, max)}/{max}
-                  </span>
-                </div>
-              )}
-              {gift && <p className="text-xs font-semibold text-night">Article exclusif : {gift.name}</p>}
-            </div>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-export default function Wardrobe({ profile, setProfile, progress, onBack }) {
-  const [tab, setTab] = useState("hat");
-  const [trying, setTrying] = useState(null); // article essayé, pas encore à toi
+// focus : article à montrer en arrivant (ex. l'exclusif d'un badge, depuis la page Badges).
+export default function Wardrobe({ profile, setProfile, progress, focus, onBack, onBadges }) {
+  const [tab, setTab] = useState(ITEM.get(focus)?.slot ?? "hat");
+  const [trying, setTrying] = useState(focus && !profile.owned.includes(focus) ? focus : null); // article essayé, pas encore à toi
   const [{ busy, error }, run] = useAction();
   const { owned, look } = profile;
   const tried = ITEM.get(trying);
@@ -166,6 +119,13 @@ export default function Wardrobe({ profile, setProfile, progress, onBack }) {
         <Kicker>
           {owned.length} / {ITEMS.length} articles
         </Kicker>
+        <button
+          onClick={onBadges}
+          className="ml-auto flex h-9 shrink-0 cursor-pointer items-center gap-2 rounded-full border-2 border-ink px-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-colors hover:bg-ink hover:text-paper focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-fluo"
+        >
+          <Medal />
+          Badges {progress.badges.length}/{BADGE.size}
+        </button>
       </header>
       <InkTitle className="text-[clamp(3.5rem,15vw,6.5rem)]">Vestiaire.</InkTitle>
       <p className="-mt-2 max-w-xl font-medium text-muted">
@@ -199,7 +159,14 @@ export default function Wardrobe({ profile, setProfile, progress, onBack }) {
                   </button>
                 </div>
                 {reason ? (
-                  <p className="text-sm font-semibold text-fluo">{reason}</p>
+                  <p className="text-sm font-semibold text-fluo">
+                    {reason}
+                    {tried.badge && !progress.badges.includes(tried.badge) && (
+                      <button onClick={onBadges} className="ml-1.5 cursor-pointer text-ink underline underline-offset-2">
+                        Comment l'obtenir ?
+                      </button>
+                    )}
+                  </p>
                 ) : (
                   <Stamp onClick={buy} disabled={busy} className="px-4 py-2 text-sm">
                     {tried.price ? (
@@ -237,9 +204,7 @@ export default function Wardrobe({ profile, setProfile, progress, onBack }) {
           </div>
 
           <motion.div key={tab} role="tabpanel" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-            {tab === "badges" ? (
-              <Badges progress={progress} />
-            ) : tab === "base" ? (
+            {tab === "base" ? (
               <div className="flex flex-col gap-6">
                 <Field label="Peau">
                   <div className="flex flex-wrap gap-3">

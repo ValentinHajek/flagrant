@@ -1,5 +1,6 @@
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
+import Badges from "./Badges.jsx";
 import End from "./End.jsx";
 import Game from "./Game.jsx";
 import { API_ENABLED, api, getSession, setSession, syncHistory } from "./api.js";
@@ -36,6 +37,8 @@ export default function App() {
   const [error, setError] = useState(null);
   const [settings, setSettingsState] = useState(loadSettings);
   const [screen, setScreen] = useState("home");
+  const [badgesBack, setBadgesBack] = useState("home"); // la page Badges revient là d'où on l'a ouverte
+  const [focus, setFocus] = useState(null); // article à montrer en ouvrant le vestiaire
   const [quiz, setQuiz] = useState(null);
   const [end, setEnd] = useState(null);
   const [notice, setNotice] = useState(null);
@@ -88,6 +91,15 @@ export default function App() {
       .catch(() => setError("la carte"));
   }, [needMap, map]);
 
+  const openWardrobe = (item = null) => {
+    setFocus(item);
+    setScreen("wardrobe");
+  };
+  const openBadges = () => {
+    setBadgesBack(screen);
+    setScreen("badges");
+  };
+
   const setSettings = (s) => {
     setSettingsState(s);
     save("settings", s);
@@ -119,7 +131,7 @@ export default function App() {
       <main className={`mx-auto px-4 pb-16 pt-6 sm:px-10 sm:pt-10 ${screen === "stats" || screen === "wardrobe" ? "max-w-5xl" : "max-w-2xl"}`}>
         {error && <p className="font-semibold text-fluo">Impossible de charger {error}. Recharge la page.</p>}
         {all && (
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo(0, 0)}>
             <motion.section key={screen === "game" ? quiz.id : screen} variants={page} initial="initial" animate="animate" exit="exit">
               {screen === "home" && (
                 <Home
@@ -131,7 +143,8 @@ export default function App() {
                   onStats={() => setScreen("stats")}
                   look={profile.look}
                   progress={progress}
-                  onWardrobe={() => setScreen("wardrobe")}
+                  onWardrobe={() => openWardrobe()}
+                  onBadges={openBadges}
                 />
               )}
               {screen === "game" && <Game all={all} map={map} quiz={quiz} onFinish={finish} onQuit={() => setScreen("home")} />}
@@ -143,10 +156,16 @@ export default function App() {
                   onAgain={start}
                   onMenu={() => setScreen("home")}
                   onStats={() => setScreen("stats")}
-                  onWardrobe={() => setScreen("wardrobe")}
+                  onWardrobe={() => openWardrobe()}
+                  onBadges={openBadges}
                 />
               )}
-              {screen === "wardrobe" && <Wardrobe profile={profile} setProfile={setProfile} progress={progress} onBack={() => setScreen("home")} />}
+              {screen === "wardrobe" && (
+                <Wardrobe profile={profile} setProfile={setProfile} progress={progress} focus={focus} onBack={() => setScreen("home")} onBadges={openBadges} />
+              )}
+              {screen === "badges" && (
+                <Badges progress={progress} look={profile.look} owned={profile.owned} onBack={() => setScreen(badgesBack)} onWardrobe={openWardrobe} />
+              )}
               {screen === "stats" && (
                 <Stats
                   all={all}

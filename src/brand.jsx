@@ -68,6 +68,14 @@ export const Tampon = ({ size = 16, className = "" }) => (
   </svg>
 );
 
+/* ---------- Rosette : les badges ---------- */
+export const Medal = ({ className = "size-3.5" }) => (
+  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden className={className}>
+    <circle cx="8" cy="6" r="4.3" />
+    <path d="M5.4 9.6 4.6 15 8 13l3.4 2-.8-5.4" />
+  </svg>
+);
+
 /* ---------- Motifs flottants (globe, punaise, boussole, fanion) ---------- */
 const MOTIFS = {
   globe: (

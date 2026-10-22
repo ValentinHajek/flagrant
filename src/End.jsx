@@ -34,7 +34,7 @@ function CountUp({ to, delay = 0 }) {
 }
 
 // Ce que la partie rapporte : tampons (détail des bonus), expérience, badges et articles débloqués.
-function Rewards({ reward: { before, after, gain }, look, mood, onWardrobe }) {
+function Rewards({ reward: { before, after, gain }, look, mood, onWardrobe, onBadges }) {
   const badges = after.badges.filter((id) => !before.badges.includes(id)).map((id) => BADGE.get(id));
   const unlocked = ITEMS.filter((i) => (i.badge ? badges.some((b) => b.id === i.badge) : i.level > before.level && i.level <= after.level));
   const lines = [
@@ -91,19 +91,25 @@ function Rewards({ reward: { before, after, gain }, look, mood, onWardrobe }) {
         </div>
         <XpBar progress={after} from={levelUp ? 0 : frac(before)} delay={0.9} />
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm font-semibold text-night">
+      <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-3">
+        <p className="mr-auto text-sm font-semibold text-night">
           {unlocked.length ? `Nouveau au vestiaire : ${unlocked.map((i) => i.name).join(", ")}` : `${after.balance} tampons à dépenser`}
         </p>
-        <Stamp variant="ghost" onClick={onWardrobe} className="px-4 py-1.5 text-sm">
-          Vestiaire →
-        </Stamp>
+        {/* Les deux liens restent ensemble quand la ligne passe à la ligne (mobile) */}
+        <div className="flex items-center gap-4">
+          <Stamp variant="link" onClick={onBadges} className="px-0 py-1.5 text-sm">
+            Badges
+          </Stamp>
+          <Stamp variant="ghost" onClick={onWardrobe} className="px-4 py-1.5 text-sm">
+            Vestiaire →
+          </Stamp>
+        </div>
       </div>
     </motion.section>
   );
 }
 
-export default function End({ results, all = [], best, isRecord, reward, look, onAgain, onMenu, onStats, onWardrobe }) {
+export default function End({ results, all = [], best, isRecord, reward, look, onAgain, onMenu, onStats, onWardrobe, onBadges }) {
   const score = results.reduce((s, r) => s + r.points, 0);
   const max = results.length * PTS_CASH;
   const verdict = VERDICTS.find(([min]) => score / max >= min)[1];
@@ -166,7 +172,7 @@ export default function End({ results, all = [], best, isRecord, reward, look, o
         ))}
       </div>
 
-      {reward && <Rewards reward={reward} look={look} mood={score / max >= 0.6 ? "happy" : score / max >= 0.3 ? "neutral" : "sad"} onWardrobe={onWardrobe} />}
+      {reward && <Rewards reward={reward} look={look} mood={score / max >= 0.6 ? "happy" : score / max >= 0.3 ? "neutral" : "sad"} onWardrobe={onWardrobe} onBadges={onBadges} />}
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <Stamp ref={againRef} onClick={onAgain} className="flex-1 py-4 text-xl">Rejouer</Stamp>
