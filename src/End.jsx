@@ -19,7 +19,7 @@ function status(r) {
   return [r.given ? `Tu as dit « ${r.given} »` : "Passé", "text-fluo"];
 }
 
-export default function End({ results, best, isRecord, onAgain, onMenu, onStats }) {
+export default function End({ results, all = [], best, isRecord, onAgain, onMenu, onStats }) {
   const score = results.reduce((s, r) => s + r.points, 0);
   const max = results.length * PTS_CASH;
   const verdict = VERDICTS.find(([min]) => score / max >= min)[1];
@@ -91,6 +91,8 @@ export default function End({ results, best, isRecord, onAgain, onMenu, onStats 
         <ul className="flex flex-col gap-2.5">
           {results.map((r, k) => {
             const [label, color] = status(r);
+            // Le pays répondu par erreur, montré dans le même format que la question.
+            const wrong = !r.points && r.picked && r.type !== "map" && all.find((c) => c.code === r.picked);
             return (
               <motion.li
                 key={k}
@@ -106,7 +108,15 @@ export default function End({ results, best, isRecord, onAgain, onMenu, onStats 
                 )}
                 <div className="min-w-0">
                   <div className="truncate font-semibold">{r.country.nom}</div>
-                  <div className={`truncate text-sm font-medium ${color}`}>{label}</div>
+                  <div className={`flex items-center gap-2 text-sm font-medium ${color}`}>
+                    <span className="truncate">{label}</span>
+                    {wrong &&
+                      (r.type === "tld" ? (
+                        <span className="shrink-0 font-display text-base">{wrong.tld}</span>
+                      ) : (
+                        <img src={flagUrl(wrong)} alt={`Drapeau : ${wrong.nom}`} className="h-4 w-6 shrink-0 rounded-[2px] object-cover ring-1 ring-night/20" />
+                      ))}
+                  </div>
                 </div>
                 <span className={`ml-auto font-display text-2xl ${r.points ? "text-ink" : "text-fluo"}`}>+{r.points}</span>
               </motion.li>

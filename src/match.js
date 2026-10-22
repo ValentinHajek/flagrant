@@ -23,13 +23,27 @@ const names = (c) =>
 // Empêche "Niger" de valider "Nigéria" ou "Guinée" de valider "Guinée-Bissau".
 // Sinon, un début de nom suffit s'il ne désigne qu'un seul pays ("saint vincent", "papouasie") :
 // indispensable pour taper les noms à rallonge avant la fin du chrono.
+const distTo = (q) => (c) => Math.min(...names(c).map((n) => distance(q, n)));
+const prefixOwners = (q, all) => all.filter((c) => names(c).some((n) => n.startsWith(`${q} `)));
+
 export function isCorrect(input, target, all) {
   const q = normalize(input);
   if (!q) return false;
-  const dist = (c) => Math.min(...names(c).map((n) => distance(q, n)));
+  const dist = distTo(q);
   const d = dist(target);
   if (d <= tolerance(q.length) && all.every((c) => c === target || dist(c) >= d)) return true;
   if (q.length < 5 || all.some((c) => names(c).includes(q))) return false;
-  const owners = all.filter((c) => names(c).some((n) => n.startsWith(`${q} `)));
+  const owners = prefixOwners(q, all);
   return owners.length === 1 && owners[0] === target;
+}
+
+// Le pays que la saisie désigne (pour montrer son drapeau au récap), ou null si rien de clair.
+export function closest(input, all) {
+  const q = normalize(input);
+  if (!q) return null;
+  const dist = distTo(q);
+  const [best] = all.map((c) => [dist(c), c]).sort((a, b) => a[0] - b[0]);
+  if (best && best[0] <= tolerance(q.length)) return best[1];
+  const owners = q.length < 5 ? [] : prefixOwners(q, all);
+  return owners.length === 1 ? owners[0] : null;
 }

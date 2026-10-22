@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { isCorrect } from "./match.js";
+import { closest, isCorrect } from "./match.js";
 import { COUNTS, buildQuiz, distractors, eligible, questionCount } from "./quiz.js";
 
 const all = JSON.parse(readFileSync(new URL("../public/data/countries.json", import.meta.url)));
@@ -69,3 +69,10 @@ for (const mode of ["flag", "tld", "mix"]) {
   }
 }
 console.log("quiz OK");
+
+// Pays désigné par une mauvaise réponse (drapeau du récap)
+assert.equal(closest("Niger", all)?.code, "NE");
+assert.equal(closest("allemagen", all)?.code, "DE");
+assert.equal(closest("papouasie", all)?.code, "PG");
+assert.equal(closest("zzzzzz", all), null);
+assert.equal(closest("", all), null);

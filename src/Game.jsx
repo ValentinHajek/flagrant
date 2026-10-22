@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { Logo, Stamp } from "./brand.jsx";
 import { distanceToCountry, fmtKm } from "./geo.js";
-import { isCorrect } from "./match.js";
+import { closest, isCorrect } from "./match.js";
 import { PTS_CARRE, PTS_CASH, SECONDS, distractors, flagUrl, mapPoints, shuffle } from "./quiz.js";
 import WorldMap from "./WorldMap.jsx";
 
@@ -181,7 +181,7 @@ export default function Game({ all, map, quiz, onFinish, onQuit }) {
   const submit = (e) => {
     e.preventDefault();
     if (!guess.trim() || result) return;
-    answer(guess, isCorrect(guess, q.country, all));
+    answer(guess, isCorrect(guess, q.country, all), closest(guess, all)?.code);
   };
 
   const secs = Math.ceil(msLeft / 1000);

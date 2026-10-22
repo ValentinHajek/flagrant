@@ -101,7 +101,7 @@ export default function App() {
                 <Home all={all} settings={settings} setSettings={setSettings} onStart={start} loading={needMap && !map} onStats={() => setScreen("stats")} />
               )}
               {screen === "game" && <Game all={all} map={map} quiz={quiz} onFinish={finish} onQuit={() => setScreen("home")} />}
-              {screen === "end" && <End {...end} onAgain={start} onMenu={() => setScreen("home")} onStats={() => setScreen("stats")} />}
+              {screen === "end" && <End {...end} all={all} onAgain={start} onMenu={() => setScreen("home")} onStats={() => setScreen("stats")} />}
               {screen === "stats" && (
                 <Stats
                   all={all}
