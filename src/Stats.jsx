@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { AccountCard, Duel } from "./Account.jsx";
+import { API_ENABLED, api, getSession, syncHistory } from "./api.js";
 import { InkTitle, Kicker, Logo, Stamp } from "./brand.jsx";
 import { flagUrl } from "./quiz.js";
 import { loadHistory, summarize } from "./stats.js";
@@ -121,12 +123,28 @@ function ScoreChart({ games, avg }) {
   );
 }
 
-export default function Stats({ all, mode: initialMode, onBack, onPlay }) {
+export default function Stats({ all, mode: initialMode, notice, onBack, onPlay }) {
   const [mode, setMode] = useState(initialMode);
-  const history = useMemo(loadHistory, []);
+  const [history, setHistory] = useState(loadHistory);
+  const [account, setAccount] = useState(null); // { me, friends } une fois connecté
+  const [rival, setRival] = useState(null); // ami choisi pour le duel, avec ses parties
   const byCode = useMemo(() => new Map(all.map((c) => [c.code, c])), [all]);
   const s = summarize(history, mode);
   const top = mode === "map" ? "pile" : "cash";
+
+  // Connecté : profil + synchro de l'historique (parties jouées sur d'autres appareils).
+  useEffect(() => {
+    if (!API_ENABLED || !getSession()) return;
+    api("/me").then(setAccount).catch(() => setAccount(null));
+    syncHistory()
+      .then(() => setHistory(loadHistory()))
+      .catch(() => {});
+  }, []);
+
+  const pickRival = (friend) => {
+    if (rival?.id === friend.id) return setRival(null);
+    api(`/games?user=${friend.id}`).then(({ games }) => setRival({ ...friend, games }));
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -153,6 +171,10 @@ export default function Stats({ all, mode: initialMode, onBack, onPlay }) {
         ))}
       </div>
 
+      {rival && (
+        <Duel mine={s} theirs={summarize(rival.games, mode)} myName={account?.me.pseudo ?? "Toi"} rival={rival} onClose={() => setRival(null)} />
+      )}
+
       {!s ? (
         <div className={`${card} flex flex-col items-start gap-4 p-6`}>
           <p className="text-lg font-medium text-muted">Pas encore de partie terminée dans ce mode.</p>
@@ -175,7 +197,7 @@ export default function Stats({ all, mode: initialMode, onBack, onPlay }) {
 
           <section className={`${card} flex flex-col gap-3 p-4 sm:p-5`}>
             <div>
-              <h3 className="font-display text-xl uppercase text-night">Tes {s.last.length} dernières parties</h3>
+              <h3 className="font-display text-xl uppercase text-night">{s.last.length > 1 ? `Tes ${s.last.length} dernières parties` : "Ta dernière partie"}</h3>
               <p className="text-sm font-medium text-muted">Score en % · la plus récente en orange</p>
             </div>
             <ScoreChart games={s.last} avg={s.avg} />
@@ -244,7 +266,23 @@ export default function Stats({ all, mode: initialMode, onBack, onPlay }) {
         </motion.div>
       )}
 
-      <p className="text-sm font-medium text-muted">Tes stats restent sur cet appareil (pas encore de compte ni de synchro).</p>
+      {API_ENABLED && (
+        <AccountCard
+          account={account}
+          setAccount={setAccount}
+          notice={notice}
+          rivalId={rival?.id}
+          onPickRival={pickRival}
+          onLoggedOut={() => {
+            setAccount(null);
+            setRival(null);
+            setHistory(loadHistory());
+          }}
+        />
+      )}
+      <p className="text-sm font-medium text-muted">
+        {account ? "Tes parties sont sauvegardées sur ton compte." : "Tes stats restent sur cet appareil tant que tu n'es pas connecté."}
+      </p>
     </div>
   );
 }

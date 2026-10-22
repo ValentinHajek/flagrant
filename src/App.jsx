@@ -2,6 +2,7 @@ import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import End from "./End.jsx";
 import Game from "./Game.jsx";
+import { API_ENABLED, api, getSession, setSession, syncHistory } from "./api.js";
 import { parseWorld } from "./geo.js";
 import Home from "./Home.jsx";
 import Stats from "./Stats.jsx";
@@ -34,12 +35,27 @@ export default function App() {
   const [screen, setScreen] = useState("home");
   const [quiz, setQuiz] = useState(null);
   const [end, setEnd] = useState(null);
+  const [notice, setNotice] = useState(null);
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}data/countries.json`)
       .then((r) => r.json())
       .then(setAll)
       .catch(() => setError("la base des pays"));
+  }, []);
+
+  // Retour depuis le lien reçu par e-mail : on échange le jeton contre une session, puis on synchronise.
+  useEffect(() => {
+    const token = new URLSearchParams(location.search).get("login");
+    if (!token || !API_ENABLED) return;
+    window.history.replaceState(null, "", location.pathname); // le jeton ne reste pas dans l'URL ni l'historique
+    api("/session", { method: "POST", body: { token } })
+      .then(({ session }) => {
+        setSession(session);
+        return syncHistory();
+      })
+      .catch((e) => setNotice(e.message))
+      .finally(() => setScreen("stats"));
   }, []);
 
   // La carte (≈ 240 Ko) n'est chargée que si on choisit le mode carte.
@@ -69,6 +85,7 @@ export default function App() {
     const score = results.reduce((s, r) => s + r.points, 0);
     if (score > best) save(key, score);
     recordGame(toEntry(settings, results));
+    if (getSession()) syncHistory().catch(() => {}); // sinon, ce sera envoyé à la prochaine synchro
     setEnd({ results, best, isRecord: score > best && score > 0 });
     setScreen("end");
   };
@@ -89,6 +106,7 @@ export default function App() {
                 <Stats
                   all={all}
                   mode={settings.mode}
+                  notice={notice}
                   onBack={() => setScreen("home")}
                   onPlay={(mode) => {
                     setSettings({ ...settings, mode });

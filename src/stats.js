@@ -26,7 +26,8 @@ export const loadHistory = () => {
   return Array.isArray(h) ? h.filter((g) => g && g.max > 0 && Number.isFinite(g.score)) : [];
 };
 
-export const recordGame = (entry) => save(KEY, [...loadHistory(), entry].slice(-MAX_GAMES));
+export const saveHistory = (games) => save(KEY, games.slice(-MAX_GAMES));
+export const recordGame = (entry) => saveHistory([...loadHistory(), entry]);
 
 const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
 const pct = (g) => g.score / g.max;

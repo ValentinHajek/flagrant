@@ -6,7 +6,9 @@
     "dev": "vite --port 4173",
     "build": "vite build",
     "preview": "vite preview --port 4173",
-    "test": "node src/match.test.js && node src/geo.test.js && node src/stats.test.js"
+    "test": "node src/match.test.js && node src/geo.test.js && node src/stats.test.js",
+    "test:api": "node test/api.test.js",
+    "dev:api": "node --env-file-if-exists=.env.local scripts/dev-api.mjs"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",
@@ -14,6 +16,8 @@
     "d3-transition": "^3.0.1",
     "d3-zoom": "^3.0.0",
     "framer-motion": "^14.5.0",
+    "mongodb": "^7.7.0",
+    "nodemailer": "^10.2.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "topojson-client": "^3.1.0"
