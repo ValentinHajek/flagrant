@@ -7,6 +7,7 @@ import { fmtKm } from "./geo.js";
 import { ITEMS } from "./items.js";
 import { BADGE } from "./progress.js";
 import { PTS_CASH, flagUrl } from "./quiz.js";
+import { sound } from "./sound.js";
 import { XpBar } from "./Wardrobe.jsx";
 
 const VERDICTS = [
@@ -49,7 +50,10 @@ function BadgeUnlocked({ badges, look }) {
   const b = badges[k];
   useEffect(() => {
     if (!b) return;
-    const t = setTimeout(() => ref.current?.showModal(), k === 0 ? 1300 : 150); // après le décompte du score
+    const t = setTimeout(() => {
+      ref.current?.showModal();
+      sound("badge");
+    }, k === 0 ? 1300 : 150); // après le décompte du score
     return () => clearTimeout(t);
   }, [k]);
   if (!b) return null;
@@ -205,6 +209,15 @@ export default function End({ results, all = [], best, isRecord, reward, look, o
   useEffect(() => {
     window.scrollTo(0, 0);
     againRef.current?.focus({ preventScroll: true });
+  }, []);
+
+  // Un seul son par écran de fin : le badge (joué à l'ouverture de sa fenêtre), sinon le niveau, le record ou le score posé,
+  // calés sur les tampons « Niveau » (1,7 s) et « Record » ou la fin du décompte (1,1 s).
+  useEffect(() => {
+    if (newBadges.length) return;
+    const levelUp = reward && reward.after.level > reward.before.level;
+    const t = setTimeout(() => sound(levelUp ? "niveau" : isRecord ? "record" : "fin"), levelUp ? 1750 : 1150);
+    return () => clearTimeout(t);
   }, []);
 
   useEffect(() => {

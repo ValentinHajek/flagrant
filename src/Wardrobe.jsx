@@ -6,6 +6,7 @@ import { InkTitle, Kicker, Logo, Medal, Stamp, Tampon } from "./brand.jsx";
 import { BASE, ITEM, ITEMS, RARITY, SLOTS } from "./items.js";
 import { buyItem, saveLook } from "./profile.js";
 import { BADGE, DAILY_BONUS, cannotBuy } from "./progress.js";
+import { sound } from "./sound.js";
 
 const card = "rounded-[20px] border-[2.5px] border-night bg-paper";
 const TABS = [["base", "Toi"], ...SLOTS];
@@ -95,7 +96,11 @@ export default function Wardrobe({ profile, setProfile, progress, focus, onBack,
     setTrying(null);
     run(() => saveLook(next.look));
   };
-  const pick = (it) => (owned.includes(it.id) ? wear({ [it.slot]: it.id }) : setTrying(trying === it.id ? null : it.id));
+  const pick = (it) => {
+    sound("essayer");
+    if (owned.includes(it.id)) wear({ [it.slot]: it.id });
+    else setTrying(trying === it.id ? null : it.id);
+  };
   // Acheté = porté tout de suite.
   const buy = () =>
     run(async () => {
@@ -103,6 +108,7 @@ export default function Wardrobe({ profile, setProfile, progress, focus, onBack,
       const next = { ...p, look: { ...look, [tried.slot]: tried.id } };
       setProfile(next);
       setTrying(null);
+      sound("acheter");
       await saveLook(next.look);
     });
 

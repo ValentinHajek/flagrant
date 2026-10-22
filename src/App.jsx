@@ -10,6 +10,7 @@ import { loadProfile, saveProfile, syncProfile } from "./profile.js";
 import { computeProgress } from "./progress.js";
 import Stats from "./Stats.jsx";
 import { COUNTS, DEFAULT_COUNT, MODES, buildQuiz } from "./quiz.js";
+import { sound } from "./sound.js";
 import { loadHistory, recordGame, toEntry } from "./stats.js";
 import { bestKey, load, save } from "./storage.js";
 import Wardrobe from "./Wardrobe.jsx";
@@ -113,6 +114,7 @@ export default function App() {
 
   const start = () => {
     if (needMap && !map) return;
+    sound("depart"); // dans le clic même : sur iPhone, c'est ce geste qui autorise le son
     setQuiz({ ...buildQuiz(all, settings.mode, settings.territories, settings.count), id: Date.now() });
     setScreen("game");
   };

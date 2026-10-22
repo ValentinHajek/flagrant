@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { LoginForm } from "./Account.jsx";
 import { API_ENABLED, getSession } from "./api.js";
 import Avatar from "./Avatar.jsx";
 import { Glyph, InkTitle, Kicker, Logo, Marquee, Medal, Motif, Stamp, Tampon } from "./brand.jsx";
 import { BADGES } from "./progress.js";
 import { COUNTS, MAP_PILE_KM, MAP_PROCHE_KM, PTS_CARRE, PTS_CASH, SECONDS, flagUrl, questionCount, shuffle } from "./quiz.js";
+import { enableSound, sound, soundEnabled } from "./sound.js";
 import { bestKey, load } from "./storage.js";
 
 const MiniFlag = ({ code, className = "" }) => (
@@ -64,6 +65,12 @@ const rise = {
 export default function Home({ all, settings, setSettings, onStart, loading, onStats, look, progress, onWardrobe, onBadges, notice, history }) {
   const { mode, territories, count } = settings;
   const ribbon = useMemo(() => shuffle(all.filter((c) => c.souverain && c.tld)).slice(0, 18), [all]);
+  const [soundOn, setSoundOn] = useState(soundEnabled);
+  const toggleSound = () => {
+    enableSound(!soundOn);
+    setSoundOn(!soundOn);
+    sound("carre"); // muet si on vient de couper : confirme seulement le retour du son
+  };
 
   return (
     <motion.div variants={stagger} initial="initial" animate="animate" className="relative flex flex-col gap-6 sm:gap-7">
@@ -73,11 +80,21 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
 
       <motion.header variants={rise} className="flex items-center gap-2">
         <Logo size={34} />
-        <span className="font-display text-xl uppercase tracking-[0.02em] text-ink max-[380px]:hidden">Geoflash</span>
+        <span className="font-display text-xl uppercase tracking-[0.02em] text-ink max-[440px]:hidden">Geoflash</span>
+        <button
+          onClick={toggleSound}
+          aria-label={soundOn ? "Couper le son" : "Remettre le son"}
+          className={`ml-auto grid size-9 shrink-0 cursor-pointer place-items-center rounded-full border-2 transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-fluo ${soundOn ? "border-ink text-ink hover:bg-ink hover:text-paper" : "border-fluo bg-fluo text-night"}`}
+        >
+          <svg viewBox="0 0 20 20" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" aria-hidden>
+            <path d="M3 7.5v5h3.2L10.5 16V4L6.2 7.5z" fill="currentColor" stroke="none" />
+            <path d={soundOn ? "M13.4 7a4.2 4.2 0 0 1 0 6M15.9 4.6a7.6 7.6 0 0 1 0 10.8" : "M13.5 7.6l4.8 4.8M18.3 7.6l-4.8 4.8"} />
+          </svg>
+        </button>
         <button
           onClick={onStats}
           aria-label="Mes stats"
-          className="ml-auto flex h-9 cursor-pointer items-center gap-2 rounded-full border-2 border-ink px-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-colors hover:bg-ink hover:text-paper focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-fluo"
+          className="flex h-9 cursor-pointer items-center gap-2 rounded-full border-2 border-ink px-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-colors hover:bg-ink hover:text-paper focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-fluo"
         >
           <svg viewBox="0 0 16 16" className="size-3.5" fill="currentColor" aria-hidden>
             <rect x="1" y="8" width="3.5" height="7" rx="1" />

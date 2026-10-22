@@ -4,6 +4,7 @@ import { Logo, Stamp } from "./brand.jsx";
 import { distanceToCountry, fmtKm } from "./geo.js";
 import { closest, isCorrect } from "./match.js";
 import { PTS_CARRE, PTS_CASH, SECONDS, distractors, flagUrl, mapPoints, shuffle } from "./quiz.js";
+import { sound } from "./sound.js";
 import WorldMap from "./WorldMap.jsx";
 
 const DELAY_OK = 1000;
@@ -93,6 +94,7 @@ export default function Game({ all, map, quiz, onFinish, onQuit }) {
   const answers = useRef([]);
   const pending = useRef(null);
   const deadline = useRef(0);
+  const ticked = useRef(0); // dernière seconde du chrono qui a fait « tic »
   const inputRef = useRef(null);
   const q = questions[i];
   const isMap = q.type === "map";
@@ -104,6 +106,7 @@ export default function Game({ all, map, quiz, onFinish, onQuit }) {
     pending.current = null;
     if (i + 1 >= questions.length) return onFinish(questions.map((q, k) => ({ ...q, ...answers.current[k] })));
     deadline.current = 0;
+    ticked.current = 0;
     setI(i + 1);
     setReady(false);
     setMsLeft(SECONDS * 1000);
@@ -116,6 +119,9 @@ export default function Game({ all, map, quiz, onFinish, onQuit }) {
   const commit = (r) => {
     if (answers.current[i]) return; // déjà répondu (double clic, chrono à zéro au même moment…)
     r.delay = (r.correct ? DELAY_OK : DELAY_KO) + (isMap ? DELAY_MAP : 0);
+    let n = 0; // bonnes réponses d'affilée juste avant : la note monte avec la série
+    while (answers.current[i - n - 1]?.points) n++;
+    sound(r.points === PTS_CASH ? "flash" : r.points ? "carre" : "rate", n);
     answers.current[i] = r;
     setResult(r);
     pending.current = setTimeout(next, r.delay);
@@ -145,7 +151,12 @@ export default function Game({ all, map, quiz, onFinish, onQuit }) {
     deadline.current ||= Date.now() + SECONDS * 1000;
     const t = setInterval(() => {
       const ms = Math.max(0, deadline.current - Date.now());
+      const s = Math.ceil(ms / 1000);
       setMsLeft(ms);
+      if (s && s <= LOW && s !== ticked.current) {
+        ticked.current = s;
+        sound("tic", LOW - s); // un tic par seconde sur les dernières, de plus en plus marqué
+      }
       if (!ms) onTimeout.current();
     }, 100);
     return () => clearInterval(t);
@@ -253,7 +264,18 @@ export default function Game({ all, map, quiz, onFinish, onQuit }) {
           </AnimatePresence>
           {/* La carte reste montée d'une question à l'autre : les 235 pays ne sont dessinés qu'une fois */}
           <div className={`relative overflow-hidden rounded-[22px] border-[2.5px] border-night bg-paper transition-shadow duration-300 ${tone ? SHADOW[tone] : "shadow-print-lg"}`}>
-            <WorldMap map={map} target={q.country} pin={pin} onPin={setPin} result={result} tone={tone} onReady={() => setReady(true)} />
+            <WorldMap
+              map={map}
+              target={q.country}
+              pin={pin}
+              onPin={(p) => {
+                setPin(p);
+                sound("epingle");
+              }}
+              result={result}
+              tone={tone}
+              onReady={() => setReady(true)}
+            />
             <span className="pointer-events-none absolute left-4 top-3 hidden text-[11px] font-semibold uppercase tracking-[0.24em] text-muted sm:block">
               Molette pour zoomer
             </span>
