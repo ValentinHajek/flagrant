@@ -132,13 +132,9 @@ function Top({ id }) {
 
 /* ---------- Cheveux ---------- */
 function HairBack({ style, color }) {
+  // Longs : une seule masse derrière la tête et le cou, jusqu'aux épaules (pas deux mèches avec un vide au milieu)
   if (style === "long")
-    return (
-      <g fill={color} {...line}>
-        <path d="M38,48 C29,66 29,90 33,104 L47,104 C43,90 43,70 45,56 Z" />
-        <path d="M82,48 C91,66 91,90 87,104 L73,104 C77,90 77,70 75,56 Z" />
-      </g>
-    );
+    return <path d="M37,48 C33,30 46,22 60,22 C74,22 87,30 83,48 C89,64 91,88 88,106 Q74,110 60,108 Q46,110 32,106 C29,88 31,64 37,48 Z" fill={color} {...line} />;
   // Couettes : deux mèches attachées en haut des tempes, qui retombent sur les épaules
   if (style === "couettes")
     return (
