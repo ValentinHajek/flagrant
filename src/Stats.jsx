@@ -10,8 +10,9 @@ import { compareCountries, loadHistory, summarize } from "./stats.js";
 const TABS = [
   ["flag", "Drapeaux"],
   ["tld", "Extensions"],
-  ["mix", "Mix"],
+  ["capital", "Capitales"],
   ["map", "Carte"],
+  ["mix", "Mix"],
 ];
 // Période des stats et du duel : toutes les parties ou seulement les dernières.
 const PERIODS = [
@@ -316,7 +317,7 @@ export default function Stats({ all, mode: initialMode, notice, history, setHist
                 role="tab"
                 aria-selected={mode === id}
                 onClick={() => setMode(id)}
-                className="relative flex-1 cursor-pointer rounded-full py-1.5 font-display text-base uppercase focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-fluo sm:text-lg"
+                className="relative flex-auto cursor-pointer rounded-full py-1.5 font-display text-base uppercase sm:flex-1 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-fluo sm:text-lg"
               >
                 {mode === id && (
                   <motion.span
@@ -408,7 +409,10 @@ export default function Stats({ all, mode: initialMode, notice, history, setHist
                             <img src={flagUrl(c)} alt="" className="h-8 w-12 shrink-0 rounded-[3px] object-cover ring-1 ring-night/20" />
                           )}
                           <div className="min-w-0 flex-1">
-                            <div className="truncate font-semibold">{c.nom}</div>
+                            <div className="truncate font-semibold">
+                              {c.nom}
+                              {mode === "capital" && <span className="font-medium text-muted"> · {c.capitale}</span>}
+                            </div>
                             <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-paper-deep">
                               <div className="h-full rounded-full bg-fluo" style={{ width: `${(t.miss / t.seen) * 100}%` }} />
                             </div>

@@ -34,15 +34,10 @@ const MODE_CARDS = [
     art: <span className="font-display text-4xl leading-10 text-ink">.JP</span>,
   },
   {
-    id: "mix",
-    title: "Mix",
-    desc: "Drapeaux et extensions",
-    art: (
-      <div className="flex items-center gap-2">
-        <MiniFlag code="kr" className="-rotate-6" />
-        <span className="font-display text-3xl leading-10 text-fluo">.KR</span>
-      </div>
-    ),
+    id: "capital",
+    title: "Capitales",
+    desc: "La capitale → le pays",
+    art: <span className="font-display text-3xl uppercase leading-10 text-ink">Oslo</span>,
   },
   {
     id: "map",
@@ -52,6 +47,17 @@ const MODE_CARDS = [
       <div className="relative h-10 w-20">
         <Glyph name="globe" size={40} />
         <Glyph name="pin" size={30} color="#ff5a1e" className="absolute left-6 -top-1 rotate-12" />
+      </div>
+    ),
+  },
+  {
+    id: "mix",
+    title: "Mix",
+    desc: "Tous les modes mélangés",
+    art: (
+      <div className="flex items-center gap-2">
+        <MiniFlag code="kr" className="-rotate-6" />
+        <span className="font-display text-3xl leading-10 text-fluo">.KR</span>
       </div>
     ),
   },
@@ -139,6 +145,7 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
         <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
           {MODE_CARDS.map((m) => {
             const active = mode === m.id;
+            const wide = m.id === "mix"; // 5e carte : toute la largeur, en ligne
             const n = questionCount(all, m.id, territories, count);
             const games = history.filter((g) => g.mode === m.id);
             // Historique (synchronisé entre appareils) + ancien record local, au même format de partie.
@@ -151,7 +158,7 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
                 whileHover={{ y: -3, rotate: active ? -1 : 0.6 }}
                 whileTap={{ scale: 0.97 }}
                 animate={{ rotate: active ? -1.5 : 0 }}
-                className={`relative flex cursor-pointer items-center gap-4 rounded-[20px] px-4 py-3 sm:flex-col sm:items-start sm:gap-3 sm:p-4 border-[2.5px] border-night bg-paper transition-shadow duration-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-4 has-[:focus-visible]:outline-fluo ${active ? "shadow-print-fluo" : "shadow-print-lg"}`}
+                className={`relative flex cursor-pointer items-center gap-4 rounded-[20px] px-4 py-3 sm:p-4 ${wide ? "sm:col-span-2" : "sm:flex-col sm:items-start sm:gap-3"} border-[2.5px] border-night bg-paper transition-shadow duration-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-4 has-[:focus-visible]:outline-fluo ${active ? "shadow-print-fluo" : "shadow-print-lg"}`}
               >
                 <input type="radio" name="mode" value={m.id} checked={active} onChange={() => setSettings({ ...settings, mode: m.id })} className="sr-only" />
                 {active && (
@@ -169,7 +176,7 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
                   <div className="font-display text-2xl uppercase text-ink">{m.title}</div>
                   <div className="text-sm font-medium text-muted">{m.desc}</div>
                 </div>
-                <div className="ml-auto text-right text-[11px] font-semibold uppercase tracking-[0.18em] text-muted sm:ml-0 sm:mt-auto sm:text-left">
+                <div className={`ml-auto text-right text-[11px] font-semibold uppercase tracking-[0.18em] text-muted ${wide ? "" : "sm:ml-0 sm:mt-auto sm:text-left"}`}>
                   {best ? (
                     <>Record<br className="sm:hidden" /> {best}/{max}</>
                   ) : (

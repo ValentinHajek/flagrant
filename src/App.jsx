@@ -88,8 +88,8 @@ export default function App() {
       });
   }, []);
 
-  // La carte (≈ 240 Ko) n'est chargée que si on choisit le mode carte, ou pour jouer un défi sur la carte.
-  const needMap = settings.mode === "map";
+  // La carte (≈ 240 Ko) n'est chargée que pour les modes Carte et Mix, ou pour jouer un défi qui en a besoin.
+  const needMap = settings.mode === "map" || settings.mode === "mix";
   const mapLoad = useRef(null);
   const loadMap = () =>
     (mapLoad.current ??= fetch(`${import.meta.env.BASE_URL}data/world.json`)
@@ -137,7 +137,7 @@ export default function App() {
   const playDuel = async (duel) => {
     const quiz = fromSeries(all, duel.territories, duel.questions);
     if (!quiz) throw new Error("Ce défi contient des pays inconnus de cette version : recharge la page");
-    if (duel.mode === "map") await loadMap();
+    if (quiz.questions.some((q) => q.type === "map")) await loadMap();
     sound("depart");
     setQuiz({ ...quiz, id: Date.now(), duel });
     setScreen("game");

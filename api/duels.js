@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { cleanLook } from "../src/items.js";
-import { MODES } from "../src/quiz.js";
+import { MODES, TYPES } from "../src/quiz.js";
 import { HttpError, body, json, limit, preflight, requireUser, route } from "./_lib.js";
 
 export const OPTIONS = preflight;
@@ -9,17 +9,17 @@ export const OPTIONS = preflight;
 // Le score de chacun, c'est sa première partie synchronisée avec ce défi (champ duel des parties).
 
 const isCode = (c) => typeof c === "string" && /^[A-Z]{2}$/.test(c);
-const TYPES = { flag: ["flag"], tld: ["tld"], mix: ["flag", "tld"], map: ["map"] };
 
 // Mêmes questions et mêmes leurres au carré pour les deux joueurs (pas de carré sur la carte).
 function cleanSeries(mode, list) {
   if (!Array.isArray(list) || list.length < 5 || list.length > 50) return null;
+  const types = mode === "mix" ? TYPES : [mode];
   const seen = new Set();
   for (const q of list) {
-    if (!q || !isCode(q.code) || seen.has(q.code) || !TYPES[mode].includes(q.type)) return null;
+    if (!q || !isCode(q.code) || seen.has(q.code) || !types.includes(q.type)) return null;
     seen.add(q.code);
     const c = q.choices;
-    const ok = mode === "map" ? c === undefined : Array.isArray(c) && c.length === 3 && new Set(c).size === 3 && c.every((x) => isCode(x) && x !== q.code);
+    const ok = q.type === "map" ? c === undefined : Array.isArray(c) && c.length === 3 && new Set(c).size === 3 && c.every((x) => isCode(x) && x !== q.code);
     if (!ok) return null;
   }
   return list.map(({ code, type, choices }) => (choices ? { code, type, choices } : { code, type }));

@@ -54,18 +54,23 @@ function ResultStamp({ result }) {
   );
 }
 
+const LABEL = { flag: "Drapeau", tld: "Extension", capital: "Capitale" };
+
 // L'indice à deviner. Prévient quand il est visible (drapeau chargé) pour lancer le chrono :
 // une connexion lente ne doit pas coûter de secondes.
 function Prompt({ q, onReady }) {
   useEffect(() => {
-    if (q.type === "tld") onReady();
+    if (q.type !== "flag") onReady();
   }, []);
   if (q.type === "flag")
     return <img src={flagUrl(q.country)} alt="Drapeau à identifier" onLoad={onReady} onError={onReady} className="max-h-full max-w-full rounded-md object-contain ring-2 ring-night/15" />;
+  const text = q.type === "tld" ? q.country.tld : q.country.capitale;
+  // Capitale : plus petite au-delà de 8 lettres, sur plusieurs lignes au besoin (« Bandar Seri Begawan »).
+  const size = q.type === "tld" ? "text-[clamp(5rem,24vw,10rem)]" : text.length <= 8 ? "text-[clamp(3rem,16vw,6.5rem)] uppercase" : "text-[clamp(2.25rem,11vw,4.5rem)] uppercase";
   return (
-    <div className="relative isolate font-display text-[clamp(5rem,24vw,10rem)] leading-none text-ink">
-      <span aria-hidden className="absolute inset-0 -z-10 translate-x-[5px] translate-y-[6px] text-fluo">{q.country.tld}</span>
-      {q.country.tld}
+    <div className={`relative isolate text-balance text-center font-display leading-none text-ink ${size}`}>
+      <span aria-hidden className="absolute inset-0 -z-10 translate-x-[5px] translate-y-[6px] text-fluo">{text}</span>
+      {text}
     </div>
   );
 }
@@ -172,7 +177,7 @@ export default function Game({ all, map, quiz, onFinish, onQuit }) {
 
   // Précharge les prochains drapeaux, sans tout télécharger d'un coup en mode « Tous ».
   useEffect(() => {
-    questions.slice(i + 1, i + 4).forEach((x) => x.type !== "tld" && (new Image().src = flagUrl(x.country)));
+    questions.slice(i + 1, i + 4).forEach((x) => (x.type === "flag" || x.type === "map") && (new Image().src = flagUrl(x.country)));
   }, [i]);
 
   useEffect(() => {
@@ -297,7 +302,7 @@ export default function Game({ all, map, quiz, onFinish, onQuit }) {
           </div>
         </>
       ) : (
-        /* Carte de l'indice : drapeau ou extension */
+        /* Carte de l'indice : drapeau, extension ou capitale */
         <div className="relative">
           <AnimatePresence mode="wait">
             <motion.div
@@ -314,7 +319,7 @@ export default function Game({ all, map, quiz, onFinish, onQuit }) {
               >
                 <Prompt q={q} onReady={() => setReady(true)} />
                 <span className="absolute left-4 top-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-muted">
-                  {q.type === "flag" ? "Drapeau" : "Extension"}
+                  {LABEL[q.type]}
                 </span>
                 <ResultStamp result={result} />
                 {result?.correct && <Burst />}

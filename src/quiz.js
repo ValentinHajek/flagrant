@@ -9,7 +9,9 @@ export const maxCombo = (top) => Array.from({ length: top }, (_, k) => comboBonu
 export const total = (g) => g.score + (g.bonus ?? 0);
 export const COUNTS = [10, 20, 30, 50, "all"];
 export const DEFAULT_COUNT = 20;
-export const MODES = ["flag", "tld", "mix", "map"];
+export const MODES = ["flag", "tld", "capital", "mix", "map"];
+// Types de question : un par mode, le mix les mélange tous.
+export const TYPES = ["flag", "tld", "capital", "map"];
 
 // Mode carte : épingle dans le pays ou presque = 3 pts, proche = 1 pt. En vue monde 1 px ≈ 50 km :
 // la marge de 100 km rend les micro-États et les îles cliquables sans zoomer.
@@ -20,12 +22,15 @@ export const mapPoints = (km) => (km <= MAP_PILE_KM ? PTS_CASH : km <= MAP_PROCH
 export const flagUrl = (c) => `https://flagcdn.com/${c.code.toLowerCase()}.svg`;
 export const shuffle = (a) => a.map((v) => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map((p) => p[1]);
 
-const canFlag = (c) => c.drapeau;
-const canTld = (c) => Boolean(c.tld);
+const CAN = {
+  flag: (c) => c.drapeau,
+  tld: (c) => Boolean(c.tld),
+  capital: (c) => Boolean(c.capitale) && c.capitale !== c.nom, // Monaco, Singapour… : la capitale donnerait la réponse
+  map: (c) => c.carte,
+};
+CAN.mix = (c) => TYPES.some((t) => CAN[t](c));
 
-const CAN = { flag: canFlag, tld: canTld, mix: (c) => canFlag(c) || canTld(c), map: (c) => c.carte };
-
-// Pays qui peuvent tomber dans ce mode ("flag" | "tld" | "mix" | "map").
+// Pays qui peuvent tomber dans ce mode (un des MODES).
 export const eligible = (all, mode, territories) => all.filter((c) => (territories || c.souverain) && CAN[mode](c));
 
 export const questionCount = (all, mode, territories, count) => {
@@ -40,7 +45,7 @@ export function buildQuiz(all, mode, territories, count) {
     .slice(0, questionCount(all, mode, territories, count))
     .map((country) => ({
       country,
-      type: mode !== "mix" ? mode : !canTld(country) ? "flag" : !canFlag(country) ? "tld" : Math.random() < 0.5 ? "flag" : "tld",
+      type: mode !== "mix" ? mode : shuffle(TYPES.filter((t) => CAN[t](country)))[0],
     }));
   return { scope, questions };
 }
@@ -50,11 +55,11 @@ export const DUEL_MAX = 50;
 export const toSeries = ({ questions, scope }) =>
   questions.map(({ country, type }) => ({ code: country.code, type, ...(type !== "map" && { choices: distractors(country, scope).map((c) => c.code) }) }));
 
-// null si un pays de la série manque à cette version des données.
+// null si un pays de la série manque à cette version des données, ou ne se prête pas à sa question (capitale absente…).
 export function fromSeries(all, territories, series) {
   const byCode = new Map(all.map((c) => [c.code, c]));
   const questions = series.map(({ code, type, choices }) => ({ country: byCode.get(code), type, choices: choices?.map((c) => byCode.get(c)) }));
-  if (questions.some((q) => !q.country || q.choices?.some((c) => !c))) return null;
+  if (questions.some((q) => !q.country || !TYPES.includes(q.type) || !CAN[q.type](q.country) || q.choices?.some((c) => !c))) return null;
   return { scope: all.filter((c) => territories || c.souverain), questions };
 }
 

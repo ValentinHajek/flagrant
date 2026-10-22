@@ -131,6 +131,13 @@ try {
   assert.equal((await call("duels", "DELETE", { token: a.session, query: `?id=${refused}` })).status, 404, "seul l'invité refuse");
   assert.equal((await call("duels", "DELETE", { token: b.session, query: `?id=${refused}` })).status, 200);
   assert.equal((await call("duels", "GET", { token: a.session })).data.duels[0].declined, true);
+  // Capitales, et mix de tous les types : une question carte n'a jamais de leurres.
+  const mixed = [...series.slice(0, 3).map((q) => ({ ...q, type: "capital" })), series[3], { code: "JP", type: "map" }];
+  assert.equal((await challenge(a.session, b.me.id, { mode: "mix", questions: mixed })).status, 200, "mix : capitales, drapeau, carte");
+  assert.equal((await challenge(a.session, b.me.id, { mode: "mix", questions: [...mixed.slice(0, 4), { ...mixed[4], choices: ["FR", "BE", "DE"] }] })).status, 400, "carte avec leurres");
+  assert.equal((await challenge(a.session, b.me.id, { mode: "capital", questions: series.map((q) => ({ ...q, type: "capital" })) })).status, 200);
+  assert.equal((await challenge(a.session, b.me.id, { mode: "capital", questions: series })).status, 400, "type hors du mode");
+  assert.equal((await call("games", "POST", { token: b.session, body: { games: [game({ mode: "capital" })] } })).data.accepted, 1, "partie Capitales acceptée");
 
   // CORS : en-têtes seulement pour l'origine autorisée.
   const ok = await call("me", "GET", { token: a.session, headers: { origin: "https://valentinhajek.github.io" } });

@@ -249,7 +249,7 @@ export default function End({ results, all = [], best, isRecord, reward, duel, p
       </div>
     );
 
-  const [top, mid] = results[0].type === "map" ? ["Pile", "Proche"] : ["Flash", "Carré"];
+  const [top, mid] = results.every((r) => r.type === "map") ? ["Pile", "Proche"] : ["Flash", "Carré"];
   const stats = [
     [top, results.filter((r) => r.points === PTS_CASH).length, "text-leaf"],
     [mid, results.filter((r) => r.points && r.points < PTS_CASH).length, "text-ink"],
@@ -329,7 +329,10 @@ export default function End({ results, all = [], best, isRecord, reward, duel, p
                   <span className="w-14 shrink-0 text-center font-display text-2xl text-ink">{r.country.tld}</span>
                 )}
                 <div className="min-w-0">
-                  <div className="truncate font-semibold">{r.country.nom}</div>
+                  <div className="truncate font-semibold">
+                    {r.country.nom}
+                    {r.type === "capital" && <span className="font-medium text-muted"> · {r.country.capitale}</span>}
+                  </div>
                   {wrong ? (
                     <button
                       onClick={() => setZoom({ country: wrong, type: r.type })}
@@ -372,6 +375,7 @@ export default function End({ results, all = [], best, isRecord, reward, duel, p
               <img src={flagUrl(zoom.country)} alt={`Drapeau : ${zoom.country.nom}`} className="max-h-[60vh] w-full rounded-md object-contain ring-2 ring-night/15" />
             )}
             <div className="font-display text-2xl uppercase text-night">{zoom.country.nom}</div>
+            {zoom.type === "capital" && zoom.country.capitale && <div className="-mt-3 text-lg font-semibold text-muted">Capitale : {zoom.country.capitale}</div>}
             <Stamp variant="ghost" onClick={() => zoomRef.current.close()}>Fermer</Stamp>
           </div>
         )}

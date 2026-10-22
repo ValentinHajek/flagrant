@@ -23,6 +23,26 @@ ALIASES = {
     "BA": ["Bosnie"], "DO": ["République dominicaine"], "CF": ["Centrafrique"],
 }
 
+# Capitales : mledoze les donne en anglais. Nom français quand il diffère (vérifié sur Wikidata),
+# None pour une capitale qui en ferait deviner une autre (Victoria = Seychelles, Kingston = Jamaïque).
+CAPITALES = {
+    "AD": "Andorre-la-Vieille", "AE": "Abou Dabi", "AF": "Kaboul", "AM": "Erevan", "AT": "Vienne",
+    "AZ": "Bakou", "BD": "Dacca", "BE": "Bruxelles", "BR": "Brasilia", "BT": "Thimphou", "CH": "Berne",
+    "CN": "Pékin", "CO": "Bogota", "CU": "La Havane", "CY": "Nicosie", "DK": "Copenhague",
+    "DO": "Saint-Domingue", "DZ": "Alger", "EG": "Le Caire", "EH": "Laâyoune", "ET": "Addis-Abeba",
+    "GB": "Londres", "GD": "Saint-Georges", "GE": "Tbilissi", "GG": "Saint-Pierre-Port",
+    "GQ": "Malabo",  # Ciudad de la Paz pas encore en service, et confondue avec La Paz
+    "GR": "Athènes", "GT": "Guatemala", "HK": None, "IL": "Jérusalem", "IQ": "Bagdad", "IR": "Téhéran",
+    "JE": "Saint-Hélier", "KG": "Bichkek", "KI": "Tarawa-Sud", "KR": "Séoul", "KW": "Koweït",
+    "LB": "Beyrouth", "MN": "Oulan-Bator", "MP": "Saïpan", "MT": "La Valette", "MU": "Port-Louis",
+    "MX": "Mexico", "NF": None, "NP": "Katmandou", "OM": "Mascate", "PA": "Panama", "PF": "Papeete",
+    "PH": "Manille", "PL": "Varsovie", "PT": "Lisbonne", "PY": "Asuncion", "RO": "Bucarest",
+    "RU": "Moscou", "SA": "Riyad", "SG": "Singapour", "SM": "Saint-Marin", "SO": "Mogadiscio",
+    "SS": "Djouba", "SY": "Damas", "TD": "N'Djaména", "TJ": "Douchanbé", "TM": "Achgabat",
+    "TT": "Port-d'Espagne", "US": "Washington", "UZ": "Tachkent", "VA": "Cité du Vatican",
+    "VI": "Charlotte-Amélie", "VN": "Hanoï", "VU": "Port-Vila", "YE": "Sanaa",
+}
+
 # Contours sans code ISO numérique dans Natural Earth, rattachés à la main.
 MAP_NAMES = {"Somaliland": "SO", "N. Cyprus": "CY", "Kosovo": "XK"}
 
@@ -50,6 +70,7 @@ for c in src:
         "nom": fr["common"],
         "alias": sorted({fr["official"], *ALIASES.get(c["cca2"], [])} - {fr["common"]}),
         "tld": tld,
+        "capitale": CAPITALES[c["cca2"]] if c["cca2"] in CAPITALES else next(iter(c["capital"]), None),
         "region": REGIONS.get(c["region"], c["region"]),
         "sousRegion": c.get("subregion") or c["region"],
         "souverain": bool(c["independent"]),

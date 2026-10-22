@@ -7,7 +7,7 @@ import { PTS_CARRE, PTS_CASH } from "./quiz.js";
 import { XpBar } from "./Wardrobe.jsx";
 
 const card = "rounded-[20px] border-[2.5px] border-night bg-paper";
-export const MODE_NAMES = { flag: "Drapeaux", tld: "Extensions", mix: "Mix", map: "Carte" };
+export const MODE_NAMES = { flag: "Drapeaux", tld: "Extensions", capital: "Capitales", map: "Carte", mix: "Mix" };
 
 // Les règles de gameReward (progress.js), en clair.
 const EARN = [
@@ -74,7 +74,7 @@ function BadgeCard({ b, k, progress, look, owned, onWardrobe }) {
           </span>
         </div>
       )}
-      {missing?.length > 0 && <p className="text-xs font-semibold text-fluo">Il te manque : {missing.map((m) => MODE_NAMES[m]).join(", ")}</p>}
+      {missing?.length > 0 && <p className="text-xs font-semibold text-fluo">À essayer : {missing.map((m) => MODE_NAMES[m]).join(", ")}</p>}
 
       {gift && (
         <div className="flex items-center gap-3 border-t-2 border-dashed border-night/15 pt-3">

@@ -45,7 +45,7 @@ export const BADGES = [
   { id: "premier-pas", name: "Premier tampon", seal: "1er", reward: 20, test: (s) => s.games >= 1,
     desc: "Termine une partie, peu importe le mode ou le nombre de questions." },
   { id: "polyvalent", name: "Polyvalent", seal: "x4", reward: 50, test: (s) => s.modes.size >= 4, goal: (s) => [s.modes.size, 4], unit: "modes",
-    desc: "Termine au moins une partie dans chacun des 4 modes : Drapeaux, Extensions, Mix et Carte." },
+    desc: "Termine au moins une partie dans 4 modes différents, au choix parmi Drapeaux, Extensions, Capitales, Carte et Mix." },
   { id: "sans-faute", name: "Sans faute", seal: "100%", reward: 100, test: (s) => s.perfect,
     desc: "Une partie d'au moins 10 questions sans une seule erreur : tout en flash, ou tout « pile » en mode Carte. Un carré casse le sans-faute." },
   { id: "serie-de-feu", name: "Série de feu", seal: "15", reward: 100, test: (s) => s.bestStreak >= 15, goal: (s) => [s.bestStreak, 15], unit: "d'affilée",
