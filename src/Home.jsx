@@ -57,7 +57,7 @@ const rise = {
   animate: { opacity: 1, y: 0, rotate: 0, transition: { type: "spring", stiffness: 260, damping: 22 } },
 };
 
-export default function Home({ all, settings, setSettings, onStart, loading }) {
+export default function Home({ all, settings, setSettings, onStart, loading, onStats }) {
   const { mode, territories, count } = settings;
   const ribbon = useMemo(() => shuffle(all.filter((c) => c.souverain && c.tld)).slice(0, 18), [all]);
 
@@ -70,9 +70,17 @@ export default function Home({ all, settings, setSettings, onStart, loading }) {
       <motion.header variants={rise} className="flex items-center gap-2">
         <Logo size={34} />
         <span className="font-display text-xl uppercase tracking-[0.02em] text-ink">Flagrant</span>
-        <span className="ml-auto rounded-full border-2 border-ink px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-ink">
-          GeoGuessr training
-        </span>
+        <button
+          onClick={onStats}
+          className="ml-auto flex cursor-pointer items-center gap-2 rounded-full border-2 border-ink px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-colors hover:bg-ink hover:text-paper focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-fluo"
+        >
+          <svg viewBox="0 0 16 16" className="size-3.5" fill="currentColor" aria-hidden>
+            <rect x="1" y="8" width="3.5" height="7" rx="1" />
+            <rect x="6.25" y="4" width="3.5" height="11" rx="1" />
+            <rect x="11.5" y="1" width="3.5" height="14" rx="1" />
+          </svg>
+          Mes stats
+        </button>
       </motion.header>
 
       <motion.div variants={rise} className="flex flex-col gap-4 sm:pt-4">

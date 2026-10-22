@@ -6,7 +6,7 @@
     "dev": "vite --port 4173",
     "build": "vite build",
     "preview": "vite preview --port 4173",
-    "test": "node src/match.test.js && node src/geo.test.js"
+    "test": "node src/match.test.js && node src/geo.test.js && node src/stats.test.js"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",

@@ -4,7 +4,9 @@ import End from "./End.jsx";
 import Game from "./Game.jsx";
 import { parseWorld } from "./geo.js";
 import Home from "./Home.jsx";
+import Stats from "./Stats.jsx";
 import { COUNTS, DEFAULT_COUNT, MODES, buildQuiz } from "./quiz.js";
+import { recordGame, toEntry } from "./stats.js";
 import { bestKey, load, save } from "./storage.js";
 
 // Entrée « impression » : la feuille arrive légèrement de travers puis se recale.
@@ -66,6 +68,7 @@ export default function App() {
     const best = load(key, 0);
     const score = results.reduce((s, r) => s + r.points, 0);
     if (score > best) save(key, score);
+    recordGame(toEntry(settings, results));
     setEnd({ results, best, isRecord: score > best && score > 0 });
     setScreen("end");
   };
@@ -77,9 +80,22 @@ export default function App() {
         {all && (
           <AnimatePresence mode="wait">
             <motion.section key={screen === "game" ? quiz.id : screen} variants={page} initial="initial" animate="animate" exit="exit">
-              {screen === "home" && <Home all={all} settings={settings} setSettings={setSettings} onStart={start} loading={needMap && !map} />}
+              {screen === "home" && (
+                <Home all={all} settings={settings} setSettings={setSettings} onStart={start} loading={needMap && !map} onStats={() => setScreen("stats")} />
+              )}
               {screen === "game" && <Game all={all} map={map} quiz={quiz} onFinish={finish} onQuit={() => setScreen("home")} />}
-              {screen === "end" && <End {...end} onAgain={start} onMenu={() => setScreen("home")} />}
+              {screen === "end" && <End {...end} onAgain={start} onMenu={() => setScreen("home")} onStats={() => setScreen("stats")} />}
+              {screen === "stats" && (
+                <Stats
+                  all={all}
+                  mode={settings.mode}
+                  onBack={() => setScreen("home")}
+                  onPlay={(mode) => {
+                    setSettings({ ...settings, mode });
+                    setScreen("home");
+                  }}
+                />
+              )}
             </motion.section>
           </AnimatePresence>
         )}

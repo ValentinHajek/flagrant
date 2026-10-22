@@ -19,7 +19,7 @@ function status(r) {
   return [r.given ? `Tu as dit « ${r.given} »` : "Passé", "text-fluo"];
 }
 
-export default function End({ results, best, isRecord, onAgain, onMenu }) {
+export default function End({ results, best, isRecord, onAgain, onMenu, onStats }) {
   const score = results.reduce((s, r) => s + r.points, 0);
   const max = results.length * PTS_CASH;
   const verdict = VERDICTS.find(([min]) => score / max >= min)[1];
@@ -83,6 +83,7 @@ export default function End({ results, best, isRecord, onAgain, onMenu }) {
       <div className="flex flex-col gap-3 sm:flex-row">
         <Stamp ref={againRef} onClick={onAgain} className="flex-1 py-4 text-xl">Rejouer</Stamp>
         <Stamp variant="ghost" onClick={onMenu} className="py-4">Changer de mode</Stamp>
+        <Stamp variant="link" onClick={onStats} className="py-4">Mes stats</Stamp>
       </div>
 
       <div className="flex flex-col gap-3">
