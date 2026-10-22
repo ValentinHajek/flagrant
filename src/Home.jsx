@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useMemo } from "react";
-import { InkTitle, Kicker, Logo, Marquee, Motif, Stamp } from "./brand.jsx";
-import { COUNTS, PTS_CARRE, PTS_CASH, SECONDS, flagUrl, questionCount, shuffle } from "./quiz.js";
+import { Glyph, InkTitle, Kicker, Logo, Marquee, Motif, Stamp } from "./brand.jsx";
+import { COUNTS, MAP_PILE_KM, MAP_PROCHE_KM, PTS_CARRE, PTS_CASH, SECONDS, flagUrl, questionCount, shuffle } from "./quiz.js";
 import { bestKey, load } from "./storage.js";
 
 const MiniFlag = ({ code, className = "" }) => (
@@ -30,11 +30,22 @@ const MODE_CARDS = [
   {
     id: "mix",
     title: "Mix",
-    desc: "Les deux, au hasard",
+    desc: "Drapeaux et extensions",
     art: (
       <div className="flex items-center gap-2">
         <MiniFlag code="kr" className="-rotate-6" />
         <span className="font-display text-3xl leading-10 text-fluo">.KR</span>
+      </div>
+    ),
+  },
+  {
+    id: "map",
+    title: "Carte",
+    desc: "Le pays → la carte",
+    art: (
+      <div className="relative h-10 w-20">
+        <Glyph name="globe" size={40} />
+        <Glyph name="pin" size={30} color="#ff5a1e" className="absolute left-6 -top-1 rotate-12" />
       </div>
     ),
   },
@@ -46,7 +57,7 @@ const rise = {
   animate: { opacity: 1, y: 0, rotate: 0, transition: { type: "spring", stiffness: 260, damping: 22 } },
 };
 
-export default function Home({ all, settings, setSettings, onStart }) {
+export default function Home({ all, settings, setSettings, onStart, loading }) {
   const { mode, territories, count } = settings;
   const ribbon = useMemo(() => shuffle(all.filter((c) => c.souverain && c.tld)).slice(0, 18), [all]);
 
@@ -74,7 +85,7 @@ export default function Home({ all, settings, setSettings, onStart }) {
 
       <motion.fieldset variants={rise} className="flex flex-col gap-3">
         <legend className="mb-3 font-display text-lg uppercase tracking-[0.04em] text-night">Choisis ton mode</legend>
-        <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
+        <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
           {MODE_CARDS.map((m) => {
             const active = mode === m.id;
             const best = load(bestKey(m.id, territories, count), 0);
@@ -143,13 +154,23 @@ export default function Home({ all, settings, setSettings, onStart }) {
       </motion.label>
 
       <motion.div variants={rise} className="flex flex-col gap-4">
-        <Stamp className="w-full py-4 text-2xl" onClick={onStart}>
-          C'est parti →
+        <Stamp className="w-full py-4 text-2xl" onClick={onStart} disabled={loading}>
+          {loading ? "Chargement de la carte…" : "C'est parti →"}
         </Stamp>
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-muted">
-          <span><b className="text-ink">Cash</b> saisie libre = {PTS_CASH} pts</span>
-          <span><b className="text-ink">Carré</b> 4 choix = {PTS_CARRE} pt</span>
-          <span><b className="text-ink">Fautes</b> d'orthographe tolérées</span>
+          {mode === "map" ? (
+            <>
+              <span><b className="text-ink">Pile</b> à {MAP_PILE_KM} km près = {PTS_CASH} pts</span>
+              <span><b className="text-ink">Proche</b> moins de {MAP_PROCHE_KM} km = {PTS_CARRE} pt</span>
+              <span><b className="text-ink">Zoom</b> molette ou pincer</span>
+            </>
+          ) : (
+            <>
+              <span><b className="text-ink">Cash</b> saisie libre = {PTS_CASH} pts</span>
+              <span><b className="text-ink">Carré</b> 4 choix = {PTS_CARRE} pt</span>
+              <span><b className="text-ink">Fautes</b> d'orthographe tolérées</span>
+            </>
+          )}
         </div>
       </motion.div>
 

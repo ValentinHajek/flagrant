@@ -89,6 +89,12 @@ const MOTIFS = {
   ),
 };
 
+export const Glyph = ({ name, size = 40, color = BLUE, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none" stroke={color} strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" aria-hidden className={className}>
+    {MOTIFS[name]}
+  </svg>
+);
+
 export function Motif({ name, size = 56, color = BLUE, className = "", style, float = 0 }) {
   return (
     <motion.div
@@ -98,9 +104,7 @@ export function Motif({ name, size = 56, color = BLUE, className = "", style, fl
       animate={{ y: [0, -18, -6, 0], rotate: [0, 6, -4, 0] }}
       transition={{ duration: 6 + float, repeat: Infinity, ease: "easeInOut", delay: float }}
     >
-      <svg width={size} height={size} viewBox="0 0 100 100" fill="none" stroke={color} strokeWidth={7} strokeLinecap="round" strokeLinejoin="round">
-        {MOTIFS[name]}
-      </svg>
+      <Glyph name={name} size={size} color={color} />
     </motion.div>
   );
 }

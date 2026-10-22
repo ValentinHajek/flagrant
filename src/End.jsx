@@ -1,6 +1,7 @@
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { InkTitle, Kicker, Stamp } from "./brand.jsx";
+import { fmtKm } from "./geo.js";
 import { PTS_CASH, flagUrl } from "./quiz.js";
 
 const VERDICTS = [
@@ -11,6 +12,7 @@ const VERDICTS = [
 ];
 
 function status(r) {
+  if (r.km != null) return r.points === PTS_CASH ? ["Dans le mille", "text-leaf"] : [`À ${fmtKm(r.km)}`, r.points ? "text-ink" : "text-fluo"];
   if (r.points === PTS_CASH) return ["Cash", "text-leaf"];
   if (r.points) return ["Carré", "text-ink"];
   if (r.timeout) return ["Temps écoulé", "text-fluo"];
@@ -32,9 +34,10 @@ export default function End({ results, best, isRecord, onAgain, onMenu }) {
     return () => a.stop();
   }, []);
 
+  const [top, mid] = results[0].type === "map" ? ["Pile", "Proche"] : ["Cash", "Carré"];
   const stats = [
-    ["Cash", results.filter((r) => r.points === PTS_CASH).length, "text-leaf"],
-    ["Carré", results.filter((r) => r.points && r.points < PTS_CASH).length, "text-ink"],
+    [top, results.filter((r) => r.points === PTS_CASH).length, "text-leaf"],
+    [mid, results.filter((r) => r.points && r.points < PTS_CASH).length, "text-ink"],
     ["Ratés", results.filter((r) => !r.points).length, "text-fluo"],
   ];
 
@@ -95,7 +98,7 @@ export default function End({ results, best, isRecord, onAgain, onMenu }) {
                 transition={{ delay: 0.5 + Math.min(k, 15) * 0.04, type: "spring", stiffness: 300, damping: 26 }}
                 className={`flex items-center gap-4 rounded-2xl border-[2.5px] border-night bg-paper px-4 py-3 ${r.points ? "" : "shadow-[3px_3.5px_0_var(--color-fluo)]"}`}
               >
-                {r.type === "flag" ? (
+                {r.type !== "tld" ? (
                   <img src={flagUrl(r.country)} alt="" className="h-9 w-14 shrink-0 rounded-[3px] object-contain" />
                 ) : (
                   <span className="w-14 shrink-0 text-center font-display text-2xl text-ink">{r.country.tld}</span>

@@ -3,7 +3,13 @@ export const PTS_CASH = 3;
 export const PTS_CARRE = 1;
 export const COUNTS = [10, 20, 30, 50, "all"];
 export const DEFAULT_COUNT = 20;
-export const MODES = ["flag", "tld", "mix"];
+export const MODES = ["flag", "tld", "mix", "map"];
+
+// Mode carte : épingle dans le pays ou presque = 3 pts, proche = 1 pt. En vue monde 1 px ≈ 50 km :
+// la marge de 100 km rend les micro-États et les îles cliquables sans zoomer.
+export const MAP_PILE_KM = 100;
+export const MAP_PROCHE_KM = 500;
+export const mapPoints = (km) => (km <= MAP_PILE_KM ? PTS_CASH : km <= MAP_PROCHE_KM ? PTS_CARRE : 0);
 
 export const flagUrl = (c) => `https://flagcdn.com/${c.code.toLowerCase()}.svg`;
 export const shuffle = (a) => a.map((v) => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map((p) => p[1]);
@@ -11,9 +17,10 @@ export const shuffle = (a) => a.map((v) => [Math.random(), v]).sort((x, y) => x[
 const canFlag = (c) => c.drapeau;
 const canTld = (c) => Boolean(c.tld);
 
-// Pays qui peuvent tomber dans ce mode ("flag" | "tld" | "mix").
-export const eligible = (all, mode, territories) =>
-  all.filter((c) => (territories || c.souverain) && (mode === "flag" ? canFlag(c) : mode === "tld" ? canTld(c) : canFlag(c) || canTld(c)));
+const CAN = { flag: canFlag, tld: canTld, mix: (c) => canFlag(c) || canTld(c), map: (c) => c.carte };
+
+// Pays qui peuvent tomber dans ce mode ("flag" | "tld" | "mix" | "map").
+export const eligible = (all, mode, territories) => all.filter((c) => (territories || c.souverain) && CAN[mode](c));
 
 export const questionCount = (all, mode, territories, count) => {
   const n = eligible(all, mode, territories).length;

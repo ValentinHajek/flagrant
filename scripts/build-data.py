@@ -1,6 +1,9 @@
-"""Génère data/countries.json depuis le dataset mledoze/countries (source de REST Countries).
+"""Génère public/data/countries.json et la carte public/data/world.json depuis :
+- mledoze/countries (source de REST Countries) : noms FR, extensions, régions ;
+- world-atlas (Natural Earth 1:50M, TopoJSON) : contours des pays pour le mode carte.
 Usage : curl -sL https://raw.githubusercontent.com/mledoze/countries/master/countries.json -o /tmp/c.json
-        python3 scripts/build-data.py /tmp/c.json   (écrit public/data/countries.json)
+        curl -sL https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json -o /tmp/w.json
+        python3 scripts/build-data.py /tmp/c.json /tmp/w.json
 """
 import json, sys
 
@@ -20,7 +23,24 @@ ALIASES = {
     "BA": ["Bosnie"], "DO": ["République dominicaine"], "CF": ["Centrafrique"],
 }
 
+# Contours sans code ISO numérique dans Natural Earth, rattachés à la main.
+MAP_NAMES = {"Somaliland": "SO", "N. Cyprus": "CY", "Kosovo": "XK"}
+
 src = json.load(open(sys.argv[1]))
+topo = json.load(open(sys.argv[2]))
+
+# Carte : géométries réindexées par code ISO alpha-2, fusionnées par pays (Australie + îles Ashmore…).
+ccn3 = {c["ccn3"]: c["cca2"] for c in src if c.get("ccn3")}
+polygons = {}
+for g in topo["objects"]["countries"]["geometries"]:
+    code = ccn3.get(g.get("id")) or MAP_NAMES.get(g["properties"]["name"])
+    if not code or code == "AQ" or "arcs" not in g:  # Antarctique hors jeu, contours inconnus ignorés
+        continue
+    polygons.setdefault(code, []).extend([g["arcs"]] if g["type"] == "Polygon" else g["arcs"])
+topo["objects"] = {"countries": {"type": "GeometryCollection", "geometries": [
+    {"type": "MultiPolygon", "id": code, "arcs": arcs} for code, arcs in sorted(polygons.items())]}}
+json.dump(topo, open("public/data/world.json", "w"), separators=(",", ":"))
+
 out = []
 for c in src:
     fr = c["translations"]["fra"]
@@ -34,6 +54,7 @@ for c in src:
         "sousRegion": c.get("subregion") or c["region"],
         "souverain": bool(c["independent"]),
         "drapeau": c["cca2"] not in SAME_FLAG,
+        "carte": c["cca2"] in polygons,
     })
 
 # Extension partagée (ex. .fr pour Saint-Martin) : on la garde pour le pays souverain seulement.
@@ -44,4 +65,4 @@ for c in out:
 
 out.sort(key=lambda c: c["nom"])
 json.dump(out, open("public/data/countries.json", "w"), ensure_ascii=False, indent=1)
-print(len(out), "pays/territoires,", sum(c["tld"] is not None for c in out), "extensions")
+print(len(out), "pays/territoires,", sum(c["tld"] is not None for c in out), "extensions,", len(polygons), "contours")

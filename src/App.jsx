@@ -2,6 +2,7 @@ import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import End from "./End.jsx";
 import Game from "./Game.jsx";
+import { parseWorld } from "./geo.js";
 import Home from "./Home.jsx";
 import { COUNTS, DEFAULT_COUNT, MODES, buildQuiz } from "./quiz.js";
 import { bestKey, load, save } from "./storage.js";
@@ -25,7 +26,8 @@ function loadSettings() {
 
 export default function App() {
   const [all, setAll] = useState(null);
-  const [error, setError] = useState(false);
+  const [map, setMap] = useState(null);
+  const [error, setError] = useState(null);
   const [settings, setSettingsState] = useState(loadSettings);
   const [screen, setScreen] = useState("home");
   const [quiz, setQuiz] = useState(null);
@@ -35,8 +37,18 @@ export default function App() {
     fetch(`${import.meta.env.BASE_URL}data/countries.json`)
       .then((r) => r.json())
       .then(setAll)
-      .catch(() => setError(true));
+      .catch(() => setError("la base des pays"));
   }, []);
+
+  // La carte (≈ 240 Ko) n'est chargée que si on choisit le mode carte.
+  const needMap = settings.mode === "map";
+  useEffect(() => {
+    if (!needMap || map) return;
+    fetch(`${import.meta.env.BASE_URL}data/world.json`)
+      .then((r) => r.json())
+      .then((topo) => setMap(parseWorld(topo)))
+      .catch(() => setError("la carte"));
+  }, [needMap, map]);
 
   const setSettings = (s) => {
     setSettingsState(s);
@@ -44,6 +56,7 @@ export default function App() {
   };
 
   const start = () => {
+    if (needMap && !map) return;
     setQuiz({ ...buildQuiz(all, settings.mode, settings.territories, settings.count), id: Date.now() });
     setScreen("game");
   };
@@ -60,12 +73,12 @@ export default function App() {
   return (
     <MotionConfig reducedMotion="user">
       <main className="mx-auto max-w-2xl px-4 pb-16 pt-6 sm:px-10 sm:pt-10">
-        {error && <p className="font-semibold text-fluo">Impossible de charger la base des pays. Recharge la page.</p>}
+        {error && <p className="font-semibold text-fluo">Impossible de charger {error}. Recharge la page.</p>}
         {all && (
           <AnimatePresence mode="wait">
             <motion.section key={screen === "game" ? quiz.id : screen} variants={page} initial="initial" animate="animate" exit="exit">
-              {screen === "home" && <Home all={all} settings={settings} setSettings={setSettings} onStart={start} />}
-              {screen === "game" && <Game all={all} quiz={quiz} onFinish={finish} onQuit={() => setScreen("home")} />}
+              {screen === "home" && <Home all={all} settings={settings} setSettings={setSettings} onStart={start} loading={needMap && !map} />}
+              {screen === "game" && <Game all={all} map={map} quiz={quiz} onFinish={finish} onQuit={() => setScreen("home")} />}
               {screen === "end" && <End {...end} onAgain={start} onMenu={() => setScreen("home")} />}
             </motion.section>
           </AnimatePresence>
