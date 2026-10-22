@@ -1,0 +1,2926 @@
+[
+ {
+  "code": "AF",
+  "nom": "Afghanistan",
+  "alias": [
+   "République islamique d'Afghanistan"
+  ],
+  "tld": ".af",
+  "region": "Asie",
+  "sousRegion": "Southern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "ZA",
+  "nom": "Afrique du Sud",
+  "alias": [
+   "République d'Afrique du Sud"
+  ],
+  "tld": ".za",
+  "region": "Afrique",
+  "sousRegion": "Southern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "AX",
+  "nom": "Ahvenanmaa",
+  "alias": [],
+  "tld": ".ax",
+  "region": "Europe",
+  "sousRegion": "Northern Europe",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "AL",
+  "nom": "Albanie",
+  "alias": [
+   "République d'Albanie"
+  ],
+  "tld": ".al",
+  "region": "Europe",
+  "sousRegion": "Southeast Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "DZ",
+  "nom": "Algérie",
+  "alias": [
+   "République démocratique et populaire d'Algérie"
+  ],
+  "tld": ".dz",
+  "region": "Afrique",
+  "sousRegion": "Northern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "DE",
+  "nom": "Allemagne",
+  "alias": [
+   "République fédérale d'Allemagne"
+  ],
+  "tld": ".de",
+  "region": "Europe",
+  "sousRegion": "Western Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "AD",
+  "nom": "Andorre",
+  "alias": [
+   "Principauté d'Andorre"
+  ],
+  "tld": ".ad",
+  "region": "Europe",
+  "sousRegion": "Southern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "AO",
+  "nom": "Angola",
+  "alias": [
+   "République d'Angola"
+  ],
+  "tld": ".ao",
+  "region": "Afrique",
+  "sousRegion": "Middle Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "AI",
+  "nom": "Anguilla",
+  "alias": [],
+  "tld": ".ai",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "AQ",
+  "nom": "Antarctique",
+  "alias": [],
+  "tld": ".aq",
+  "region": "Antarctique",
+  "sousRegion": "Antarctic",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "AG",
+  "nom": "Antigua-et-Barbuda",
+  "alias": [
+   "Antigua -et-Barbuda"
+  ],
+  "tld": ".ag",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SA",
+  "nom": "Arabie Saoudite",
+  "alias": [
+   "Royaume d'Arabie Saoudite"
+  ],
+  "tld": ".sa",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "AR",
+  "nom": "Argentine",
+  "alias": [
+   "République argentine"
+  ],
+  "tld": ".ar",
+  "region": "Amériques",
+  "sousRegion": "South America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "AM",
+  "nom": "Arménie",
+  "alias": [
+   "République d'Arménie"
+  ],
+  "tld": ".am",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "AW",
+  "nom": "Aruba",
+  "alias": [],
+  "tld": ".aw",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "AU",
+  "nom": "Australie",
+  "alias": [],
+  "tld": ".au",
+  "region": "Océanie",
+  "sousRegion": "Australia and New Zealand",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "AT",
+  "nom": "Autriche",
+  "alias": [
+   "République d'Autriche"
+  ],
+  "tld": ".at",
+  "region": "Europe",
+  "sousRegion": "Central Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "AZ",
+  "nom": "Azerbaïdjan",
+  "alias": [
+   "République d'Azerbaïdjan"
+  ],
+  "tld": ".az",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BS",
+  "nom": "Bahamas",
+  "alias": [
+   "Commonwealth des Bahamas"
+  ],
+  "tld": ".bs",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BH",
+  "nom": "Bahreïn",
+  "alias": [
+   "Royaume de Bahreïn"
+  ],
+  "tld": ".bh",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BD",
+  "nom": "Bangladesh",
+  "alias": [
+   "La République populaire du Bangladesh"
+  ],
+  "tld": ".bd",
+  "region": "Asie",
+  "sousRegion": "Southern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BB",
+  "nom": "Barbade",
+  "alias": [],
+  "tld": ".bb",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BE",
+  "nom": "Belgique",
+  "alias": [
+   "Royaume de Belgique"
+  ],
+  "tld": ".be",
+  "region": "Europe",
+  "sousRegion": "Western Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BZ",
+  "nom": "Belize",
+  "alias": [],
+  "tld": ".bz",
+  "region": "Amériques",
+  "sousRegion": "Central America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BM",
+  "nom": "Bermudes",
+  "alias": [],
+  "tld": ".bm",
+  "region": "Amériques",
+  "sousRegion": "North America",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "BT",
+  "nom": "Bhoutan",
+  "alias": [
+   "Royaume du Bhoutan"
+  ],
+  "tld": ".bt",
+  "region": "Asie",
+  "sousRegion": "Southern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "MM",
+  "nom": "Birmanie",
+  "alias": [
+   "République de l'Union du Myanmar"
+  ],
+  "tld": ".mm",
+  "region": "Asie",
+  "sousRegion": "South-Eastern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BY",
+  "nom": "Biélorussie",
+  "alias": [
+   "République de Biélorussie"
+  ],
+  "tld": ".by",
+  "region": "Europe",
+  "sousRegion": "Eastern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BO",
+  "nom": "Bolivie",
+  "alias": [
+   "État plurinational de Bolivie"
+  ],
+  "tld": ".bo",
+  "region": "Amériques",
+  "sousRegion": "South America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BA",
+  "nom": "Bosnie-Herzégovine",
+  "alias": [
+   "Bosnie",
+   "Bosnie-et-Herzégovine"
+  ],
+  "tld": ".ba",
+  "region": "Europe",
+  "sousRegion": "Southeast Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BW",
+  "nom": "Botswana",
+  "alias": [
+   "République du Botswana"
+  ],
+  "tld": ".bw",
+  "region": "Afrique",
+  "sousRegion": "Southern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BN",
+  "nom": "Brunei",
+  "alias": [
+   "État de Brunei Darussalam"
+  ],
+  "tld": ".bn",
+  "region": "Asie",
+  "sousRegion": "South-Eastern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BR",
+  "nom": "Brésil",
+  "alias": [
+   "République fédérative du Brésil"
+  ],
+  "tld": ".br",
+  "region": "Amériques",
+  "sousRegion": "South America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BG",
+  "nom": "Bulgarie",
+  "alias": [
+   "République de Bulgarie"
+  ],
+  "tld": ".bg",
+  "region": "Europe",
+  "sousRegion": "Southeast Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BF",
+  "nom": "Burkina Faso",
+  "alias": [
+   "République du Burkina"
+  ],
+  "tld": ".bf",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BI",
+  "nom": "Burundi",
+  "alias": [
+   "République du Burundi"
+  ],
+  "tld": ".bi",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BJ",
+  "nom": "Bénin",
+  "alias": [
+   "République du Bénin"
+  ],
+  "tld": ".bj",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "KH",
+  "nom": "Cambodge",
+  "alias": [
+   "Royaume du Cambodge"
+  ],
+  "tld": ".kh",
+  "region": "Asie",
+  "sousRegion": "South-Eastern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "CM",
+  "nom": "Cameroun",
+  "alias": [
+   "République du Cameroun"
+  ],
+  "tld": ".cm",
+  "region": "Afrique",
+  "sousRegion": "Middle Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "CA",
+  "nom": "Canada",
+  "alias": [],
+  "tld": ".ca",
+  "region": "Amériques",
+  "sousRegion": "North America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "CL",
+  "nom": "Chili",
+  "alias": [
+   "République du Chili"
+  ],
+  "tld": ".cl",
+  "region": "Amériques",
+  "sousRegion": "South America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "CN",
+  "nom": "Chine",
+  "alias": [
+   "République populaire de Chine"
+  ],
+  "tld": ".cn",
+  "region": "Asie",
+  "sousRegion": "Eastern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "CY",
+  "nom": "Chypre",
+  "alias": [
+   "République de Chypre"
+  ],
+  "tld": ".cy",
+  "region": "Europe",
+  "sousRegion": "Southern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "VA",
+  "nom": "Cité du Vatican",
+  "alias": [
+   "Vatican"
+  ],
+  "tld": ".va",
+  "region": "Europe",
+  "sousRegion": "Southern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "CO",
+  "nom": "Colombie",
+  "alias": [
+   "République de Colombie"
+  ],
+  "tld": ".co",
+  "region": "Amériques",
+  "sousRegion": "South America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "KM",
+  "nom": "Comores",
+  "alias": [
+   "Union des Comores"
+  ],
+  "tld": ".km",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "CG",
+  "nom": "Congo",
+  "alias": [
+   "Congo Brazzaville",
+   "République du Congo"
+  ],
+  "tld": ".cg",
+  "region": "Afrique",
+  "sousRegion": "Middle Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "CD",
+  "nom": "Congo (Rép. dém.)",
+  "alias": [
+   "Congo Kinshasa",
+   "RDC",
+   "République démocratique du Congo"
+  ],
+  "tld": ".cd",
+  "region": "Afrique",
+  "sousRegion": "Middle Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "KP",
+  "nom": "Corée du Nord",
+  "alias": [
+   "République populaire démocratique de Corée"
+  ],
+  "tld": ".kp",
+  "region": "Asie",
+  "sousRegion": "Eastern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "KR",
+  "nom": "Corée du Sud",
+  "alias": [
+   "Corée",
+   "République de Corée"
+  ],
+  "tld": ".kr",
+  "region": "Asie",
+  "sousRegion": "Eastern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "CR",
+  "nom": "Costa Rica",
+  "alias": [
+   "République du Costa Rica"
+  ],
+  "tld": ".cr",
+  "region": "Amériques",
+  "sousRegion": "Central America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "HR",
+  "nom": "Croatie",
+  "alias": [
+   "République de Croatie"
+  ],
+  "tld": ".hr",
+  "region": "Europe",
+  "sousRegion": "Southeast Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "CU",
+  "nom": "Cuba",
+  "alias": [
+   "République de Cuba"
+  ],
+  "tld": ".cu",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "CW",
+  "nom": "Curaçao",
+  "alias": [
+   "Pays de Curaçao"
+  ],
+  "tld": ".cw",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "CI",
+  "nom": "Côte d'Ivoire",
+  "alias": [
+   "Ivory Coast",
+   "République de Côte d' Ivoire"
+  ],
+  "tld": ".ci",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "DK",
+  "nom": "Danemark",
+  "alias": [
+   "Royaume du Danemark"
+  ],
+  "tld": ".dk",
+  "region": "Europe",
+  "sousRegion": "Northern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "DJ",
+  "nom": "Djibouti",
+  "alias": [
+   "République de Djibouti"
+  ],
+  "tld": ".dj",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "DM",
+  "nom": "Dominique",
+  "alias": [
+   "Commonwealth de la Dominique"
+  ],
+  "tld": ".dm",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "ES",
+  "nom": "Espagne",
+  "alias": [
+   "Royaume d'Espagne"
+  ],
+  "tld": ".es",
+  "region": "Europe",
+  "sousRegion": "Southern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "EE",
+  "nom": "Estonie",
+  "alias": [
+   "République d'Estonie"
+  ],
+  "tld": ".ee",
+  "region": "Europe",
+  "sousRegion": "Northern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SZ",
+  "nom": "Eswatini",
+  "alias": [
+   "Royaume d’Eswatini",
+   "Swaziland"
+  ],
+  "tld": ".sz",
+  "region": "Afrique",
+  "sousRegion": "Southern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "FJ",
+  "nom": "Fidji",
+  "alias": [
+   "République des Fidji"
+  ],
+  "tld": ".fj",
+  "region": "Océanie",
+  "sousRegion": "Melanesia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "FI",
+  "nom": "Finlande",
+  "alias": [
+   "République de Finlande"
+  ],
+  "tld": ".fi",
+  "region": "Europe",
+  "sousRegion": "Northern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "FR",
+  "nom": "France",
+  "alias": [
+   "République française"
+  ],
+  "tld": ".fr",
+  "region": "Europe",
+  "sousRegion": "Western Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "GA",
+  "nom": "Gabon",
+  "alias": [
+   "République gabonaise"
+  ],
+  "tld": ".ga",
+  "region": "Afrique",
+  "sousRegion": "Middle Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "GM",
+  "nom": "Gambie",
+  "alias": [
+   "République de Gambie"
+  ],
+  "tld": ".gm",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "GH",
+  "nom": "Ghana",
+  "alias": [
+   "République du Ghana"
+  ],
+  "tld": ".gh",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "GI",
+  "nom": "Gibraltar",
+  "alias": [],
+  "tld": ".gi",
+  "region": "Europe",
+  "sousRegion": "Southern Europe",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "GD",
+  "nom": "Grenade",
+  "alias": [],
+  "tld": ".gd",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "GL",
+  "nom": "Groenland",
+  "alias": [],
+  "tld": ".gl",
+  "region": "Amériques",
+  "sousRegion": "North America",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "GR",
+  "nom": "Grèce",
+  "alias": [
+   "République hellénique"
+  ],
+  "tld": ".gr",
+  "region": "Europe",
+  "sousRegion": "Southern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "GP",
+  "nom": "Guadeloupe",
+  "alias": [],
+  "tld": ".gp",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": false,
+  "drapeau": false
+ },
+ {
+  "code": "GU",
+  "nom": "Guam",
+  "alias": [],
+  "tld": ".gu",
+  "region": "Océanie",
+  "sousRegion": "Micronesia",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "GT",
+  "nom": "Guatemala",
+  "alias": [
+   "République du Guatemala"
+  ],
+  "tld": ".gt",
+  "region": "Amériques",
+  "sousRegion": "Central America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "GG",
+  "nom": "Guernesey",
+  "alias": [
+   "Bailliage de Guernesey"
+  ],
+  "tld": ".gg",
+  "region": "Europe",
+  "sousRegion": "Northern Europe",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "GN",
+  "nom": "Guinée",
+  "alias": [
+   "République de Guinée"
+  ],
+  "tld": ".gn",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "GQ",
+  "nom": "Guinée équatoriale",
+  "alias": [
+   "République de Guinée équatoriale"
+  ],
+  "tld": ".gq",
+  "region": "Afrique",
+  "sousRegion": "Middle Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "GW",
+  "nom": "Guinée-Bissau",
+  "alias": [
+   "République de Guinée-Bissau"
+  ],
+  "tld": ".gw",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "GY",
+  "nom": "Guyana",
+  "alias": [
+   "République coopérative de Guyana"
+  ],
+  "tld": ".gy",
+  "region": "Amériques",
+  "sousRegion": "South America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "GF",
+  "nom": "Guyane",
+  "alias": [],
+  "tld": ".gf",
+  "region": "Amériques",
+  "sousRegion": "South America",
+  "souverain": false,
+  "drapeau": false
+ },
+ {
+  "code": "GE",
+  "nom": "Géorgie",
+  "alias": [
+   "République de Géorgie"
+  ],
+  "tld": ".ge",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "GS",
+  "nom": "Géorgie du Sud-et-les Îles Sandwich du Sud",
+  "alias": [
+   "Géorgie du Sud et les îles Sandwich du Sud"
+  ],
+  "tld": ".gs",
+  "region": "Antarctique",
+  "sousRegion": "Antarctic",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "HT",
+  "nom": "Haïti",
+  "alias": [
+   "République d'Haïti"
+  ],
+  "tld": ".ht",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "HN",
+  "nom": "Honduras",
+  "alias": [
+   "République du Honduras"
+  ],
+  "tld": ".hn",
+  "region": "Amériques",
+  "sousRegion": "Central America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "HK",
+  "nom": "Hong Kong",
+  "alias": [
+   "Région administrative spéciale de Hong Kong de la République populaire de Chine"
+  ],
+  "tld": ".hk",
+  "region": "Asie",
+  "sousRegion": "Eastern Asia",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "HU",
+  "nom": "Hongrie",
+  "alias": [],
+  "tld": ".hu",
+  "region": "Europe",
+  "sousRegion": "Central Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "IN",
+  "nom": "Inde",
+  "alias": [
+   "République de l'Inde"
+  ],
+  "tld": ".in",
+  "region": "Asie",
+  "sousRegion": "Southern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "ID",
+  "nom": "Indonésie",
+  "alias": [
+   "République d'Indonésie"
+  ],
+  "tld": ".id",
+  "region": "Asie",
+  "sousRegion": "South-Eastern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "IQ",
+  "nom": "Irak",
+  "alias": [
+   "République d'Irak"
+  ],
+  "tld": ".iq",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "IR",
+  "nom": "Iran",
+  "alias": [
+   "République islamique d'Iran"
+  ],
+  "tld": ".ir",
+  "region": "Asie",
+  "sousRegion": "Southern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "IE",
+  "nom": "Irlande",
+  "alias": [
+   "République d'Irlande"
+  ],
+  "tld": ".ie",
+  "region": "Europe",
+  "sousRegion": "Northern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "IS",
+  "nom": "Islande",
+  "alias": [
+   "République d'Islande"
+  ],
+  "tld": ".is",
+  "region": "Europe",
+  "sousRegion": "Northern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "IL",
+  "nom": "Israël",
+  "alias": [
+   "État d'Israël"
+  ],
+  "tld": ".il",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "IT",
+  "nom": "Italie",
+  "alias": [
+   "République italienne"
+  ],
+  "tld": ".it",
+  "region": "Europe",
+  "sousRegion": "Southern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "JM",
+  "nom": "Jamaïque",
+  "alias": [],
+  "tld": ".jm",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "JP",
+  "nom": "Japon",
+  "alias": [],
+  "tld": ".jp",
+  "region": "Asie",
+  "sousRegion": "Eastern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "JE",
+  "nom": "Jersey",
+  "alias": [
+   "Bailliage de Jersey"
+  ],
+  "tld": ".je",
+  "region": "Europe",
+  "sousRegion": "Northern Europe",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "JO",
+  "nom": "Jordanie",
+  "alias": [
+   "Royaume hachémite de Jordanie"
+  ],
+  "tld": ".jo",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "KZ",
+  "nom": "Kazakhstan",
+  "alias": [
+   "République du Kazakhstan"
+  ],
+  "tld": ".kz",
+  "region": "Asie",
+  "sousRegion": "Central Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "KE",
+  "nom": "Kenya",
+  "alias": [
+   "République du Kenya"
+  ],
+  "tld": ".ke",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "KG",
+  "nom": "Kirghizistan",
+  "alias": [
+   "République kirghize"
+  ],
+  "tld": ".kg",
+  "region": "Asie",
+  "sousRegion": "Central Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "KI",
+  "nom": "Kiribati",
+  "alias": [
+   "République de Kiribati"
+  ],
+  "tld": ".ki",
+  "region": "Océanie",
+  "sousRegion": "Micronesia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "XK",
+  "nom": "Kosovo",
+  "alias": [
+   "République du Kosovo"
+  ],
+  "tld": ".xk",
+  "region": "Europe",
+  "sousRegion": "Southeast Europe",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "KW",
+  "nom": "Koweït",
+  "alias": [
+   "État du Koweït"
+  ],
+  "tld": ".kw",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "LA",
+  "nom": "Laos",
+  "alias": [
+   "République démocratique populaire lao"
+  ],
+  "tld": ".la",
+  "region": "Asie",
+  "sousRegion": "South-Eastern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "LS",
+  "nom": "Lesotho",
+  "alias": [
+   "Royaume du Lesotho"
+  ],
+  "tld": ".ls",
+  "region": "Afrique",
+  "sousRegion": "Southern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "LV",
+  "nom": "Lettonie",
+  "alias": [
+   "République de Lettonie"
+  ],
+  "tld": ".lv",
+  "region": "Europe",
+  "sousRegion": "Northern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "LB",
+  "nom": "Liban",
+  "alias": [
+   "République libanaise"
+  ],
+  "tld": ".lb",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "LR",
+  "nom": "Liberia",
+  "alias": [
+   "République du Libéria"
+  ],
+  "tld": ".lr",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "LY",
+  "nom": "Libye",
+  "alias": [
+   "Grande République arabe libyenne populaire et socialiste"
+  ],
+  "tld": ".ly",
+  "region": "Afrique",
+  "sousRegion": "Northern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "LI",
+  "nom": "Liechtenstein",
+  "alias": [
+   "Principauté du Liechtenstein"
+  ],
+  "tld": ".li",
+  "region": "Europe",
+  "sousRegion": "Western Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "LT",
+  "nom": "Lituanie",
+  "alias": [
+   "République de Lituanie"
+  ],
+  "tld": ".lt",
+  "region": "Europe",
+  "sousRegion": "Northern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "LU",
+  "nom": "Luxembourg",
+  "alias": [
+   "Grand-Duché de Luxembourg"
+  ],
+  "tld": ".lu",
+  "region": "Europe",
+  "sousRegion": "Western Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "MO",
+  "nom": "Macao",
+  "alias": [
+   "Région administrative spéciale de Macao de la République populaire de Chine"
+  ],
+  "tld": ".mo",
+  "region": "Asie",
+  "sousRegion": "Eastern Asia",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "MK",
+  "nom": "Macédoine du Nord",
+  "alias": [
+   "Macédoine",
+   "République de Macédoine du Nord"
+  ],
+  "tld": ".mk",
+  "region": "Europe",
+  "sousRegion": "Southeast Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "MG",
+  "nom": "Madagascar",
+  "alias": [
+   "République de Madagascar"
+  ],
+  "tld": ".mg",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "MY",
+  "nom": "Malaisie",
+  "alias": [
+   "Fédération de Malaisie"
+  ],
+  "tld": ".my",
+  "region": "Asie",
+  "sousRegion": "South-Eastern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "MW",
+  "nom": "Malawi",
+  "alias": [
+   "République du Malawi"
+  ],
+  "tld": ".mw",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "MV",
+  "nom": "Maldives",
+  "alias": [
+   "République des Maldives"
+  ],
+  "tld": ".mv",
+  "region": "Asie",
+  "sousRegion": "Southern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "ML",
+  "nom": "Mali",
+  "alias": [
+   "République du Mali"
+  ],
+  "tld": ".ml",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "MT",
+  "nom": "Malte",
+  "alias": [
+   "République de Malte"
+  ],
+  "tld": ".mt",
+  "region": "Europe",
+  "sousRegion": "Southern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "MA",
+  "nom": "Maroc",
+  "alias": [
+   "Royaume du Maroc"
+  ],
+  "tld": ".ma",
+  "region": "Afrique",
+  "sousRegion": "Northern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "MQ",
+  "nom": "Martinique",
+  "alias": [],
+  "tld": ".mq",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": false,
+  "drapeau": false
+ },
+ {
+  "code": "MR",
+  "nom": "Mauritanie",
+  "alias": [
+   "République islamique de Mauritanie"
+  ],
+  "tld": ".mr",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "YT",
+  "nom": "Mayotte",
+  "alias": [
+   "Département de Mayotte"
+  ],
+  "tld": ".yt",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": false,
+  "drapeau": false
+ },
+ {
+  "code": "MX",
+  "nom": "Mexique",
+  "alias": [
+   "États-Unis du Mexique"
+  ],
+  "tld": ".mx",
+  "region": "Amériques",
+  "sousRegion": "North America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "FM",
+  "nom": "Micronésie",
+  "alias": [
+   "États fédérés de Micronésie"
+  ],
+  "tld": ".fm",
+  "region": "Océanie",
+  "sousRegion": "Micronesia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "MD",
+  "nom": "Moldavie",
+  "alias": [
+   "République de Moldavie"
+  ],
+  "tld": ".md",
+  "region": "Europe",
+  "sousRegion": "Eastern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "MC",
+  "nom": "Monaco",
+  "alias": [
+   "Principauté de Monaco"
+  ],
+  "tld": ".mc",
+  "region": "Europe",
+  "sousRegion": "Western Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "MN",
+  "nom": "Mongolie",
+  "alias": [],
+  "tld": ".mn",
+  "region": "Asie",
+  "sousRegion": "Eastern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "MS",
+  "nom": "Montserrat",
+  "alias": [],
+  "tld": ".ms",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "ME",
+  "nom": "Monténégro",
+  "alias": [],
+  "tld": ".me",
+  "region": "Europe",
+  "sousRegion": "Southeast Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "MZ",
+  "nom": "Mozambique",
+  "alias": [
+   "République du Mozambique"
+  ],
+  "tld": ".mz",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "NA",
+  "nom": "Namibie",
+  "alias": [
+   "République de Namibie"
+  ],
+  "tld": ".na",
+  "region": "Afrique",
+  "sousRegion": "Southern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "NR",
+  "nom": "Nauru",
+  "alias": [
+   "République de Nauru"
+  ],
+  "tld": ".nr",
+  "region": "Océanie",
+  "sousRegion": "Micronesia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "NI",
+  "nom": "Nicaragua",
+  "alias": [
+   "République du Nicaragua"
+  ],
+  "tld": ".ni",
+  "region": "Amériques",
+  "sousRegion": "Central America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "NE",
+  "nom": "Niger",
+  "alias": [
+   "République du Niger"
+  ],
+  "tld": ".ne",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "NG",
+  "nom": "Nigéria",
+  "alias": [
+   "République fédérale du Nigeria"
+  ],
+  "tld": ".ng",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "NU",
+  "nom": "Niue",
+  "alias": [],
+  "tld": ".nu",
+  "region": "Océanie",
+  "sousRegion": "Polynesia",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "NO",
+  "nom": "Norvège",
+  "alias": [
+   "Royaume de Norvège"
+  ],
+  "tld": ".no",
+  "region": "Europe",
+  "sousRegion": "Northern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "NC",
+  "nom": "Nouvelle-Calédonie",
+  "alias": [],
+  "tld": ".nc",
+  "region": "Océanie",
+  "sousRegion": "Melanesia",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "NZ",
+  "nom": "Nouvelle-Zélande",
+  "alias": [],
+  "tld": ".nz",
+  "region": "Océanie",
+  "sousRegion": "Australia and New Zealand",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "NP",
+  "nom": "Népal",
+  "alias": [
+   "République du Népal"
+  ],
+  "tld": ".np",
+  "region": "Asie",
+  "sousRegion": "Southern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "OM",
+  "nom": "Oman",
+  "alias": [
+   "Sultanat d'Oman"
+  ],
+  "tld": ".om",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "UG",
+  "nom": "Ouganda",
+  "alias": [
+   "République de l'Ouganda"
+  ],
+  "tld": ".ug",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "UZ",
+  "nom": "Ouzbékistan",
+  "alias": [
+   "République d'Ouzbékistan"
+  ],
+  "tld": ".uz",
+  "region": "Asie",
+  "sousRegion": "Central Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "PK",
+  "nom": "Pakistan",
+  "alias": [
+   "République islamique du Pakistan"
+  ],
+  "tld": ".pk",
+  "region": "Asie",
+  "sousRegion": "Southern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "PW",
+  "nom": "Palaos (Palau)",
+  "alias": [
+   "République des Palaos (Palau)"
+  ],
+  "tld": ".pw",
+  "region": "Océanie",
+  "sousRegion": "Micronesia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "PS",
+  "nom": "Palestine",
+  "alias": [
+   "État de Palestine"
+  ],
+  "tld": ".ps",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "PA",
+  "nom": "Panama",
+  "alias": [
+   "République du Panama"
+  ],
+  "tld": ".pa",
+  "region": "Amériques",
+  "sousRegion": "Central America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "PG",
+  "nom": "Papouasie-Nouvelle-Guinée",
+  "alias": [
+   "État indépendant de Papouasie-Nouvelle-Guinée"
+  ],
+  "tld": ".pg",
+  "region": "Océanie",
+  "sousRegion": "Melanesia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "PY",
+  "nom": "Paraguay",
+  "alias": [
+   "République du Paraguay"
+  ],
+  "tld": ".py",
+  "region": "Amériques",
+  "sousRegion": "South America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "NL",
+  "nom": "Pays-Bas",
+  "alias": [
+   "Hollande"
+  ],
+  "tld": ".nl",
+  "region": "Europe",
+  "sousRegion": "Western Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BQ",
+  "nom": "Pays-Bas caribéens",
+  "alias": [
+   "Bonaire, Saint-Eustache et Saba"
+  ],
+  "tld": ".bq",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "PH",
+  "nom": "Philippines",
+  "alias": [
+   "République des Philippines"
+  ],
+  "tld": ".ph",
+  "region": "Asie",
+  "sousRegion": "South-Eastern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "PL",
+  "nom": "Pologne",
+  "alias": [
+   "République de Pologne"
+  ],
+  "tld": ".pl",
+  "region": "Europe",
+  "sousRegion": "Central Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "PF",
+  "nom": "Polynésie française",
+  "alias": [],
+  "tld": ".pf",
+  "region": "Océanie",
+  "sousRegion": "Polynesia",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "PR",
+  "nom": "Porto Rico",
+  "alias": [],
+  "tld": ".pr",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "PT",
+  "nom": "Portugal",
+  "alias": [
+   "République portugaise"
+  ],
+  "tld": ".pt",
+  "region": "Europe",
+  "sousRegion": "Southern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "PE",
+  "nom": "Pérou",
+  "alias": [
+   "République du Pérou"
+  ],
+  "tld": ".pe",
+  "region": "Amériques",
+  "sousRegion": "South America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "QA",
+  "nom": "Qatar",
+  "alias": [
+   "État du Qatar"
+  ],
+  "tld": ".qa",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "RO",
+  "nom": "Roumanie",
+  "alias": [],
+  "tld": ".ro",
+  "region": "Europe",
+  "sousRegion": "Southeast Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "GB",
+  "nom": "Royaume-Uni",
+  "alias": [
+   "Angleterre",
+   "Grande-Bretagne",
+   "Royaume-Uni de Grande-Bretagne et d'Irlande du Nord",
+   "UK"
+  ],
+  "tld": ".uk",
+  "region": "Europe",
+  "sousRegion": "Northern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "RU",
+  "nom": "Russie",
+  "alias": [
+   "Fédération de Russie"
+  ],
+  "tld": ".ru",
+  "region": "Europe",
+  "sousRegion": "Eastern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "RW",
+  "nom": "Rwanda",
+  "alias": [
+   "République rwandaise"
+  ],
+  "tld": ".rw",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "CF",
+  "nom": "République centrafricaine",
+  "alias": [
+   "Centrafrique"
+  ],
+  "tld": ".cf",
+  "region": "Afrique",
+  "sousRegion": "Middle Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "DO",
+  "nom": "République dominicaine",
+  "alias": [
+   "République Dominicaine"
+  ],
+  "tld": ".do",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "RE",
+  "nom": "Réunion",
+  "alias": [
+   "Ile de la Réunion"
+  ],
+  "tld": ".re",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": false,
+  "drapeau": false
+ },
+ {
+  "code": "EH",
+  "nom": "Sahara Occidental",
+  "alias": [
+   "République arabe sahraouie démocratique"
+  ],
+  "tld": ".eh",
+  "region": "Afrique",
+  "sousRegion": "Northern Africa",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "BL",
+  "nom": "Saint-Barthélemy",
+  "alias": [
+   "Collectivité de Saint-Barthélemy"
+  ],
+  "tld": ".bl",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "KN",
+  "nom": "Saint-Christophe-et-Niévès",
+  "alias": [
+   "Fédération de Saint-Christophe-et-Niévès"
+  ],
+  "tld": ".kn",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SM",
+  "nom": "Saint-Marin",
+  "alias": [
+   "République de Saint-Marin"
+  ],
+  "tld": ".sm",
+  "region": "Europe",
+  "sousRegion": "Southern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "MF",
+  "nom": "Saint-Martin",
+  "alias": [],
+  "tld": null,
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": false,
+  "drapeau": false
+ },
+ {
+  "code": "SX",
+  "nom": "Saint-Martin",
+  "alias": [
+   "Sint Maarten"
+  ],
+  "tld": ".sx",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "PM",
+  "nom": "Saint-Pierre-et-Miquelon",
+  "alias": [],
+  "tld": ".pm",
+  "region": "Amériques",
+  "sousRegion": "North America",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "VC",
+  "nom": "Saint-Vincent-et-les-Grenadines",
+  "alias": [
+   "Saint-Vincent-et-les Grenadines"
+  ],
+  "tld": ".vc",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SH",
+  "nom": "Sainte-Hélène, Ascension et Tristan da Cunha",
+  "alias": [],
+  "tld": ".sh",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "LC",
+  "nom": "Sainte-Lucie",
+  "alias": [],
+  "tld": ".lc",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SV",
+  "nom": "Salvador",
+  "alias": [
+   "République du Salvador"
+  ],
+  "tld": ".sv",
+  "region": "Amériques",
+  "sousRegion": "Central America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "WS",
+  "nom": "Samoa",
+  "alias": [],
+  "tld": ".ws",
+  "region": "Océanie",
+  "sousRegion": "Polynesia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "AS",
+  "nom": "Samoa américaines",
+  "alias": [],
+  "tld": ".as",
+  "region": "Océanie",
+  "sousRegion": "Polynesia",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "RS",
+  "nom": "Serbie",
+  "alias": [
+   "République de Serbie"
+  ],
+  "tld": ".rs",
+  "region": "Europe",
+  "sousRegion": "Southeast Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SC",
+  "nom": "Seychelles",
+  "alias": [
+   "République des Seychelles"
+  ],
+  "tld": ".sc",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SL",
+  "nom": "Sierra Leone",
+  "alias": [
+   "République de Sierra Leone"
+  ],
+  "tld": ".sl",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SG",
+  "nom": "Singapour",
+  "alias": [
+   "République de Singapour"
+  ],
+  "tld": ".sg",
+  "region": "Asie",
+  "sousRegion": "South-Eastern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SK",
+  "nom": "Slovaquie",
+  "alias": [
+   "République slovaque"
+  ],
+  "tld": ".sk",
+  "region": "Europe",
+  "sousRegion": "Central Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SI",
+  "nom": "Slovénie",
+  "alias": [
+   "République de Slovénie"
+  ],
+  "tld": ".si",
+  "region": "Europe",
+  "sousRegion": "Central Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SO",
+  "nom": "Somalie",
+  "alias": [
+   "République fédérale de Somalie"
+  ],
+  "tld": ".so",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SD",
+  "nom": "Soudan",
+  "alias": [
+   "République du Soudan"
+  ],
+  "tld": ".sd",
+  "region": "Afrique",
+  "sousRegion": "Northern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SS",
+  "nom": "Soudan du Sud",
+  "alias": [
+   "République du Soudan du Sud"
+  ],
+  "tld": ".ss",
+  "region": "Afrique",
+  "sousRegion": "Middle Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "LK",
+  "nom": "Sri Lanka",
+  "alias": [
+   "République démocratique socialiste du Sri Lanka"
+  ],
+  "tld": ".lk",
+  "region": "Asie",
+  "sousRegion": "Southern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "CH",
+  "nom": "Suisse",
+  "alias": [
+   "Confédération suisse"
+  ],
+  "tld": ".ch",
+  "region": "Europe",
+  "sousRegion": "Western Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SR",
+  "nom": "Surinam",
+  "alias": [
+   "République du Suriname"
+  ],
+  "tld": ".sr",
+  "region": "Amériques",
+  "sousRegion": "South America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SE",
+  "nom": "Suède",
+  "alias": [
+   "Royaume de Suède"
+  ],
+  "tld": ".se",
+  "region": "Europe",
+  "sousRegion": "Northern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SJ",
+  "nom": "Svalbard et Jan Mayen",
+  "alias": [
+   "Jan Mayen Svalbard"
+  ],
+  "tld": ".sj",
+  "region": "Europe",
+  "sousRegion": "Northern Europe",
+  "souverain": false,
+  "drapeau": false
+ },
+ {
+  "code": "SY",
+  "nom": "Syrie",
+  "alias": [
+   "République arabe syrienne"
+  ],
+  "tld": ".sy",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "ST",
+  "nom": "São Tomé et Príncipe",
+  "alias": [
+   "République démocratique de São Tomé et Príncipe"
+  ],
+  "tld": ".st",
+  "region": "Afrique",
+  "sousRegion": "Middle Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "SN",
+  "nom": "Sénégal",
+  "alias": [
+   "République du Sénégal"
+  ],
+  "tld": ".sn",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "TJ",
+  "nom": "Tadjikistan",
+  "alias": [
+   "République du Tadjikistan"
+  ],
+  "tld": ".tj",
+  "region": "Asie",
+  "sousRegion": "Central Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "TZ",
+  "nom": "Tanzanie",
+  "alias": [
+   "République unie de Tanzanie"
+  ],
+  "tld": ".tz",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "TW",
+  "nom": "Taïwan",
+  "alias": [
+   "République de Chine (Taïwan)"
+  ],
+  "tld": ".tw",
+  "region": "Asie",
+  "sousRegion": "Eastern Asia",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "TD",
+  "nom": "Tchad",
+  "alias": [
+   "République du Tchad"
+  ],
+  "tld": ".td",
+  "region": "Afrique",
+  "sousRegion": "Middle Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "CZ",
+  "nom": "Tchéquie",
+  "alias": [
+   "République tchèque"
+  ],
+  "tld": ".cz",
+  "region": "Europe",
+  "sousRegion": "Central Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "TF",
+  "nom": "Terres australes et antarctiques françaises",
+  "alias": [
+   "Territoire des Terres australes et antarctiques françaises"
+  ],
+  "tld": ".tf",
+  "region": "Antarctique",
+  "sousRegion": "Antarctic",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "IO",
+  "nom": "Territoire britannique de l'océan Indien",
+  "alias": [
+   "Territoire britannique de l' océan Indien"
+  ],
+  "tld": ".io",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "TH",
+  "nom": "Thaïlande",
+  "alias": [
+   "Royaume de Thaïlande"
+  ],
+  "tld": ".th",
+  "region": "Asie",
+  "sousRegion": "South-Eastern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "TL",
+  "nom": "Timor oriental",
+  "alias": [
+   "République démocratique du Timor oriental"
+  ],
+  "tld": ".tl",
+  "region": "Asie",
+  "sousRegion": "South-Eastern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "TG",
+  "nom": "Togo",
+  "alias": [
+   "République togolaise"
+  ],
+  "tld": ".tg",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "TK",
+  "nom": "Tokelau",
+  "alias": [
+   "Îles Tokelau"
+  ],
+  "tld": ".tk",
+  "region": "Océanie",
+  "sousRegion": "Polynesia",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "TO",
+  "nom": "Tonga",
+  "alias": [
+   "Royaume des Tonga"
+  ],
+  "tld": ".to",
+  "region": "Océanie",
+  "sousRegion": "Polynesia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "TT",
+  "nom": "Trinité-et-Tobago",
+  "alias": [
+   "République de Trinité-et-Tobago"
+  ],
+  "tld": ".tt",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "TN",
+  "nom": "Tunisie",
+  "alias": [
+   "République tunisienne"
+  ],
+  "tld": ".tn",
+  "region": "Afrique",
+  "sousRegion": "Northern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "TM",
+  "nom": "Turkménistan",
+  "alias": [],
+  "tld": ".tm",
+  "region": "Asie",
+  "sousRegion": "Central Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "TR",
+  "nom": "Turquie",
+  "alias": [
+   "République de Turquie"
+  ],
+  "tld": ".tr",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "TV",
+  "nom": "Tuvalu",
+  "alias": [],
+  "tld": ".tv",
+  "region": "Océanie",
+  "sousRegion": "Polynesia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "UA",
+  "nom": "Ukraine",
+  "alias": [],
+  "tld": ".ua",
+  "region": "Europe",
+  "sousRegion": "Eastern Europe",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "UY",
+  "nom": "Uruguay",
+  "alias": [
+   "République orientale de l'Uruguay"
+  ],
+  "tld": ".uy",
+  "region": "Amériques",
+  "sousRegion": "South America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "VU",
+  "nom": "Vanuatu",
+  "alias": [
+   "République de Vanuatu"
+  ],
+  "tld": ".vu",
+  "region": "Océanie",
+  "sousRegion": "Melanesia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "VE",
+  "nom": "Venezuela",
+  "alias": [
+   "République bolivarienne du Venezuela"
+  ],
+  "tld": ".ve",
+  "region": "Amériques",
+  "sousRegion": "South America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "VN",
+  "nom": "Viêt Nam",
+  "alias": [
+   "République socialiste du Viêt Nam"
+  ],
+  "tld": ".vn",
+  "region": "Asie",
+  "sousRegion": "South-Eastern Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "WF",
+  "nom": "Wallis-et-Futuna",
+  "alias": [
+   "Territoire des îles Wallis et Futuna"
+  ],
+  "tld": ".wf",
+  "region": "Océanie",
+  "sousRegion": "Polynesia",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "YE",
+  "nom": "Yémen",
+  "alias": [
+   "République du Yémen"
+  ],
+  "tld": ".ye",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "ZM",
+  "nom": "Zambie",
+  "alias": [
+   "République de Zambie"
+  ],
+  "tld": ".zm",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "ZW",
+  "nom": "Zimbabwe",
+  "alias": [
+   "République du Zimbabwe"
+  ],
+  "tld": ".zw",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "EG",
+  "nom": "Égypte",
+  "alias": [
+   "République arabe d'Égypte"
+  ],
+  "tld": ".eg",
+  "region": "Afrique",
+  "sousRegion": "Northern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "AE",
+  "nom": "Émirats arabes unis",
+  "alias": [
+   "EAU",
+   "Émirats"
+  ],
+  "tld": ".ae",
+  "region": "Asie",
+  "sousRegion": "Western Asia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "EC",
+  "nom": "Équateur",
+  "alias": [
+   "République de l'Équateur"
+  ],
+  "tld": ".ec",
+  "region": "Amériques",
+  "sousRegion": "South America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "ER",
+  "nom": "Érythrée",
+  "alias": [
+   "État d'Érythrée"
+  ],
+  "tld": ".er",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "US",
+  "nom": "États-Unis",
+  "alias": [
+   "Amérique",
+   "Les états-unis d'Amérique",
+   "USA",
+   "États-Unis d'Amérique"
+  ],
+  "tld": ".us",
+  "region": "Amériques",
+  "sousRegion": "North America",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "ET",
+  "nom": "Éthiopie",
+  "alias": [
+   "République fédérale démocratique d'Éthiopie"
+  ],
+  "tld": ".et",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "BV",
+  "nom": "Île Bouvet",
+  "alias": [],
+  "tld": ".bv",
+  "region": "Antarctique",
+  "sousRegion": "Antarctic",
+  "souverain": false,
+  "drapeau": false
+ },
+ {
+  "code": "CX",
+  "nom": "Île Christmas",
+  "alias": [
+   "Territoire de l'île Christmas"
+  ],
+  "tld": ".cx",
+  "region": "Océanie",
+  "sousRegion": "Australia and New Zealand",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "MU",
+  "nom": "Île Maurice",
+  "alias": [
+   "République de Maurice"
+  ],
+  "tld": ".mu",
+  "region": "Afrique",
+  "sousRegion": "Eastern Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "NF",
+  "nom": "Île Norfolk",
+  "alias": [
+   "Territoire de l'île Norfolk"
+  ],
+  "tld": ".nf",
+  "region": "Océanie",
+  "sousRegion": "Australia and New Zealand",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "IM",
+  "nom": "Île de Man",
+  "alias": [
+   "Isle of Man"
+  ],
+  "tld": ".im",
+  "region": "Europe",
+  "sousRegion": "Northern Europe",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "KY",
+  "nom": "Îles Caïmans",
+  "alias": [],
+  "tld": ".ky",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "CC",
+  "nom": "Îles Cocos",
+  "alias": [
+   "Territoire des îles Cocos (Keeling)"
+  ],
+  "tld": ".cc",
+  "region": "Océanie",
+  "sousRegion": "Australia and New Zealand",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "CK",
+  "nom": "Îles Cook",
+  "alias": [],
+  "tld": ".ck",
+  "region": "Océanie",
+  "sousRegion": "Polynesia",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "FO",
+  "nom": "Îles Féroé",
+  "alias": [],
+  "tld": ".fo",
+  "region": "Europe",
+  "sousRegion": "Northern Europe",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "HM",
+  "nom": "Îles Heard-et-MacDonald",
+  "alias": [],
+  "tld": ".hm",
+  "region": "Antarctique",
+  "sousRegion": "Antarctic",
+  "souverain": false,
+  "drapeau": false
+ },
+ {
+  "code": "FK",
+  "nom": "Îles Malouines",
+  "alias": [],
+  "tld": ".fk",
+  "region": "Amériques",
+  "sousRegion": "South America",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "MP",
+  "nom": "Îles Mariannes du Nord",
+  "alias": [
+   "Commonwealth des îles Mariannes du Nord"
+  ],
+  "tld": ".mp",
+  "region": "Océanie",
+  "sousRegion": "Micronesia",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "MH",
+  "nom": "Îles Marshall",
+  "alias": [
+   "République des Îles Marshall"
+  ],
+  "tld": ".mh",
+  "region": "Océanie",
+  "sousRegion": "Micronesia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "PN",
+  "nom": "Îles Pitcairn",
+  "alias": [
+   "Groupe d'îles Pitcairn"
+  ],
+  "tld": ".pn",
+  "region": "Océanie",
+  "sousRegion": "Polynesia",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "SB",
+  "nom": "Îles Salomon",
+  "alias": [],
+  "tld": ".sb",
+  "region": "Océanie",
+  "sousRegion": "Melanesia",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "TC",
+  "nom": "Îles Turques-et-Caïques",
+  "alias": [
+   "Îles Turques et Caïques"
+  ],
+  "tld": ".tc",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "VG",
+  "nom": "Îles Vierges britanniques",
+  "alias": [
+   "îles Vierges"
+  ],
+  "tld": ".vg",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "VI",
+  "nom": "Îles Vierges des États-Unis",
+  "alias": [],
+  "tld": ".vi",
+  "region": "Amériques",
+  "sousRegion": "Caribbean",
+  "souverain": false,
+  "drapeau": true
+ },
+ {
+  "code": "CV",
+  "nom": "Îles du Cap-Vert",
+  "alias": [
+   "Cap-Vert",
+   "République du Cap-Vert"
+  ],
+  "tld": ".cv",
+  "region": "Afrique",
+  "sousRegion": "Western Africa",
+  "souverain": true,
+  "drapeau": true
+ },
+ {
+  "code": "UM",
+  "nom": "Îles mineures éloignées des États-Unis",
+  "alias": [],
+  "tld": null,
+  "region": "Amériques",
+  "sousRegion": "North America",
+  "souverain": false,
+  "drapeau": false
+ }
+]

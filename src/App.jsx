@@ -1,0 +1,76 @@
+import { AnimatePresence, MotionConfig, motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import End from "./End.jsx";
+import Game from "./Game.jsx";
+import Home from "./Home.jsx";
+import { COUNTS, DEFAULT_COUNT, MODES, buildQuiz } from "./quiz.js";
+import { bestKey, load, save } from "./storage.js";
+
+// Entrée « impression » : la feuille arrive légèrement de travers puis se recale.
+const page = {
+  initial: { opacity: 0, y: 56, rotate: -3, scale: 0.94 },
+  animate: { opacity: 1, y: 0, rotate: 0, scale: 1, transition: { type: "spring", stiffness: 180, damping: 20 } },
+  exit: { opacity: 0, y: -30, rotate: 2, transition: { duration: 0.2 } },
+};
+
+// Réglages relus du stockage local : on ne garde que des valeurs connues (vieille version, valeur trafiquée…).
+function loadSettings() {
+  const s = load("settings", {}) ?? {};
+  return {
+    mode: MODES.includes(s.mode) ? s.mode : "flag",
+    territories: s.territories === true,
+    count: COUNTS.includes(s.count) ? s.count : DEFAULT_COUNT,
+  };
+}
+
+export default function App() {
+  const [all, setAll] = useState(null);
+  const [error, setError] = useState(false);
+  const [settings, setSettingsState] = useState(loadSettings);
+  const [screen, setScreen] = useState("home");
+  const [quiz, setQuiz] = useState(null);
+  const [end, setEnd] = useState(null);
+
+  useEffect(() => {
+    fetch("/data/countries.json")
+      .then((r) => r.json())
+      .then(setAll)
+      .catch(() => setError(true));
+  }, []);
+
+  const setSettings = (s) => {
+    setSettingsState(s);
+    save("settings", s);
+  };
+
+  const start = () => {
+    setQuiz({ ...buildQuiz(all, settings.mode, settings.territories, settings.count), id: Date.now() });
+    setScreen("game");
+  };
+
+  const finish = (results) => {
+    const key = bestKey(settings.mode, settings.territories, settings.count);
+    const best = load(key, 0);
+    const score = results.reduce((s, r) => s + r.points, 0);
+    if (score > best) save(key, score);
+    setEnd({ results, best, isRecord: score > best && score > 0 });
+    setScreen("end");
+  };
+
+  return (
+    <MotionConfig reducedMotion="user">
+      <main className="mx-auto max-w-2xl px-4 pb-16 pt-6 sm:px-10 sm:pt-10">
+        {error && <p className="font-semibold text-fluo">Impossible de charger la base des pays. Recharge la page.</p>}
+        {all && (
+          <AnimatePresence mode="wait">
+            <motion.section key={screen === "game" ? quiz.id : screen} variants={page} initial="initial" animate="animate" exit="exit">
+              {screen === "home" && <Home all={all} settings={settings} setSettings={setSettings} onStart={start} />}
+              {screen === "game" && <Game all={all} quiz={quiz} onFinish={finish} onQuit={() => setScreen("home")} />}
+              {screen === "end" && <End {...end} onAgain={start} onMenu={() => setScreen("home")} />}
+            </motion.section>
+          </AnimatePresence>
+        )}
+      </main>
+    </MotionConfig>
+  );
+}

@@ -1,0 +1,63 @@
+/* Flagrant — DA « risographie » reprise de Kryos : encres décalées, trame demi-teinte, papier, grain. */
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f1ecdd;
+  --color-paper-deep: #e7e0cc;
+  --color-ink: #2340c4;
+  --color-ink-deep: #16299e;
+  --color-fluo: #ff5a1e;
+  --color-leaf: #00a95c;
+  --color-night: #17140d;
+  --color-muted: #5c5647;
+
+  --font-display: "Anton", "Archivo Black", system-ui, sans-serif;
+  --font-sans: "Space Grotesk", system-ui, sans-serif;
+
+  --shadow-print: 4px 4.5px 0 var(--color-ink);
+  --shadow-print-sm: 2px 2.5px 0 var(--color-ink-deep);
+  --shadow-print-lg: 6px 7px 0 var(--color-ink);
+  --shadow-print-fluo: 9px 11px 0 var(--color-fluo);
+}
+
+/* clip (et non hidden) : les entrées animées hors-champ ne doivent jamais élargir la page sur mobile. */
+html,
+body {
+  overflow-x: clip;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-night);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Trame demi-teinte globale */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(var(--color-ink) 1.1px, transparent 1.2px);
+  background-size: 7px 7px;
+  opacity: 0.06;
+}
+
+/* Grain d'impression léger */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
