@@ -61,7 +61,7 @@ const rise = {
   animate: { opacity: 1, y: 0, rotate: 0, transition: { type: "spring", stiffness: 260, damping: 22 } },
 };
 
-export default function Home({ all, settings, setSettings, onStart, loading, onStats, look, progress, onWardrobe, onBadges }) {
+export default function Home({ all, settings, setSettings, onStart, loading, onStats, look, progress, onWardrobe, onBadges, notice, history }) {
   const { mode, territories, count } = settings;
   const ribbon = useMemo(() => shuffle(all.filter((c) => c.souverain && c.tld)).slice(0, 18), [all]);
 
@@ -115,8 +115,12 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
         <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
           {MODE_CARDS.map((m) => {
             const active = mode === m.id;
-            const best = load(bestKey(m.id, territories, count), 0);
-            const max = questionCount(all, m.id, territories, count) * PTS_CASH;
+            const n = questionCount(all, m.id, territories, count);
+            const games = history.filter((g) => g.mode === m.id);
+            // Historique (synchronisé entre appareils) + ancien record local, au même format de partie.
+            const same = games.filter((g) => !!g.territories === !!territories && g.n === n);
+            const best = Math.max(load(bestKey(m.id, territories, count), 0), ...same.map((g) => g.score));
+            const max = n * PTS_CASH;
             return (
               <motion.label
                 key={m.id}
@@ -142,7 +146,11 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
                   <div className="text-sm font-medium text-muted">{m.desc}</div>
                 </div>
                 <div className="ml-auto text-right text-[11px] font-semibold uppercase tracking-[0.18em] text-muted sm:ml-0 sm:mt-auto sm:text-left">
-                  {best ? <>Record<br className="sm:hidden" /> {best}/{max}</> : <span className="hidden sm:inline">Pas encore joué</span>}
+                  {best ? (
+                    <>Record<br className="sm:hidden" /> {best}/{max}</>
+                  ) : (
+                    <span className="hidden sm:inline">{games.length ? `Pas encore en ${n} questions` : "Pas encore joué"}</span>
+                  )}
                 </div>
               </motion.label>
             );
@@ -204,7 +212,7 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
       {API_ENABLED && !getSession() && (
         <motion.section variants={rise} className="flex flex-col gap-3 rounded-[20px] border-[2.5px] border-night bg-paper p-5 shadow-print">
           <h3 className="font-display text-xl uppercase text-night">Sauvegarde & défie tes amis</h3>
-          <LoginForm />
+          <LoginForm notice={notice} />
         </motion.section>
       )}
 

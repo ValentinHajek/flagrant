@@ -74,11 +74,17 @@ export default function App() {
       api("/session", { method: "POST", body: { token } })
         .then(({ session }) => {
           setSession(session);
+          setScreen("stats");
           return syncAll();
         })
-        .catch((e) => setNotice(e.message))
-        .finally(() => setScreen("stats"));
-    } else if (getSession()) syncAll().catch(() => {});
+        .catch((e) => {
+          setNotice(e.message);
+          if (!getSession()) setScreen("home"); // lien expiré : retour à l'accueil, où se trouve le formulaire e-mail
+        });
+    } else if (getSession())
+      syncAll().catch(() => {
+        if (!getSession()) setNotice("Session expirée, remets ton e-mail pour te reconnecter."); // api() a vidé la session sur 401
+      });
   }, []);
 
   // La carte (≈ 240 Ko) n'est chargée que si on choisit le mode carte.
@@ -145,6 +151,8 @@ export default function App() {
                   progress={progress}
                   onWardrobe={() => openWardrobe()}
                   onBadges={openBadges}
+                  notice={notice}
+                  history={history}
                 />
               )}
               {screen === "game" && <Game all={all} map={map} quiz={quiz} onFinish={finish} onQuit={() => setScreen("home")} />}
@@ -177,6 +185,7 @@ export default function App() {
                   onLoggedOut={() => {
                     setHistory(loadHistory());
                     setProfileState(loadProfile());
+                    setScreen("home");
                   }}
                   onBack={() => setScreen("home")}
                   onPlay={(mode) => {
