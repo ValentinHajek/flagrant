@@ -17,7 +17,7 @@ const VERDICTS = [
 
 function status(r) {
   if (r.km != null) return r.points === PTS_CASH ? ["Dans le mille", "text-leaf"] : [`À ${fmtKm(r.km)}`, r.points ? "text-ink" : "text-fluo"];
-  if (r.points === PTS_CASH) return ["Cash", "text-leaf"];
+  if (r.points === PTS_CASH) return ["Flash", "text-leaf"];
   if (r.points) return ["Carré", "text-ink"];
   if (r.timeout) return ["Temps écoulé", "text-fluo"];
   return [r.given ? `Tu as dit « ${r.given} »` : "Passé", "text-fluo"];
@@ -126,7 +126,7 @@ export default function End({ results, all = [], best, isRecord, reward, look, o
     if (zoom) zoomRef.current?.showModal();
   }, [zoom]);
 
-  const [top, mid] = results[0].type === "map" ? ["Pile", "Proche"] : ["Cash", "Carré"];
+  const [top, mid] = results[0].type === "map" ? ["Pile", "Proche"] : ["Flash", "Carré"];
   const stats = [
     [top, results.filter((r) => r.points === PTS_CASH).length, "text-leaf"],
     [mid, results.filter((r) => r.points && r.points < PTS_CASH).length, "text-ink"],

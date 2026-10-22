@@ -268,7 +268,7 @@ export default function Stats({ all, mode: initialMode, notice, history, setHist
   const s = summarize(history, mode, n);
   const rs = rival && summarize(rival.games, mode, n); // stats de l'ami dans ce mode (null s'il n'y a pas joué)
   const myName = account?.me.pseudo ?? "Toi";
-  const top = mode === "map" ? "pile" : "cash";
+  const top = mode === "map" ? "pile" : "flash";
   const trend = s?.trend == null ? null : Math.round(s.trend * 100); // en points ; 0 = stable
 
   // Connecté : profil + synchro de l'historique (parties jouées sur d'autres appareils).

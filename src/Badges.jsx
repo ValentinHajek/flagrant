@@ -11,7 +11,7 @@ const MODE_NAMES = { flag: "Drapeaux", tld: "Extensions", mix: "Mix", map: "Cart
 
 // Les règles de gameReward (progress.js), en clair.
 const EARN = [
-  ["Ton score", `1 tampon pour ${PTS_CASH} points : une réponse en cash ou pile = 1 tampon, ${PTS_CASH / PTS_CARRE} en carré ou proche = 1 tampon.`],
+  ["Ton score", `1 tampon pour ${PTS_CASH} points : une réponse en flash ou pile = 1 tampon, ${PTS_CASH / PTS_CARRE} en carré ou proche = 1 tampon.`],
   ["Sans-faute", "+50 % du score pour une partie d'au moins 10 questions sans aucune erreur."],
   ["Série", "+1 toutes les 3 bonnes réponses d'affilée au-delà de 5, sur ta meilleure série de la partie."],
   ["Tampon du jour", `+${DAILY_BONUS} pour ta première partie de la journée.`],

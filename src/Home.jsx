@@ -193,7 +193,7 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
             </>
           ) : (
             <>
-              <span><b className="text-ink">Cash</b> saisie libre = {PTS_CASH} pts</span>
+              <span><b className="text-ink">Flash</b> saisie libre = {PTS_CASH} pts</span>
               <span><b className="text-ink">Carré</b> 4 choix = {PTS_CARRE} pt</span>
               <span><b className="text-ink">Fautes</b> d'orthographe tolérées</span>
             </>

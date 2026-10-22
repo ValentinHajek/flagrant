@@ -47,7 +47,7 @@ export const BADGES = [
   { id: "polyvalent", name: "Polyvalent", seal: "x4", reward: 50, test: (s) => s.modes.size >= 4, goal: (s) => [s.modes.size, 4], unit: "modes",
     desc: "Termine au moins une partie dans chacun des 4 modes : Drapeaux, Extensions, Mix et Carte." },
   { id: "sans-faute", name: "Sans faute", seal: "100%", reward: 100, test: (s) => s.perfect,
-    desc: "Une partie d'au moins 10 questions sans une seule erreur : tout en cash, ou tout « pile » en mode Carte. Un carré casse le sans-faute." },
+    desc: "Une partie d'au moins 10 questions sans une seule erreur : tout en flash, ou tout « pile » en mode Carte. Un carré casse le sans-faute." },
   { id: "serie-de-feu", name: "Série de feu", seal: "15", reward: 100, test: (s) => s.bestStreak >= 15, goal: (s) => [s.bestStreak, 15], unit: "d'affilée",
     desc: "Enchaîne 15 bonnes réponses d'affilée dans une même partie (le carré et « proche » comptent)." },
   { id: "centurion", name: "Centurion", seal: "100", reward: 150, test: (s) => s.flags.size >= 100, goal: (s) => [s.flags.size, 100], unit: "drapeaux",
