@@ -19,9 +19,11 @@
   --shadow-print-lg: 6px 7px 0 var(--color-ink);
   --shadow-print-fluo: 9px 11px 0 var(--color-fluo);
 
-  /* Articles qui s'animent (boules disco, visière binaire), toujours en motion-safe: */
+  /* Les articles légendaires, et eux seuls, s'animent (toujours en motion-safe:) */
   --animate-twinkle: twinkle 1.4s ease-in-out infinite;
   --animate-bits: bits 3s linear infinite;
+  --animate-shine: shine 3.6s ease-in-out infinite;
+  --animate-flow: flow 2.4s linear infinite;
   @keyframes twinkle {
     0%,
     100% {
@@ -35,6 +37,22 @@
   @keyframes bits {
     to {
       transform: translateX(-24px);
+    }
+  }
+  /* Reflet qui traverse l'article (64 unités) puis attend hors champ, caché par le clip */
+  @keyframes shine {
+    0% {
+      transform: translateX(0);
+    }
+    45%,
+    100% {
+      transform: translateX(64px);
+    }
+  }
+  /* Bulles et tracés qui avancent le long d'un chemin pointillé (période de 24, ou un diviseur) */
+  @keyframes flow {
+    to {
+      stroke-dashoffset: -24;
     }
   }
 }

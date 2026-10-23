@@ -23,8 +23,16 @@ const sparkle = (x, y, s) => {
   const [a, b] = [s * 0.28, s * 0.72];
   return `M${x},${y - s} l${a},${b} l${b},${a} l${-b},${a} l${-a},${b} l${-a},${-b} l${-b},${-a} l${b},${-a} Z`;
 };
-// Éclat qui scintille, chacun à son rythme (k) ; immobile si l'utilisateur réduit les animations.
+// Les légendaires, et eux seuls, s'animent ; tout reste immobile si l'utilisateur réduit les animations.
+// Éclat qui scintille, chacun à son rythme (k).
 const twinkle = (k) => ({ className: "motion-safe:animate-twinkle", style: { animationDelay: `${-k * 0.35}s` } });
+// Reflet qui balaie un article de gauche à droite, découpé par le clipPath clip : il part juste à gauche de x0
+// (bord gauche de l'article, entre y0 et y1) et file 64 unités plus loin. Sans animation, il reste caché.
+const shine = (clip, x0, y0, y1) => (
+  <g clipPath={`url(#${clip})`}>
+    <path d={`M${x0 - 14},${y1} L${x0 - 8},${y0} H${x0 - 3} L${x0 - 9},${y1} Z`} fill={CARD} opacity=".6" className="motion-safe:animate-shine" />
+  </g>
+);
 // Paillettes de l'arc-en-ciel : [x, y, taille] autour de la tête (le reste est caché par l'avatar).
 const GLITTER = [
   [20, 30, 5.5], [99, 22, 5], [13, 64, 4.5], [107, 58, 5], [43, 9, 3.5], [79, 8, 3.5], [30, 46, 3], [92, 40, 3],
@@ -99,7 +107,7 @@ const BACKGROUNDS = {
       {[FLUO, "#ffa12b", "#ffe14d", LEAF, INK, "#7a5cc4"].map((c, k) => (
         <circle key={c} cx="60" cy="118" r={96 - k * 8} fill="none" stroke={c} strokeWidth="8.5" />
       ))}
-      {GLITTER.map(([x, y, s], k) => <path key={k} d={sparkle(x, y, s)} fill={k % 3 ? CARD : SUN} />)}
+      {GLITTER.map(([x, y, s], k) => <path key={k} d={sparkle(x, y, s)} fill={k % 3 ? CARD : SUN} {...(k % 3 ? {} : twinkle(k / 3))} />)}
       {GLITTER_DOTS.map(([x, y], k) => <circle key={k} cx={x} cy={y} r={k % 2 ? 0.8 : 1.2} fill={CARD} />)}
     </>
   ),
@@ -222,6 +230,8 @@ function Top({ id, skin }) {
           <path d="M72.5,105.5 L75,101.5 L77,104 L79.5,101 L80.5,105.5 Z" fill={SUN} {...thin} />
           <path d="M71,105.5 H82" {...thin} />
           <path d={sparkle(51, 104.5, 2.2)} fill={SUN} {...thin} />
+          <path d={sparkle(53.4, 102, 1.3)} fill={CARD} {...twinkle(0)} />
+          <path d={sparkle(82.2, 100.6, 1.2)} fill={SUN} {...twinkle(2)} />
           {[119.5, 123].map((y) => <circle key={y} cx="60" cy={y} r="1.1" fill="#3b4270" {...thin} />)}
         </>
       );
@@ -249,8 +259,13 @@ function Top({ id, skin }) {
           <ellipse cx="60" cy="90.5" rx="11" ry="2.8" fill="#a9a9a9" />
           <rect x="49" y="103" width="22" height="14" rx="2.5" fill={DEEP} {...line} />
           <rect x="52" y="105.5" width="16" height="4" rx="1" fill={INK} />
-          <path d="M53.5,107.5 H58 L59.5,106.3 L61,108.7 L62.5,107.5 H66.5" fill="none" stroke={LEAF} strokeWidth=".8" />
-          {[[54, LEAF], [60, SUN], [66, FLUO]].map(([x, c]) => <circle key={x} cx={x} cy="113" r="1.5" fill={c} {...thin} />)}
+          <path d="M53.5,107.5 H58 L59.5,106.3 L61,108.7 L62.5,107.5 H66.5" fill="none" stroke={LEAF} strokeWidth=".8" strokeDasharray="16 8" className="motion-safe:animate-flow" />
+          {[[54, LEAF], [60, SUN], [66, FLUO]].map(([x, c], k) => (
+            <g key={x}>
+              <circle cx={x} cy="113" r="1.5" fill={c} {...thin} />
+              <circle cx={x} cy="113" r=".75" fill={CARD} {...twinkle(k * 1.4)} />
+            </g>
+          ))}
           <g transform="rotate(-18 36 105)">
             <path d="M31.5,102 h3 v6 h-3 Z" fill={INK} />
             <path d="M34.5,102 h3 v6 h-3 Z" fill={CARD} />
@@ -562,8 +577,9 @@ function Glasses({ id }) {
           <path d="M75,61 Q80,72 74,84" fill="none" stroke={SUN} strokeWidth="1.2" strokeDasharray="2 1.5" />
         </>
       );
-    // Masque de ski : écran irisé qui reflète des montagnes, monture épaisse, sangle à rayures
-    case "ski-mask":
+    // Masque de ski : écran irisé qui reflète des montagnes, monture épaisse, sangle à rayures, reflet qui passe
+    case "ski-mask": {
+      const lens = "M38.5,51 Q60,45.5 81.5,51 Q83,56 81,61 Q71,64 64.5,61.8 Q60,59.4 55.5,61.8 Q49,64 39,61 Q37,56 38.5,51 Z";
       return (
         <>
           <linearGradient id={`${uid}s`} x1="0" y1="0" x2="1" y2="1">
@@ -572,16 +588,22 @@ function Glasses({ id }) {
             <stop offset=".75" stopColor={FLUO} />
             <stop offset="1" stopColor={SUN} />
           </linearGradient>
+          <clipPath id={`${uid}m`}>
+            <path d={lens} />
+          </clipPath>
           <path d="M26,51.5 H37 V59 H26 Z M83,51.5 H94 V59 H83 Z" fill={NIGHT} />
           <path d="M26,54 H37 M83,54 H94" stroke={FLUO} strokeWidth="1.3" />
           <path d="M26,56.6 H37 M83,56.6 H94" stroke={SUN} strokeWidth="1.3" />
           <path d="M35,49 Q60,42.5 85,49 Q87,56 84.5,63 Q72,67 64,64 Q60,61.5 56,64 Q48,67 35.5,63 Q33,56 35,49 Z" fill={CARD} {...line} />
-          <path d="M38.5,51 Q60,45.5 81.5,51 Q83,56 81,61 Q71,64 64.5,61.8 Q60,59.4 55.5,61.8 Q49,64 39,61 Q37,56 38.5,51 Z" fill={`url(#${uid}s)`} {...thin} />
+          <path d={lens} fill={`url(#${uid}s)`} />
           <path d="M41,59.6 L46.5,54 L49.5,56.8 L53,53 L57.5,58.6 Q49,61.6 41,59.6 Z" fill={CARD} opacity=".55" />
           <path d="M44,52.2 Q52,49.2 62,49.4" fill="none" stroke={CARD} strokeWidth="1.2" strokeLinecap="round" opacity=".7" />
-          <path d={sparkle(76, 52, 2.6)} fill={CARD} />
+          {shine(`${uid}m`, 38.5, 45, 64)}
+          <path d={lens} fill="none" {...thin} />
+          <path d={sparkle(76, 52, 2.6)} fill={CARD} {...twinkle(1)} />
         </>
       );
+    }
     // Visière enveloppante : des rangées de 0 et de 1 défilent derrière l'écran (motif de 24 unités, répété 4 fois)
     case "binary-visor":
       return (
@@ -620,6 +642,7 @@ const leaf = (x, y, deg, len, w) => {
 };
 
 function Hat({ id }) {
+  const uid = useId();
   switch (id) {
     case "cap":
       return (
@@ -701,15 +724,26 @@ function Hat({ id }) {
           <ellipse cx="60" cy="36" rx="26" ry="5" fill={NIGHT} {...line} />
         </>
       );
-    case "crown":
+    // Couronne : un reflet traverse l'or, les pierres et deux éclats autour scintillent
+    case "crown": {
+      const crown = "M40,40 L41,20 L50,30 L60,14 L70,30 L79,20 L80,40 Z";
       return (
         <>
-          <path d="M40,40 L41,20 L50,30 L60,14 L70,30 L79,20 L80,40 Z" fill={SUN} {...line} />
+          <clipPath id={`${uid}c`}>
+            <path d={crown} />
+          </clipPath>
+          <path d={crown} fill={SUN} />
+          {shine(`${uid}c`, 40, 14, 40)}
+          <path d={crown} fill="none" {...line} />
           <circle cx="60" cy="31" r="2.6" fill={FLUO} {...thin} />
           <circle cx="49" cy="34" r="2" fill={INK} {...thin} />
           <circle cx="71" cy="34" r="2" fill={LEAF} {...thin} />
+          {[[59.1, 30.1], [48.3, 33.3], [70.3, 33.3]].map(([x, y], k) => <circle key={x} cx={x} cy={y} r=".75" fill={CARD} {...twinkle(k * 1.3)} />)}
+          <path d={sparkle(35.5, 17, 2.4)} fill={SUN} {...twinkle(0.6)} />
+          <path d={sparkle(85, 22, 1.8)} fill={SUN} {...twinkle(2.4)} />
         </>
       );
+    }
     case "laurel": {
       // Laurier doré : une branche par côté, de la tempe au haut du front, feuilles alternées dehors / dedans
       // (degrés sur un cercle autour de la tête ; la branche de droite est celle de gauche en miroir).
@@ -749,12 +783,14 @@ function Hat({ id }) {
         </>
       );
     // Une canette de chaque côté (la droite est la gauche en miroir), les tuyaux descendent jusqu'à la bouche
+    // et des bulles y coulent vers elle
     case "beer": {
       const tube = "M26,42 C24,56 36,69 53,68";
       const can = (
         <>
           <path d={tube} fill="none" stroke={NIGHT} strokeWidth="4" strokeLinecap="round" />
           <path d={tube} fill="none" stroke="#ffd66b" strokeWidth="2" strokeLinecap="round" />
+          <path d={tube} fill="none" stroke={CARD} strokeWidth="1.1" strokeLinecap="round" strokeDasharray=".1 5.9" className="motion-safe:animate-flow" />
           <rect x="30" y="30" width="8" height="5" fill={NIGHT} />
           <rect x="20" y="23" width="12" height="19" rx="2.5" fill={SUN} />
           <path d="M20,30 H32 V35 H20 Z" fill={FLUO} />

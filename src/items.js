@@ -1,5 +1,6 @@
 // Catalogue du Vestiaire. Prix en tampons (monnaie du jeu, jamais d'argent réel), triplés le 22/10/2026.
 // « badge » : article exclusif, en vente seulement pour les joueurs qui ont ce badge (jamais offert).
+// Les légendaires, et eux seuls, sont animés (dessins dans Avatar.jsx).
 // Le solde se recalcule avec les prix actuels : un article retiré est remboursé à ses acheteurs, une baisse de prix leur
 // rend l'écart. Pour une hausse, on change l'id (l'ancien article, retiré, est remboursé) plutôt que de leur faire payer
 // la différence.
