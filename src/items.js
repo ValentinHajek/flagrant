@@ -1,8 +1,8 @@
 // Catalogue du Vestiaire. Prix en tampons (monnaie du jeu, jamais d'argent réel), triplés le 22/10/2026.
 // « badge » : article exclusif, en vente seulement pour les joueurs qui ont ce badge (jamais offert).
-// Le solde se recalcule avec les prix actuels : un article retiré est remboursé à ses acheteurs. Pour changer un prix
-// sans faire payer la différence à ceux qui l'ont déjà, on change l'id (23/10/2026 : chapka retirée ; masque de ski,
-// aviateur et visière binaire repris sous un nouvel id, leurs anciens acheteurs remboursés).
+// Le solde se recalcule avec les prix actuels : un article retiré est remboursé à ses acheteurs, une baisse de prix leur
+// rend l'écart. Pour une hausse, on change l'id (l'ancien article, retiré, est remboursé) plutôt que de leur faire payer
+// la différence.
 
 export const SLOTS = [
   ["hat", "Chapeaux"],
@@ -54,13 +54,16 @@ export const ITEMS = [
   item("earrings", "disco", "Boules disco", 2400, 9, "legendaire"),
   item("earrings", "bolts", "Éclairs", 1200, 1, "epique", "serie-de-feu"),
 
-  item("top", "tee-ink", "T-shirt encre", 120, 1, "commune"),
-  item("top", "tee-fluo", "T-shirt fluo", 120, 1, "commune"),
+  item("top", "tee-ink", "T-shirt bleu", 120, 1, "commune"),
+  item("top", "tee-fluo", "T-shirt orange", 120, 1, "commune"),
   item("top", "tee-leaf", "T-shirt vert", 120, 1, "commune"),
   item("top", "mariniere", "Marinière", 450, 2, "rare"),
   item("top", "hoodie", "Hoodie", 600, 3, "rare"),
-  item("top", "hawaii", "Chemise hawaïenne", 900, 4, "rare"),
-  item("top", "flight", "Veste d'aviateur", 1350, 6, "epique"),
+  item("top", "tank", "Débardeur", 750, 4, "rare"),
+  item("top", "shirt", "Chemise", 1200, 5, "epique"),
+  item("top", "denim", "Veste en jean", 1500, 7, "epique"),
+  item("top", "suit", "Veste de costume", 3000, 10, "legendaire"),
+  item("top", "flight", "Veste d'aviateur", 1200, 1, "epique", "premier-pas"),
   item("top", "astronaut", "Combinaison d'astronaute", 2400, 1, "legendaire", "marathon"),
 
   item("pet", "parrot", "Perroquet", 1200, 4, "rare"),

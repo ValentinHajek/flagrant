@@ -6,6 +6,8 @@ const INK = "#2340c4", FLUO = "#ff5a1e", LEAF = "#00a95c", SUN = "#f2b632", NIGH
 const PAPER = "#f1ecdd", DEEP = "#e7e0cc", CARD = "#fffaf0", PINK = "#f27ab0";
 const line = { stroke: NIGHT, strokeWidth: 2.2, strokeLinejoin: "round", strokeLinecap: "round" };
 const thin = { ...line, strokeWidth: 1.2 };
+// Un élément dessiné côté gauche, puis le même en miroir côté droit.
+const mirrored = (el) => <>{el}<g transform="translate(120 0) scale(-1 1)">{el}</g></>;
 
 const BODY = "M12,124 C14,100 34,89 60,89 C86,89 106,100 108,124 Z";
 const CAP = "M37,52 C35,33 46,26 60,26 C75,26 85,33 83,52 C80,44 74,39 66,40 C62,36 54,35 50,38 C44,40 40,45 37,52 Z";
@@ -88,8 +90,9 @@ const BACKGROUNDS = {
 };
 
 /* ---------- Hauts (dessinés sur la forme des épaules) ---------- */
-function Top({ id }) {
-  const stripes = useId(); // un id par avatar : plusieurs marinières peuvent cohabiter sur la page
+// skin : les épaules nues du débardeur.
+function Top({ id, skin }) {
+  const stripes = useId(); // un id par avatar : plusieurs marinières (ou chemises) peuvent cohabiter sur la page
   const shirt = (fill) => <path d={BODY} fill={fill} {...line} />;
   const collar = <path d="M50,89 Q60,98 70,89" fill="none" {...line} />;
   switch (id) {
@@ -122,38 +125,103 @@ function Top({ id }) {
           <path d="M44,118 Q60,110 76,118" fill="none" {...thin} />
         </>
       );
-    case "hawaii":
+    // Débardeur de basket : épaules nues, liseré doré, numéro
+    case "tank":
       return (
         <>
-          {shirt(FLUO)}
-          {[[34, 106], [80, 104], [92, 116], [24, 118], [60, 114]].map(([x, y]) => (
-            <g key={x}>
-              <circle cx={x} cy={y} r="4" fill={SUN} />
-              <circle cx={x} cy={y} r="1.4" fill={NIGHT} />
-              <path d={`M${x + 4},${y + 2} q4,1 6,-2`} stroke={LEAF} strokeWidth="2.4" fill="none" strokeLinecap="round" />
-            </g>
-          ))}
-          <path d="M50,89 L60,104 L54,90 Z M70,89 L60,104 L66,90 Z" fill="#ff8a5c" {...thin} />
+          {shirt(skin)}
+          <path d="M40,91.6 L47,90.2 Q50,101 60,102 Q70,101 73,90.2 L80,91.6 Q82,106 93,118 L95,124 H25 L27,118 Q38,106 40,91.6 Z" fill={INK} {...line} />
+          <path d="M42.5,92.4 L46,91.7 Q49.5,103.6 60,104.3 Q70.5,103.6 74,91.7 L77.5,92.4" fill="none" stroke={SUN} strokeWidth="1.6" />
+          <text x="60" y="115.5" textAnchor="middle" fontSize="11" fontFamily="Anton, Impact, sans-serif" fill={CARD} stroke={NIGHT} strokeWidth="1" paintOrder="stroke">
+            23
+          </text>
         </>
       );
+    // Chemise à fines rayures, col pointu, boutonnage et poche
+    case "shirt":
+      return (
+        <>
+          {shirt("#dbe7f5")}
+          <clipPath id={stripes}>
+            <path d={BODY} />
+          </clipPath>
+          <g clipPath={`url(#${stripes})`} stroke={INK} strokeWidth=".7" opacity=".35">
+            {Array.from({ length: 15 }, (_, k) => <path key={k} d={`M${18 + k * 6},88 V124`} />)}
+          </g>
+          <path d={BODY} fill="none" {...line} />
+          <path d="M60,98 V124" {...thin} />
+          {[104, 111, 118].map((y) => <circle key={y} cx="60" cy={y} r="1.1" fill={CARD} {...thin} />)}
+          <path d="M69,105 H79 V112.5 Q74,114.5 69,112.5 Z" fill="#dbe7f5" {...thin} />
+          {mirrored(<path d="M51.5,89.5 L45.5,99.5 L56.5,96 Z" fill={CARD} {...line} />)}
+        </>
+      );
+    // Veste en jean : t-shirt blanc dessous, surpiqûres dorées, poches à rabat, col en pointe
+    case "denim":
+      return (
+        <>
+          {shirt("#4f7cc0")}
+          <path d="M51,90 Q60,97 69,90 L66,124 H54 Z" fill={CARD} {...line} />
+          {mirrored(
+            <>
+              <path d="M53.6,92 L55.6,124" fill="none" stroke={SUN} strokeWidth=".9" strokeDasharray="1.6 1.2" />
+              <path d="M35,104 H46 V112 Q40.5,114 35,112 Z" fill="#4572b3" {...thin} />
+              <path d="M34.5,103 H46.5 L45,107 Q40.5,108.6 36,107 Z" fill="#3f67a6" {...thin} />
+              <path d="M36,104.6 H45" fill="none" stroke={SUN} strokeWidth=".8" strokeDasharray="1.4 1" />
+              <circle cx="40.5" cy="106.6" r=".9" fill={SUN} />
+              <path d="M51,89.5 L43,96 L50,101 L56,94.5 Z" fill="#3f67a6" {...line} />
+            </>
+          )}
+        </>
+      );
+    // Veste de costume : revers satinés, chemise blanche et cravate, pochette dorée, épingle en étoile
+    case "suit":
+      return (
+        <>
+          {shirt("#1f2440")}
+          <path d="M50,90 L60,114 L70,90 Q60,96 50,90 Z" fill={CARD} {...line} />
+          <path d="M57.4,94.5 H62.6 L61.6,98.6 H58.4 Z M58.4,98.6 L56.8,110 L60,114 L63.2,110 L61.6,98.6 Z" fill={FLUO} {...thin} />
+          {mirrored(<path d="M50.5,90 L44,97 L48.6,99.2 L45.8,103 L59.5,116.5 L60,114 Z" fill="#161a30" {...line} />)}
+          <path d="M72.5,105.5 L75,101.5 L77,104 L79.5,101 L80.5,105.5 Z" fill={SUN} {...thin} />
+          <path d="M71,105.5 H82" {...thin} />
+          <path d={sparkle(51, 104.5, 2.2)} fill={SUN} {...thin} />
+          {[119.5, 123].map((y) => <circle key={y} cx="60" cy={y} r="1.1" fill="#3b4270" {...thin} />)}
+        </>
+      );
+    // Veste d'aviateur en cuir : épaulettes, grand col en mouton, fermeture éclair, écusson ailé
     case "flight":
       return (
         <>
-          {shirt("#55623a")}
-          <path d="M60,100 V124" {...thin} />
-          <path d="M38,94 Q48,86 60,97 Q72,86 82,94 Q78,102 60,102 Q42,102 38,94 Z" fill={DEEP} {...line} />
+          {shirt("#7a4e2d")}
+          {mirrored(<path d="M26.5,101 L40,94.6 L41.6,97.6 L28.4,103.8 Z" fill="#5e3b21" {...thin} />)}
+          <path d="M60,100 V124" stroke={NIGHT} strokeWidth="2.4" />
+          <path d="M60,100 V124" stroke={SUN} strokeWidth="1.1" strokeDasharray="1 1.2" />
+          <path d="M40,91.5 Q49,87 60,99 Q71,87 80,91.5 Q78,101.5 67.5,104.5 L60,99 L52.5,104.5 Q42,101.5 40,91.5 Z" fill="#efe6d2" {...line} />
+          <path d="M45,95 q1.5,-1 3,0 M47.5,99 q1.5,-1 3,0 M72,95 q1.5,-1 3,0 M69.5,99 q1.5,-1 3,0" fill="none" stroke="#c9b99a" strokeWidth=".9" strokeLinecap="round" />
+          <circle cx="76" cy="112" r="4.4" fill={INK} {...thin} />
+          <path d="M70.5,112 Q73,110 76,111.4 Q79,110 81.5,112 Q79,113.4 76,112.6 Q73,113.4 70.5,112 Z" fill={SUN} />
         </>
       );
+    // Combinaison : coutures, anneau du casque, panneau de contrôle, drapeau à l'épaule, écusson de mission
     case "astronaut":
       return (
         <>
           {shirt("#f4f4f4")}
-          <ellipse cx="60" cy="90" rx="15" ry="4.5" fill="#c9c9c9" {...line} />
-          <rect x="50" y="104" width="20" height="12" rx="2" fill={INK} {...line} />
-          <circle cx="55" cy="110" r="1.4" fill={LEAF} />
-          <circle cx="60" cy="110" r="1.4" fill={SUN} />
-          <circle cx="65" cy="110" r="1.4" fill={FLUO} />
-          <circle cx="86" cy="106" r="5" fill={FLUO} {...thin} />
+          {mirrored(<path d="M28,103 Q36,98 44,97.5" fill="none" stroke={DEEP} strokeWidth="1.6" strokeLinecap="round" />)}
+          <ellipse cx="60" cy="90.5" rx="16" ry="5" fill="#c9c9c9" {...line} />
+          <ellipse cx="60" cy="90.5" rx="11" ry="2.8" fill="#a9a9a9" />
+          <rect x="49" y="103" width="22" height="14" rx="2.5" fill={DEEP} {...line} />
+          <rect x="52" y="105.5" width="16" height="4" rx="1" fill={INK} />
+          <path d="M53.5,107.5 H58 L59.5,106.3 L61,108.7 L62.5,107.5 H66.5" fill="none" stroke={LEAF} strokeWidth=".8" />
+          {[[54, LEAF], [60, SUN], [66, FLUO]].map(([x, c]) => <circle key={x} cx={x} cy="113" r="1.5" fill={c} {...thin} />)}
+          <g transform="rotate(-18 36 105)">
+            <path d="M31.5,102 h3 v6 h-3 Z" fill={INK} />
+            <path d="M34.5,102 h3 v6 h-3 Z" fill={CARD} />
+            <path d="M37.5,102 h3 v6 h-3 Z" fill="#e1000f" />
+            <rect x="31.5" y="102" width="9" height="6" fill="none" {...thin} />
+          </g>
+          <circle cx="85" cy="108" r="5.2" fill={INK} {...thin} />
+          <circle cx="85" cy="108" r="2" fill={SUN} />
+          <ellipse cx="85" cy="108" rx="4.2" ry="1.6" transform="rotate(-20 85 108)" fill="none" stroke={FLUO} strokeWidth=".9" />
         </>
       );
     default:
@@ -365,7 +433,6 @@ function Earrings({ id }) {
 // Verre gauche de l'aviateur (le droit est en miroir) et écran de la visière binaire.
 const AVIATOR_LENS = "M42.6,50 Q51,46.8 58,49.8 Q58.4,58.6 53.6,61.6 Q48,63.8 44.4,60.4 Q41.6,56.4 42.6,50 Z";
 const VISOR = "M34,50.5 Q60,44 86,50.5 L85,60 Q60,66.5 35,60 Z";
-const mirrored = (el) => <>{el}<g transform="translate(120 0) scale(-1 1)">{el}</g></>;
 
 function Glasses({ id }) {
   const uid = useId(); // dégradés et découpe : un id par avatar
@@ -811,7 +878,7 @@ export default function Avatar({ look = DEFAULT_LOOK, size = 96, mood = "happy",
         <g transform={mirror ? "translate(120 0) scale(-1 1)" : undefined}>
           {BACKGROUNDS[l.bg] ?? BACKGROUNDS.none}
           {hair(<HairBehind style={l.hair} color={l.hairColor} />)}
-          <Top id={l.top} />
+          <Top id={l.top} skin={l.skin} />
           {hair(<HairBack style={l.hair} color={l.hairColor} />)}
           <path d="M52,72 H68 V92 Q60,96 52,92 Z" fill={l.skin} {...line} />
           <circle cx="38" cy="56" r="5" fill={l.skin} {...line} />
