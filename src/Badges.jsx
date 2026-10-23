@@ -82,7 +82,7 @@ function BadgeCard({ b, k, progress, look, owned, onWardrobe }) {
           <div className="min-w-0 flex-1">
             <div className="text-sm font-semibold text-night">{gift.name}</div>
             <div className="text-xs font-semibold text-muted">
-              {owned.includes(gift.id) ? "Dans ton vestiaire" : got ? "Offert : à récupérer au vestiaire" : "Article exclusif, offert avec ce badge"}
+              {owned.includes(gift.id) ? "Dans ton vestiaire" : got ? "Débloqué : en vente au vestiaire" : "Article exclusif, débloqué avec ce badge"}
             </div>
           </div>
           {got && !owned.includes(gift.id) && (

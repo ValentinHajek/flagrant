@@ -102,7 +102,7 @@ try {
   assert.equal((await call("shop", "POST", { token: c.session, body: { item: "cap" } })).data.error, "Déjà dans ton vestiaire");
   assert.equal((await call("shop", "POST", { token: c.session, body: { item: "crown" } })).data.error, "Niveau 10 requis");
   assert.match((await call("shop", "POST", { token: c.session, body: { item: "astronaut" } })).data.error, /Marathon/);
-  assert.equal((await call("shop", "POST", { token: c.session, body: { item: "laurel" } })).status, 200, "exclusif du badge sans-faute");
+  assert.equal((await call("shop", "POST", { token: c.session, body: { item: "laurel" } })).data.error, "Pas assez de tampons", "exclusif du badge sans-faute : débloqué mais payant");
   assert.equal((await call("me", "PATCH", { token: c.session, body: { look: { hat: "crown" } } })).status, 400, "article non possédé");
   const dressed = await call("me", "PATCH", { token: c.session, body: { look: { hat: "cap", hair: "boucles" } } });
   assert.deepEqual([dressed.data.me.look.hat, dressed.data.me.look.hair], ["cap", "boucles"]);

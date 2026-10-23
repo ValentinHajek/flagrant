@@ -54,14 +54,15 @@ const T = (iso) => Date.parse(iso);
   assert.equal(cannotBuy(ITEM.get("nope"), p, []), "Article inconnu");
   assert.equal(cannotBuy(ITEM.get("cap"), p, ["cap"]), "Déjà dans ton vestiaire");
   assert.match(cannotBuy(ITEM.get("astronaut"), p, []), /Marathon/);
-  assert.equal(cannotBuy(ITEM.get("laurel"), p, []), null, "exclusif débloqué par le badge sans-faute");
+  assert.equal(cannotBuy(ITEM.get("laurel"), { ...p, balance: 1200 }, []), null, "exclusif débloqué par le badge sans-faute");
+  assert.equal(cannotBuy(ITEM.get("laurel"), { ...p, balance: 1199 }, []), "Pas assez de tampons", "un exclusif se paie");
   assert.equal(cannotBuy(ITEM.get("crown"), p, []), "Niveau 10 requis");
   assert.equal(cannotBuy(ITEM.get("cap"), { ...p, balance: 10 }, []), "Pas assez de tampons");
 }
 
-// Catalogue : ids uniques, exclusifs reliés à un badge existant et gratuits
+// Catalogue : ids uniques, exclusifs reliés à un badge existant et payants
 assert.equal(new Set(ITEMS.map((i) => i.id)).size, ITEMS.length);
-for (const i of ITEMS.filter((i) => i.badge)) assert.ok(BADGE.has(i.badge) && i.price === 0, i.id);
+for (const i of ITEMS.filter((i) => i.badge)) assert.ok(BADGE.has(i.badge) && i.price > 0, i.id);
 
 // Tenue : valeurs inconnues et articles non possédés écartés
 assert.deepEqual(cleanLook({ skin: "<script>", hat: "crown", glasses: "round", top: "cap" }, ["round", "cap"]), { ...DEFAULT_LOOK, glasses: "round" });

@@ -110,8 +110,8 @@ function BadgeUnlocked({ badges, look }) {
           <div className="flex items-center gap-3 rounded-2xl border-2 border-dashed border-night/20 px-3 py-2 text-left">
             <Avatar look={{ ...look, [gift.slot]: gift.id }} size={48} />
             <span className="text-sm font-semibold leading-tight">
-              Article exclusif offert : {gift.name}
-              <span className="block text-xs font-medium text-muted">À récupérer au vestiaire</span>
+              Article exclusif débloqué : {gift.name}
+              <span className="block text-xs font-medium text-muted">En vente au vestiaire</span>
             </span>
           </div>
         )}

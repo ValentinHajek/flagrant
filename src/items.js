@@ -1,5 +1,5 @@
 // Catalogue du Vestiaire. Prix en tampons (monnaie du jeu, jamais d'argent réel), triplés le 22/10/2026.
-// « badge » : article exclusif, gratuit mais réservé aux joueurs qui ont ce badge.
+// « badge » : article exclusif, en vente seulement pour les joueurs qui ont ce badge (jamais offert).
 
 export const SLOTS = [
   ["hat", "Chapeaux"],
@@ -28,8 +28,8 @@ export const ITEMS = [
   item("hat", "chapka", "Chapka", 900, 5, "rare"),
   item("hat", "tophat", "Haut-de-forme", 1350, 7, "epique"),
   item("hat", "crown", "Couronne", 3000, 10, "legendaire"),
-  item("hat", "laurel", "Couronne de laurier", 0, 1, "epique", "sans-faute"),
-  item("hat", "pilot", "Casque d'aviateur", 0, 1, "epique", "pile-poil"),
+  item("hat", "laurel", "Couronne de laurier", 1200, 1, "epique", "sans-faute"),
+  item("hat", "pilot", "Casque d'aviateur", 1200, 1, "epique", "pile-poil"),
 
   item("glasses", "round", "Lunettes rondes", 180, 1, "commune"),
   item("glasses", "aviator", "Aviateur", 450, 2, "rare"),
@@ -37,12 +37,12 @@ export const ITEMS = [
   item("glasses", "ski", "Masque de ski", 900, 4, "rare"),
   item("glasses", "pixel", "Lunettes pixel", 1050, 5, "epique"),
   item("glasses", "monocle", "Monocle", 1500, 8, "epique"),
-  item("glasses", "binary", "Visière binaire", 0, 1, "epique", "maitre-xx"),
+  item("glasses", "binary", "Visière binaire", 1200, 1, "epique", "maitre-xx"),
 
   item("earrings", "hoops", "Anneaux", 180, 1, "commune"),
   item("earrings", "pearls", "Perles", 360, 2, "commune"),
   item("earrings", "globes", "Mini-globes", 900, 5, "rare"),
-  item("earrings", "bolts", "Éclairs", 0, 1, "epique", "serie-de-feu"),
+  item("earrings", "bolts", "Éclairs", 1200, 1, "epique", "serie-de-feu"),
 
   item("top", "tee-ink", "T-shirt encre", 120, 1, "commune"),
   item("top", "tee-fluo", "T-shirt fluo", 120, 1, "commune"),
@@ -51,7 +51,7 @@ export const ITEMS = [
   item("top", "hoodie", "Hoodie", 600, 3, "rare"),
   item("top", "hawaii", "Chemise hawaïenne", 900, 4, "rare"),
   item("top", "flight", "Veste d'aviateur", 1350, 6, "epique"),
-  item("top", "astronaut", "Combinaison d'astronaute", 0, 1, "legendaire", "marathon"),
+  item("top", "astronaut", "Combinaison d'astronaute", 2400, 1, "legendaire", "marathon"),
 
   item("pet", "parrot", "Perroquet", 1200, 4, "rare"),
   item("pet", "cat", "Chat", 1200, 4, "rare"),
@@ -59,7 +59,7 @@ export const ITEMS = [
   item("pet", "penguin", "Pingouin", 1500, 6, "epique"),
   item("pet", "kangaroo", "Kangourou", 1800, 7, "epique"),
   item("pet", "llama", "Lama", 2250, 9, "legendaire"),
-  item("pet", "pigeon", "Pigeon voyageur", 0, 1, "epique", "cartographe"),
+  item("pet", "pigeon", "Pigeon voyageur", 1200, 1, "epique", "cartographe"),
 
   item("bg", "bg-sun", "Fond soleil", 90, 1, "commune"),
   item("bg", "bg-ink", "Fond encre", 90, 1, "commune"),
@@ -68,7 +68,7 @@ export const ITEMS = [
   item("bg", "bg-map", "Carte du monde", 750, 3, "rare"),
   item("bg", "bg-stars", "Ciel étoilé", 1200, 6, "epique"),
   item("bg", "bg-sunrise", "Lever de soleil", 1500, 7, "epique"),
-  item("bg", "bg-rainbow", "Arc-en-ciel pailleté", 0, 1, "legendaire", "assidu"),
+  item("bg", "bg-rainbow", "Arc-en-ciel pailleté", 2400, 1, "legendaire", "assidu"),
 ];
 
 export const ITEM = new Map(ITEMS.map((i) => [i.id, i]));
