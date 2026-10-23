@@ -129,10 +129,11 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
         </button>
       </motion.header>
 
-      {getSession() && (
-        <motion.div variants={rise}>
-          <DuelInbox duels={duels} onPlay={onPlayDuel} onDecline={onDeclineDuel} />
-        </motion.div>
+      {API_ENABLED && !getSession() && (
+        <motion.section variants={rise} className="flex flex-col gap-3 rounded-[20px] border-[2.5px] border-night bg-paper p-5 shadow-print">
+          <h3 className="font-display text-xl uppercase text-night">Sauvegarde & défie tes amis</h3>
+          <LoginForm notice={notice} />
+        </motion.section>
       )}
 
       <motion.div variants={rise} className="flex flex-col gap-4 sm:pt-4">
@@ -249,11 +250,10 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
         </div>
       </motion.div>
 
-      {API_ENABLED && !getSession() && (
-        <motion.section variants={rise} className="flex flex-col gap-3 rounded-[20px] border-[2.5px] border-night bg-paper p-5 shadow-print">
-          <h3 className="font-display text-xl uppercase text-night">Sauvegarde & défie tes amis</h3>
-          <LoginForm notice={notice} />
-        </motion.section>
+      {getSession() && (
+        <motion.div variants={rise}>
+          <DuelInbox duels={duels} onPlay={onPlayDuel} onDecline={onDeclineDuel} />
+        </motion.div>
       )}
 
       <motion.div variants={rise} className="-mx-4 mt-4 border-y-[2.5px] border-night bg-paper-deep py-3 sm:-mx-10">
