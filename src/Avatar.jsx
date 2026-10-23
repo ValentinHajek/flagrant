@@ -23,6 +23,8 @@ const sparkle = (x, y, s) => {
   const [a, b] = [s * 0.28, s * 0.72];
   return `M${x},${y - s} l${a},${b} l${b},${a} l${-b},${a} l${-a},${b} l${-a},${-b} l${-b},${-a} l${b},${-a} Z`;
 };
+// Éclat qui scintille, chacun à son rythme (k) ; immobile si l'utilisateur réduit les animations.
+const twinkle = (k) => ({ className: "motion-safe:animate-twinkle", style: { animationDelay: `${-k * 0.35}s` } });
 // Paillettes de l'arc-en-ciel : [x, y, taille] autour de la tête (le reste est caché par l'avatar).
 const GLITTER = [
   [20, 30, 5.5], [99, 22, 5], [13, 64, 4.5], [107, 58, 5], [43, 9, 3.5], [79, 8, 3.5], [30, 46, 3], [92, 40, 3],
@@ -33,6 +35,17 @@ const GLITTER_DOTS = [
   [28, 11], [69, 4], [16, 51], [104, 47], [38, 33], [84, 35], [6, 57], [114, 62], [19, 73], [99, 69], [47, 4], [92, 12],
   [40, 26], [80, 25], [60, 13], [14, 36], [106, 30], [8, 68], [112, 51], [29, 90], [93, 92], [31, 72], [89, 77], [21, 19],
 ];
+
+// Étoiles fixes du ciel étoilé : [x, y, rayon], autour de la tête (le reste est caché par l'avatar).
+const STARS = [
+  [22, 38, .6], [33, 9, .5], [52, 6, .7], [63, 9, .5], [101, 30, .6], [108, 58, .7], [13, 60, .5], [26, 52, .6],
+  [8, 84, .6], [112, 74, .5], [100, 64, .5], [40, 20, .5], [88, 34, .6], [17, 30, .5], [30, 66, .6], [106, 84, .6],
+];
+// Terres de la carte du monde : pays de public/data/world.json fusionnés, en Mercator (un degré = 1/3 d'unité, 30°E au
+// centre, équateur en y = 54), simplifiés, sans ce qui sort du cercle. shortcut: tracé figé, à régénérer si on change le cadrage.
+const LAND = "M47.1,38.6l2.7,-1.4l-1.4,-1.8l4.9,-2.6l-.4,-2.1l2,2l5.1,-3.8l-2.9,-.5l1.4,-3.2l-1,-.7l-2.2,6.8l-1,.4l-.8,-2.7l-1.6,.7l-.2,-2.3l4.7,-6.3l2.8,-1.3l4.1,2.8l-.2,1.7l-2.5,-.8l1.9,2.6l2.2,-1.7l-.3,-2.3l1.1,1.7l2.4,-2l2,.6l.4,-1.4l2.5,1.4l-.6,-2.6l1.6,-2l.7,4.5l-1.5,1.5l1,.4l1,-2.3l1.3,1.2l-1.7,-1.5l.3,-3.7l.3,1.7l1.1,.3l-.1,-1.5l1.5,.7l0,1.7l-.8,-3.8l2,.6l.1,-2.5l4.2,-.9l1.5,-2.8l3.3,2.7l-3,3.8l1.8,-1.4l1.1,1.6l3.6,-1.3l2.2,3.3l3.4,-2.2l5.8,2l.7,2.3l5,-1.2l4.8,3.4l-1.1,1.4l-1.8,-1.7l-2.3,1.4l1.5,1.7l-5.1,1.6l-2.4,5.4l-.2,-3.3l3.1,-3.8l-2.6,.5l-.8,1.8l-4.3,0l-2.3,2.6l2,.9l-.4,2.6l-4.2,4l.6,2l-2.5,-2.5l-1.3,.8l1.6,.7l-.7,2.9l-1.1,2.5l-3.8,1.3l1,3l-1.4,.9l-1.6,-1.6l1.2,4.1l-4.3,-7.7l-4.4,5.4l-1.5,-4.9l-7.9,-3.1l.7,2.3l1.7,-.7l1.1,1.5l-5.4,3.3l-3.7,-6.2l3.4,6.6l2.9,.4l-4,5.1l.5,3.4l-2.8,5l-4.3,2.4l-2.6,-6.3l-.7,-7.5l-6.2,-.3l-2.6,-2.5l0,-3.3l3.6,-5.3l5.2,-.6l3.1,2.8l4.9,-.3l.9,-2.3l-2.9,0l-.5,-1.4l5.1,-1.2l-1.6,-1.1l.9,-1l-1.8,1.4l-.7,-1.4l-.9,2.9l-2.2,.2l.2,1.7l-3.2,-4.1l.9,3.5l-2.4,-2.9l-4.9,3.7l-1.1,-2.5ZM66.4,36.5l-.1,3.9l1.7,.4l-.2,-1.4l-.1,-3.1l-1.3,.2ZM0,28.2l0,-7.8l4.9,1.7l2.4,-1.8l6.9,3.8l.4,-2.2l3.4,.6l.1,1.4l.3,-5.1l2.5,4.6l1.6,-2.2l.3,2.3l-4,2.4l.3,4.9l3.4,1.1l1.1,2.4l.4,-7l1.4,-.2l1.6,3.1l1.5,-1.5l2.4,3.5l-1,.7l1.5,.6l-6.2,3.4l3,-1.8l1.5,1.9l-5.4,2.9l-1.1,5.4l-2,-2l-3.6,.9l.4,3.4l2.9,-1l-.5,2l1.8,.3l.4,2.1l6.8,-.6l3.5,2.2l-.5,1.9l6,1.8l-2.1,5.2l-2.5,1.2l-1.9,3.6l-1.3,-.8l.5,1.8l-2.8,1.6l-1.1,5.6l-1.5,.6l-.9,-3.5l1.8,-10.9l-3.7,-4.7l1.2,-4.7l-9.1,-3.9l-2.9,-4.5l1.2,3.3l-4.5,-6.3l.5,-4.2l-2.6,-4.3l-1.8,-2.2l-4.9,-1ZM97.7,58l3.5,5.8l-2.4,4.4l-5.1,-3.1l-5,1.3l-.9,-3.3l4.2,-4.4l3.5,-.7l1.2,2l1,-2ZM86.5,53.3l2.4,-1.6l.4,1.6l-1.1,2.1l-1.7,-2ZM18.6,12.6l1.8,2.1l2.8,-.3l-.9,1.3l-2.8,0l-1,-3.1ZM21.1,19.8l1.3,-2.9l.6,2l1.9,-.6l4.7,5.6l-.8,1.4l-1.6,-.8l.8,3l-3.9,-1.8l1.5,-3.3l-2,-2.1l-3.2,0l-.1,-2.7l1.3,-.8l-.4,3ZM49.1,33.8l-.5,-4l2,3.5l-1.4,.5ZM40,-1l1.4,.9l-2.1,.8l3.5,.8l-2.8,1.6l2.9,-.1l-.6,2.9l1.2,-1.9l2.7,.4l-2.9,3l-.1,9.7l-2.4,.4l1.9,.3l-1.6,.2l1.7,2.3l-1.8,-1.1l-.7,1.2l2.3,.4l-6,4l-1,4.1l-1.7,-.8l-1.8,-3.8l.6,-5.2l-1.2,.2l-1,-4.9l-3.3,-.6l-.9,-1.4l1.6,-.7l-2.1,-1.4l2.3,-1.3l-.4,-2.3l2.2,-3.3l1.2,1.3l-.9,-1.5l1.6,-.9l.3,1.7l1.2,-2l1.8,1.7l-.3,-2.4l1.4,0l-1.6,-.8l5.2,-1.6ZM82.2,52.3l3,2.5l-.3,1.2l-2.8,-3.8ZM97,57.1l-3.3,-2.6l1.9,.2l4.7,2.7l-3.3,-.3ZM44.8,24.2l-.9,2.2l-1.4,-1.3l-.1,-1l2.4,.1ZM97.1,38.8l-.3,2.7l-2.1,.2l2.3,-2.9ZM66.5,58.2l-.8,4.3l-1.1,-1.4l1.9,-3ZM57,7l2,.2l-1.4,1.7l-1.5,-1.2l.8,-.8ZM55.6,7.6l1.5,2.1l-1.5,3.4l-1,-2.2l1,-.9l-1.2,.6l-.8,-2.7l1.8,1.4l.1,-1.9ZM107.7,69.1l-1.6,2.4l1.6,-2.4ZM72.6,13.6l-3.7,3.7l-.5,-1.3l2,-2.4l2.2,-1.1l.1,1ZM68.4,17.3l.8,2.8l-1.3,-.2l.5,-2.6ZM82.2,5.3l.2,1.7l-1.9,-.1l1.7,-1.7ZM82.6,7.2l.5,2.4l-2.1,-1.2l1.5,-1.3ZM84.3,8.9l.8,1.3l-2,.8l1.2,-2.2ZM96.7,14.2l1.7,.3l-.7,.8l-1.7,.2l.6,-1.5Z";
+// Méridiens tous les 30°, parallèles à 0, ±30 et ±60° (mêmes repères que LAND).
+const GRATICULE = "M0,28.8 H120 M0,43.5 H120 M0,64.5 H120 M0,79.2 H120 M10,0 V120 M20,0 V120 M30,0 V120 M40,0 V120 M50,0 V120 M60,0 V120 M70,0 V120 M80,0 V120 M90,0 V120 M100,0 V120 M110,0 V120";
 
 const BACKGROUNDS = {
   none: <rect width="120" height="120" fill={DEEP} />,
@@ -47,26 +60,37 @@ const BACKGROUNDS = {
       <path d="M22,60 H34 M86,60 H98" stroke={FLUO} strokeWidth="2" opacity=".75" />
     </>
   ),
+  // Carte du monde : quadrillage, équateur en pointillés, terres crème décalées d'encre (risographie), rose des vents.
   "bg-map": (
     <>
       <rect width="120" height="120" fill={INK} />
-      <g fill={PAPER} opacity=".22">
-        <path d="M8,30 C18,22 34,24 38,34 C40,44 30,48 24,58 C20,64 12,60 10,50 Z" />
-        <path d="M30,66 C38,64 42,74 38,86 C36,96 30,104 26,96 C22,86 24,72 30,66 Z" />
-        <path d="M54,22 C64,16 80,18 84,26 C80,32 70,30 64,34 C58,36 52,30 54,22 Z" />
-        <path d="M58,40 C70,38 76,48 72,62 C68,74 60,80 56,68 C52,58 50,46 58,40 Z" />
-        <path d="M80,30 C96,24 114,32 114,44 C108,52 96,48 88,54 C82,50 78,40 80,30 Z" />
-        <path d="M94,74 C102,72 110,78 108,86 C102,90 94,88 92,82 Z" />
-      </g>
+      <path d={GRATICULE} stroke={CARD} strokeWidth=".4" opacity=".2" />
+      <path d="M0,54 H120" stroke={CARD} strokeWidth=".5" strokeDasharray="2 2" opacity=".35" />
+      <path d={LAND} fill="#16299e" transform="translate(1.2 1.4)" />
+      <path d={LAND} fill={PAPER} />
+      <circle cx="19" cy="88" r="4.4" fill="none" stroke={SUN} strokeWidth=".7" />
+      <path d={sparkle(19, 88, 7.5)} fill={SUN} />
+      <path d={sparkle(19, 88, 4)} fill={CARD} transform="rotate(45 19 88)" />
     </>
   ),
-  "bg-stars": (
+  // Ciel étoilé (légendaire) : Voie lactée, croissant de lune, Grande Ourse, étoiles qui scintillent et étoile filante.
+  "bg-starry": (
     <>
       <rect width="120" height="120" fill="#141a3a" />
-      {[[16, 20], [34, 12], [90, 16], [104, 34], [22, 44], [98, 58], [12, 70], [108, 82], [70, 10], [50, 24]].map(([x, y], k) => (
-        <circle key={k} cx={x} cy={y} r={k % 3 ? 1 : 1.8} fill={k % 4 ? CARD : SUN} />
+      <path d="M-4,96 C30,70 52,48 124,4 L124,30 C70,58 40,82 -4,112 Z" fill="#232c63" />
+      <path d="M-4,100 C34,74 56,54 124,12 L124,20 C64,58 36,82 -4,106 Z" fill="#323d80" opacity=".7" />
+      {STARS.map(([x, y, r], k) => <circle key={k} cx={x} cy={y} r={r} fill={CARD} opacity={k % 3 ? 0.55 : 0.9} />)}
+      <circle cx="27" cy="23" r="10" fill={CARD} opacity=".08" />
+      <path d="M26.5,16 A7,7 0 1 0 33.45,25.73 A6,6 0 0 1 26.5,16 Z" fill="#f6eecf" />
+      <path d="M68,17 L74,15 L79.5,16.5 L84.5,19 L93,17.5 L94.5,24.5 L86,25.5 L84.5,19" fill="none" stroke={CARD} strokeWidth=".35" opacity=".45" />
+      {[[68, 17], [74, 15], [79.5, 16.5], [84.5, 19], [93, 17.5], [94.5, 24.5], [86, 25.5]].map(([x, y]) => <circle key={x} cx={x} cy={y} r=".95" fill={CARD} />)}
+      {[[16, 48, 3.2, SUN], [104, 46, 2.6, CARD], [44, 11, 2.3, SUN], [11, 72, 2, CARD]].map(([x, y, r, c], k) => (
+        <path key={k} d={sparkle(x, y, r)} fill={c} {...twinkle(k * 1.3)} />
       ))}
-      <path d="M86,30 l2,5 l5,2 l-5,2 l-2,5 l-2,-5 l-5,-2 l5,-2 Z" fill={SUN} />
+      <g {...twinkle(2)}>
+        <path d="M100.5,39.5 L112,32.6 L112.6,33.6 Z" fill={CARD} opacity=".7" />
+        <path d={sparkle(100.5, 39.5, 1.8)} fill={CARD} />
+      </g>
     </>
   ),
   "bg-rainbow": (
@@ -85,6 +109,20 @@ const BACKGROUNDS = {
       <rect y="40" width="120" height="30" fill="#ff7a45" />
       <rect y="70" width="120" height="50" fill={SUN} />
       <circle cx="60" cy="98" r="30" fill={CARD} opacity=".55" />
+    </>
+  ),
+  // Coucher de soleil : le même que le lever, en violet et rose, avec les premières étoiles et deux oiseaux.
+  "bg-sunset": (
+    <>
+      <rect width="120" height="120" fill="#3d2a6e" />
+      <rect y="30" width="120" height="22" fill="#8e3f96" />
+      <rect y="52" width="120" height="22" fill={PINK} />
+      <rect y="74" width="120" height="46" fill="#ff8a5c" />
+      <circle cx="60" cy="98" r="30" fill={SUN} opacity=".6" />
+      {[[24, 14, .8], [44, 8, .6], [92, 12, .7], [104, 24, .6], [16, 26, .6], [78, 6, .5]].map(([x, y, r], k) => (
+        <circle key={k} cx={x} cy={y} r={r} fill={CARD} opacity=".85" />
+      ))}
+      <path d="M11,59 q2,-2 4,0 q2,-2 4,0 M19,53 q1.6,-1.6 3.2,0 q1.6,-1.6 3.2,0" fill="none" stroke={NIGHT} strokeWidth=".9" strokeLinecap="round" strokeLinejoin="round" />
     </>
   ),
 };
@@ -357,8 +395,6 @@ function Face({ eyes, mood }) {
 }
 
 /* ---------- Boucles d'oreilles (lobes en 38,61 et 82,61) ---------- */
-// Éclat qui scintille, chacun à son rythme (k) ; immobile si l'utilisateur réduit les animations.
-const twinkle = (k) => ({ className: "motion-safe:animate-twinkle", style: { animationDelay: `${-k * 0.35}s` } });
 
 function Earrings({ id }) {
   // s : −1 à gauche, 1 à droite, pour décaler vers l'extérieur du visage

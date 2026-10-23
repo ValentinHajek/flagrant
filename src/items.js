@@ -76,13 +76,14 @@ export const ITEMS = [
   item("pet", "unicorn", "Licorne", 2400, 9, "legendaire"),
   item("pet", "pigeon", "Pigeon voyageur", 1200, 1, "epique", "cartographe"),
 
-  item("bg", "bg-sun", "Fond soleil", 90, 1, "commune"),
-  item("bg", "bg-ink", "Fond encre", 90, 1, "commune"),
+  item("bg", "bg-sun", "Fond jaune", 90, 1, "commune"),
+  item("bg", "bg-ink", "Fond bleu", 90, 1, "commune"),
   item("bg", "bg-leaf", "Fond vert", 90, 1, "commune"),
   item("bg", "bg-stamp", "Tampon de passeport", 600, 2, "rare"),
   item("bg", "bg-map", "Carte du monde", 750, 3, "rare"),
-  item("bg", "bg-stars", "Ciel étoilé", 1200, 6, "epique"),
   item("bg", "bg-sunrise", "Lever de soleil", 1500, 7, "epique"),
+  item("bg", "bg-sunset", "Coucher de soleil", 1500, 7, "epique"),
+  item("bg", "bg-starry", "Ciel étoilé", 2400, 9, "legendaire"),
   item("bg", "bg-rainbow", "Arc-en-ciel pailleté", 2400, 1, "legendaire", "assidu"),
 ];
 
