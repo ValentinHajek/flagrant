@@ -289,20 +289,71 @@ function Face({ eyes, mood }) {
 }
 
 /* ---------- Boucles d'oreilles (lobes en 38,61 et 82,61) ---------- */
+// Éclat qui scintille, chacun à son rythme (k) ; immobile si l'utilisateur réduit les animations.
+const twinkle = (k) => ({ className: "motion-safe:animate-twinkle", style: { animationDelay: `${-k * 0.35}s` } });
+
 function Earrings({ id }) {
-  const pair = (render) => <>{render(38)}{render(82)}</>;
+  // s : −1 à gauche, 1 à droite, pour décaler vers l'extérieur du visage
+  const pair = (render) => <>{render(38, -1)}{render(82, 1)}</>;
+  // Anneau cerclé d'encre qui pend sous le lobe, en dehors du visage
+  const hoop = (color) =>
+    pair((x, s) => (
+      <g key={x}>
+        <circle cx={x + s * 2.4} cy="64.5" r="4.5" fill="none" stroke={NIGHT} strokeWidth="3.4" />
+        <circle cx={x + s * 2.4} cy="64.5" r="4.5" fill="none" stroke={color} strokeWidth="1.8" />
+      </g>
+    ));
   switch (id) {
     case "hoops":
-      return pair((x) => <circle key={x} cx={x} cy="66" r="5" fill="none" stroke={SUN} strokeWidth="2.4" />);
+      return hoop(SUN);
+    case "silver-hoops":
+      return hoop("#d3d8de");
     case "pearls":
       return pair((x) => <circle key={x} cx={x} cy="64" r="3.4" fill={CARD} {...thin} />);
+    // Petit globe de bureau : océan, deux continents, reflet, monture dorée accrochée au lobe
     case "globes":
-      return pair((x) => (
+      return pair((x, s) => {
+        const c = x + s * 2;
+        return (
+          <g key={x}>
+            <path d={`M${c - 6},67.5 A6,6 0 0 1 ${c + 6},67.5 M${c},61.5 V59.6`} fill="none" stroke={SUN} strokeWidth="1.3" strokeLinecap="round" />
+            <circle cx={c} cy="67.5" r="4.6" fill={INK} {...thin} />
+            <path d={`M${c - 3.4},66 q1.2,-2.2 3.1,-1.7 q.5,1.4 -.9,2.4 q-1.4,.7 -2.2,-.7 Z M${c + .5},69 q1.7,-1.1 3,0 q-.3,1.8 -1.9,2.1 q-1,-.6 -1.1,-2.1 Z`} fill={LEAF} />
+            <path d={`M${c - 2.6},64.8 q1,-1.3 2.5,-1.5`} fill="none" stroke={CARD} strokeWidth=".9" strokeLinecap="round" opacity=".85" />
+          </g>
+        );
+      });
+    // Petit avion vu de dessus, nez vers l'extérieur, pendu à un anneau doré
+    case "planes":
+      return pair((x, s) => (
         <g key={x}>
-          <circle cx={x} cy="66" r="4.8" fill={INK} {...thin} />
-          <ellipse cx={x} cy="66" rx="2" ry="4.8" fill="none" stroke={CARD} strokeWidth=".9" />
+          <circle cx={x + s * 1.2} cy="61.8" r="1.5" fill="none" stroke={SUN} strokeWidth="1.1" />
+          <g transform={`translate(${x + s * 3.6} 68.6) rotate(${s * 40})`}>
+            <path d="M-6.2,1 L-1.3,-1.9 H1.3 L6.2,1 V2.3 L1.3,.7 H-1.3 L-6.2,2.3 Z" fill={INK} {...thin} />
+            <path d="M-2.8,5.4 L-1,3.6 H1 L2.8,5.4 V6.3 H-2.8 Z" fill={FLUO} {...thin} />
+            <path d="M0,-6.4 C1.2,-6.4 1.4,-4.6 1.4,-2.6 V3.4 L0,6 L-1.4,3.4 V-2.6 C-1.4,-4.6 -1.2,-6.4 0,-6.4 Z" fill={CARD} {...thin} />
+            <path d="M-.6,-4.6 Q0,-5.3 .6,-4.6" fill="none" stroke={INK} strokeWidth=".8" strokeLinecap="round" />
+          </g>
         </g>
       ));
+    // Boule à facettes : quadrillage argenté, facettes de couleur et éclats autour qui scintillent
+    case "disco":
+      return pair((x, s) => {
+        const c = x + s * 2;
+        return (
+          <g key={x}>
+            <path d={`M${c},59.6 V62.4`} stroke={NIGHT} strokeWidth="1.2" />
+            <circle cx={c} cy="67.6" r="5.2" fill="#b9c0ca" {...thin} />
+            <path d={`M${c - 3.4},63.7 H${c + 3.4} M${c - 4.8},65.7 H${c + 4.8} M${c - 4.8},69.5 H${c + 4.8} M${c - 3.4},71.5 H${c + 3.4} M${c},62.4 V72.8 M${c - 2.6},63.2 Q${c - 3.6},67.6 ${c - 2.6},72 M${c + 2.6},63.2 Q${c + 3.6},67.6 ${c + 2.6},72`} fill="none" stroke="#7d8692" strokeWidth=".5" />
+            <rect x={c - 2.6} y="64" width="2.3" height="1.5" fill={CARD} {...twinkle(0)} />
+            <rect x={c + .4} y="66" width="2.2" height="1.6" fill={PINK} {...twinkle(1)} />
+            <rect x={c - 2.4} y="68" width="2.1" height="1.6" fill={SUN} {...twinkle(2)} />
+            <rect x={c + .6} y="69.8" width="2" height="1.4" fill="#9fd3e6" {...twinkle(3)} />
+            <path d={sparkle(c + s * 7, 63.5, 2.5)} fill={SUN} {...twinkle(1.5)} />
+            <path d={sparkle(c + s * 5.5, 74, 1.8)} fill={CARD} {...twinkle(2.5)} />
+          </g>
+        );
+      });
     case "bolts":
       return pair((x) => <path key={x} d={`M${x + 1.5},59 L${x - 4},66.5 L${x + 0.5},66.5 L${x - 2.5},74 L${x + 5},64 L${x + 0.5},64 Z`} fill={SUN} {...thin} />);
     default:
@@ -311,7 +362,13 @@ function Earrings({ id }) {
 }
 
 /* ---------- Lunettes (yeux en 51,55 et 69,55) ---------- */
+// Verre gauche de l'aviateur (le droit est en miroir) et écran de la visière binaire.
+const AVIATOR_LENS = "M42.6,50 Q51,46.8 58,49.8 Q58.4,58.6 53.6,61.6 Q48,63.8 44.4,60.4 Q41.6,56.4 42.6,50 Z";
+const VISOR = "M34,50.5 Q60,44 86,50.5 L85,60 Q60,66.5 35,60 Z";
+const mirrored = (el) => <>{el}<g transform="translate(120 0) scale(-1 1)">{el}</g></>;
+
 function Glasses({ id }) {
+  const uid = useId(); // dégradés et découpe : un id par avatar
   switch (id) {
     case "round":
       return (
@@ -321,14 +378,41 @@ function Glasses({ id }) {
           <path d="M58.5,55 Q60,53 61.5,55 M43.5,54 L38,52 M76.5,54 L82,52" fill="none" />
         </g>
       );
-    case "aviator":
+    // Lunettes de piscine : verres teintés cerclés de caoutchouc, élastique autour de la tête
+    case "goggles":
       return (
-        <g stroke={SUN} strokeWidth="1.6" strokeLinejoin="round">
-          <path d="M43,50 Q51,47 58,50 Q58,61 51,62 Q43,61 43,50 Z" fill="#33302a" />
-          <path d="M77,50 Q69,47 62,50 Q62,61 69,62 Q77,61 77,50 Z" fill="#33302a" />
-          <path d="M58,50.5 L62,50.5 M43,51 L38,50 M77,51 L82,50" fill="none" />
-          <path d="M46,53 L49,51 M65,53 L68,51" stroke={CARD} strokeWidth="1.2" strokeLinecap="round" />
-        </g>
+        <>
+          <path d="M36.5,54 L44.5,54.6 M83.5,54 L75.5,54.6" stroke={NIGHT} strokeWidth="3.6" strokeLinecap="round" />
+          <path d="M36.5,54 L44.5,54.6 M83.5,54 L75.5,54.6" stroke={FLUO} strokeWidth="1.8" strokeLinecap="round" />
+          {[51, 69].map((x) => (
+            <g key={x}>
+              <ellipse cx={x} cy="55" rx="7" ry="5.8" fill={FLUO} {...line} />
+              <ellipse cx={x} cy="55" rx="4.8" ry="3.8" fill="#7fd0e8" fillOpacity=".7" {...thin} />
+              <path d={`M${x - 2.8},53.8 Q${x - 1.2},52.3 ${x + 0.8},52.5`} fill="none" stroke={CARD} strokeWidth="1" strokeLinecap="round" />
+            </g>
+          ))}
+          <path d="M58,55 Q60,53.4 62,55" fill="none" stroke={NIGHT} strokeWidth="1.8" />
+        </>
+      );
+    // Monture dorée fine à double pont, verres dégradés (foncés en haut) avec un reflet
+    case "aviators":
+      return (
+        <>
+          <linearGradient id={`${uid}a`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#1f3b4d" />
+            <stop offset="1" stopColor="#6fb3c9" />
+          </linearGradient>
+          {mirrored(
+            <>
+              <path d={AVIATOR_LENS} fill={`url(#${uid}a)`} stroke={NIGHT} strokeWidth="3" />
+              <path d={AVIATOR_LENS} fill="none" stroke={SUN} strokeWidth="1.4" />
+              <path d="M45.5,53.2 L49.5,50.6 M46.2,56 L47.9,54.9" stroke={CARD} strokeWidth="1.1" strokeLinecap="round" opacity=".8" />
+              <path d="M42.6,51.2 L37,50.2" stroke={SUN} strokeWidth="1.4" strokeLinecap="round" />
+            </>
+          )}
+          <path d="M57.8,49.6 Q60,48.8 62.2,49.6" fill="none" stroke={NIGHT} strokeWidth="3" />
+          <path d="M57.8,49.6 Q60,48.8 62.2,49.6 M58.2,52.4 Q60,51.4 61.8,52.4" fill="none" stroke={SUN} strokeWidth="1.3" />
+        </>
       );
     case "hearts": {
       const heart = (dx) => `M${51 + dx},62 C${42 + dx},56 ${43 + dx},48 ${48 + dx},48 C${50 + dx},48 ${51 + dx},49.5 ${51 + dx},51 C${51 + dx},49.5 ${52 + dx},48 ${54 + dx},48 C${59 + dx},48 ${60 + dx},56 ${51 + dx},62 Z`;
@@ -340,12 +424,20 @@ function Glasses({ id }) {
         </g>
       );
     }
-    case "ski":
+    // Lunettes de star : grands verres fumés, monture dorée épaisse, un éclat
+    case "star":
       return (
         <>
-          <path d="M28,55 H36 M84,55 H92" stroke={NIGHT} strokeWidth="3.5" strokeLinecap="round" />
-          <path d="M36,49 Q60,44 84,49 L84,62 Q60,66 36,62 Z" fill={INK} {...line} />
-          <path d="M42,52 Q60,48 78,52 L78,55 Q60,51 42,55 Z" fill={FLUO} opacity=".85" />
+          {mirrored(
+            <>
+              <rect x="39" y="47" width="19.5" height="15.5" rx="5.5" fill="#2b2733" stroke={NIGHT} strokeWidth="4.4" />
+              <rect x="39" y="47" width="19.5" height="15.5" rx="5.5" fill="none" stroke={SUN} strokeWidth="2.4" />
+              <path d="M42.6,51.6 L47,49.3 M42.9,55 L44.7,54" stroke={CARD} strokeWidth="1.2" strokeLinecap="round" opacity=".75" />
+              <path d="M39,51 L35,50" stroke={SUN} strokeWidth="2" strokeLinecap="round" />
+            </>
+          )}
+          <path d="M58.5,51 Q60,49.6 61.5,51" fill="none" stroke={SUN} strokeWidth="2.4" />
+          <path d={sparkle(82, 46, 3)} fill={CARD} {...thin} />
         </>
       );
     case "pixel":
@@ -367,11 +459,48 @@ function Glasses({ id }) {
           <path d="M75,61 Q80,72 74,84" fill="none" stroke={SUN} strokeWidth="1.2" strokeDasharray="2 1.5" />
         </>
       );
-    case "binary":
+    // Masque de ski : écran irisé qui reflète des montagnes, monture épaisse, sangle à rayures
+    case "ski-mask":
       return (
         <>
-          <rect x="37" y="48" width="46" height="14" rx="3" fill={LEAF} {...line} />
-          <text x="60" y="58" textAnchor="middle" fontSize="7" fontFamily="ui-monospace, monospace" fontWeight="700" fill={NIGHT} opacity=".7">0110 1001</text>
+          <linearGradient id={`${uid}s`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor={INK} />
+            <stop offset=".45" stopColor="#7a5cc4" />
+            <stop offset=".75" stopColor={FLUO} />
+            <stop offset="1" stopColor={SUN} />
+          </linearGradient>
+          <path d="M26,51.5 H37 V59 H26 Z M83,51.5 H94 V59 H83 Z" fill={NIGHT} />
+          <path d="M26,54 H37 M83,54 H94" stroke={FLUO} strokeWidth="1.3" />
+          <path d="M26,56.6 H37 M83,56.6 H94" stroke={SUN} strokeWidth="1.3" />
+          <path d="M35,49 Q60,42.5 85,49 Q87,56 84.5,63 Q72,67 64,64 Q60,61.5 56,64 Q48,67 35.5,63 Q33,56 35,49 Z" fill={CARD} {...line} />
+          <path d="M38.5,51 Q60,45.5 81.5,51 Q83,56 81,61 Q71,64 64.5,61.8 Q60,59.4 55.5,61.8 Q49,64 39,61 Q37,56 38.5,51 Z" fill={`url(#${uid}s)`} {...thin} />
+          <path d="M41,59.6 L46.5,54 L49.5,56.8 L53,53 L57.5,58.6 Q49,61.6 41,59.6 Z" fill={CARD} opacity=".55" />
+          <path d="M44,52.2 Q52,49.2 62,49.4" fill="none" stroke={CARD} strokeWidth="1.2" strokeLinecap="round" opacity=".7" />
+          <path d={sparkle(76, 52, 2.6)} fill={CARD} />
+        </>
+      );
+    // Visière enveloppante : des rangées de 0 et de 1 défilent derrière l'écran (motif de 24 unités, répété 4 fois)
+    case "binary-visor":
+      return (
+        <>
+          <clipPath id={`${uid}v`}>
+            <path d={VISOR} />
+          </clipPath>
+          <path d="M30,52.5 H35 V58.5 H30 Z M85,52.5 H90 V58.5 H85 Z" fill={NIGHT} />
+          <circle cx="32.5" cy="55.5" r="1" fill={LEAF} {...twinkle(0)} />
+          <circle cx="87.5" cy="55.5" r="1" fill={LEAF} {...twinkle(2)} />
+          <path d={VISOR} fill="#0d2418" {...line} />
+          <g clipPath={`url(#${uid}v)`}>
+            <g className="motion-safe:animate-bits">
+              {["01101001", "10010110", "11000101"].map((bits, k) => (
+                <text key={bits} x={30 - k * 8} y={53.4 + k * 4} fontSize="3.8" fontFamily="ui-monospace, monospace" fontWeight="700" fill={LEAF} opacity={k === 1 ? 1 : 0.7} textLength="96" lengthAdjust="spacingAndGlyphs">
+                  {bits.repeat(4)}
+                </text>
+              ))}
+            </g>
+          </g>
+          <path d={VISOR} fill="none" stroke={LEAF} strokeWidth=".8" />
+          <path d="M40,51.4 Q60,47.2 80,51.4" fill="none" stroke={CARD} strokeWidth=".9" strokeLinecap="round" opacity=".35" />
         </>
       );
     default:
@@ -493,7 +622,7 @@ function Hat({ id }) {
           <path d={leaf(...p(260), 350, 7, 4)} fill={SUN} {...thin} />
         </>
       );
-      return <>{branch}<g transform="translate(120 0) scale(-1 1)">{branch}</g></>;
+      return mirrored(branch);
     }
     case "pilot":
       return (
@@ -532,8 +661,7 @@ function Hat({ id }) {
       );
       return (
         <>
-          {can}
-          <g transform="translate(120 0) scale(-1 1)">{can}</g>
+          {mirrored(can)}
           <path d="M37,45 C36,25 47,17 60,17 C73,17 84,25 83,45 Z" fill={INK} {...line} />
           <path d="M35,42 Q60,36 85,42 L85,47 Q60,41 35,47 Z" fill="#16299e" {...line} />
           <path d="M48,22 Q60,18 72,22" fill="none" stroke={CARD} strokeWidth="2.2" strokeLinecap="round" opacity=".55" />

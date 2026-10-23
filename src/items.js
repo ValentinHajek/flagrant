@@ -1,5 +1,8 @@
 // Catalogue du Vestiaire. Prix en tampons (monnaie du jeu, jamais d'argent réel), triplés le 22/10/2026.
 // « badge » : article exclusif, en vente seulement pour les joueurs qui ont ce badge (jamais offert).
+// Le solde se recalcule avec les prix actuels : un article retiré est remboursé à ses acheteurs. Pour changer un prix
+// sans faire payer la différence à ceux qui l'ont déjà, on change l'id (23/10/2026 : chapka retirée ; masque de ski,
+// aviateur et visière binaire repris sous un nouvel id, leurs anciens acheteurs remboursés).
 
 export const SLOTS = [
   ["hat", "Chapeaux"],
@@ -34,16 +37,21 @@ export const ITEMS = [
   item("hat", "space-helmet", "Casque d'astronaute", 1200, 1, "epique", "centurion"),
 
   item("glasses", "round", "Lunettes rondes", 180, 1, "commune"),
-  item("glasses", "aviator", "Aviateur", 450, 2, "rare"),
+  item("glasses", "goggles", "Lunettes de piscine", 240, 2, "commune"),
   item("glasses", "hearts", "Lunettes cœur", 600, 3, "rare"),
-  item("glasses", "ski", "Masque de ski", 900, 4, "rare"),
+  item("glasses", "star", "Lunettes de star", 900, 4, "rare"),
   item("glasses", "pixel", "Lunettes pixel", 1050, 5, "epique"),
   item("glasses", "monocle", "Monocle", 1500, 8, "epique"),
-  item("glasses", "binary", "Visière binaire", 1200, 1, "epique", "maitre-xx"),
+  item("glasses", "ski-mask", "Masque de ski", 2400, 9, "legendaire"),
+  item("glasses", "aviators", "Lunettes d'aviateur", 1200, 1, "epique", "polyvalent"),
+  item("glasses", "binary-visor", "Visière binaire", 2400, 1, "legendaire", "maitre-xx"),
 
-  item("earrings", "hoops", "Anneaux", 180, 1, "commune"),
+  item("earrings", "hoops", "Anneaux dorés", 180, 1, "commune"),
+  item("earrings", "silver-hoops", "Anneaux argentés", 180, 1, "commune"),
   item("earrings", "pearls", "Perles", 360, 2, "commune"),
   item("earrings", "globes", "Mini-globes", 900, 5, "rare"),
+  item("earrings", "planes", "Petits avions", 1350, 6, "epique"),
+  item("earrings", "disco", "Boules disco", 2400, 9, "legendaire"),
   item("earrings", "bolts", "Éclairs", 1200, 1, "epique", "serie-de-feu"),
 
   item("top", "tee-ink", "T-shirt encre", 120, 1, "commune"),

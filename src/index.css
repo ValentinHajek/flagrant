@@ -18,6 +18,25 @@
   --shadow-print-sm: 2px 2.5px 0 var(--color-ink-deep);
   --shadow-print-lg: 6px 7px 0 var(--color-ink);
   --shadow-print-fluo: 9px 11px 0 var(--color-fluo);
+
+  /* Articles qui s'animent (boules disco, visière binaire), toujours en motion-safe: */
+  --animate-twinkle: twinkle 1.4s ease-in-out infinite;
+  --animate-bits: bits 3s linear infinite;
+  @keyframes twinkle {
+    0%,
+    100% {
+      opacity: 0.2;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  /* Un motif de 0 et de 1 (24 unités de l'avatar) : le défilement boucle sans à-coup */
+  @keyframes bits {
+    to {
+      transform: translateX(-24px);
+    }
+  }
 }
 
 /* clip (et non hidden) : les entrées animées hors-champ ne doivent jamais élargir la page sur mobile. */

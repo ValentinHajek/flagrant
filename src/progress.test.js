@@ -48,7 +48,8 @@ const T = (iso) => Date.parse(iso);
   assert.ok(!p.badges.includes("marathon"));
   assert.equal(p.stats.dayStreak, 7);
   assert.equal(p.balance, p.xp - ITEM.get("cap").price - ITEM.get("bob").price);
-  assert.equal(computeProgress([perfect, ...week], ["chapka"]).balance, p.xp, "article retiré du catalogue (la chapka) : remboursé");
+  const retired = ["chapka", "ski", "aviator", "binary"]; // retirés le 23/10/2026 (changement de prix ou de dessin)
+  assert.equal(computeProgress([perfect, ...week], retired, ["ski"]).balance, p.xp, "articles retirés du catalogue : remboursés");
   assert.equal(p.level, levelOf(p.xp));
 
   // Achats : raisons de refus, dans l'ordre où le joueur les comprend
@@ -138,6 +139,8 @@ const T = (iso) => Date.parse(iso);
 // Catalogue : ids uniques, exclusifs reliés à un badge existant et payants
 assert.equal(new Set(ITEMS.map((i) => i.id)).size, ITEMS.length);
 for (const i of ITEMS.filter((i) => i.badge)) assert.ok(BADGE.has(i.badge) && i.price > 0, i.id);
+const exclusive = ITEMS.filter((i) => i.badge).map((i) => i.badge);
+assert.equal(new Set(exclusive).size, exclusive.length, "un exclusif par badge : la page Badges et la fin de partie n'en montrent qu'un");
 
 // Tenue : valeurs inconnues et articles non possédés écartés
 assert.deepEqual(cleanLook({ skin: "<script>", hat: "crown", glasses: "round", top: "cap" }, ["round", "cap"]), { ...DEFAULT_LOOK, glasses: "round" });
