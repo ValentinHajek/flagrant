@@ -740,18 +740,25 @@ function Hat({ id }) {
   }
 }
 
-/* ---------- Compagnons (sur l'épaule droite, autour de 90, 96) ---------- */
+/* ---------- Compagnons (épaule droite : le haut de l'épaule passe par 81,92 · 88,94.5 · 93,97.5) ---------- */
 function Pet({ id }) {
   switch (id) {
+    // Perché sur l'épaule, de profil vers le visage : bec crochu ivoire, mandibule noire, joue blanche autour de l'œil.
     case "parrot":
       return (
         <>
-          <path d="M91,104 L97,117 L89,108 Z" fill={INK} {...thin} />
-          <ellipse cx="90" cy="97" rx="7" ry="10" fill={LEAF} {...line} />
-          <ellipse cx="93" cy="99" rx="4" ry="7" fill="#008a4b" {...thin} />
-          <circle cx="88" cy="85" r="6" fill={FLUO} {...line} />
-          <path d="M83,84 Q78,86 82,90 Z" fill={SUN} {...thin} />
-          <circle cx="87" cy="84" r="1.2" fill={NIGHT} />
+          <path d="M92.6,95 L93,104 L95.6,104 L95.4,95.4 Z M95.2,95 L97.8,103.2 L100,101.8 L97.4,94.6 Z" fill={INK} {...thin} />
+          <path d="M95.6,95.8 L97.6,102.6" stroke={FLUO} strokeWidth="1.3" />
+          <path d="M89.4,95.6 q-.9,1.6 .4,2.6 M92.4,96.8 q-.9,1.6 .4,2.6" fill="none" stroke="#5c5647" strokeWidth="1.5" strokeLinecap="round" />
+          <ellipse cx="91.6" cy="88.4" rx="6.4" ry="8.6" fill={LEAF} transform="rotate(12 91.6 88.4)" {...line} />
+          <path d="M92.8,82.6 C97.6,83.2 99.6,89.4 98.4,95.4 C96.6,97.4 94,96.8 93,94.6 C91.8,91 91.6,86.2 92.8,82.6 Z" fill="#008a4b" {...thin} />
+          <path d="M92.9,92.4 C94.8,93.2 97,93 98.7,92 L98.4,95.4 C96.6,97.4 94,96.8 93,94.6 Z" fill={INK} {...thin} />
+          <circle cx="88.6" cy="78" r="6.2" fill={FLUO} {...line} />
+          <ellipse cx="86.4" cy="77.4" rx="2.7" ry="2.5" fill={CARD} />
+          <circle cx="86.6" cy="77.2" r="1.15" fill={NIGHT} />
+          <circle cx="87" cy="76.8" r=".4" fill={CARD} />
+          <path d="M84.4,74.4 C81.2,74 79,76.6 79.6,80.2 C79.8,81.4 80.6,82 81.2,81.4 C80.9,79.6 81.8,78.6 83.6,78.8 Z" fill={CARD} {...thin} />
+          <path d="M83.6,78.8 C81.9,78.8 81.4,80.4 82.4,81.4 C83.2,82.2 84.6,81.4 84.8,80 Z" fill={NIGHT} {...thin} />
         </>
       );
     case "cat": {
@@ -782,12 +789,42 @@ function Pet({ id }) {
         </>
       );
     }
+    // Chiot assis, de face, posé comme le chat : oreilles tombantes, museau blanc, langue, collier et médaille.
+    case "dog": {
+      const [fur, ear, tail] = ["#d39a5b", "#8a5a32", "M95,101.6 Q100.6,100.6 100.2,95.4"];
+      return (
+        <>
+          <path d={tail} fill="none" stroke={NIGHT} strokeWidth="5.2" strokeLinecap="round" />
+          <path d={tail} fill="none" stroke={fur} strokeWidth="3" strokeLinecap="round" />
+          <ellipse cx="88" cy="97.4" rx="8" ry="8" fill={fur} {...line} />
+          <ellipse cx="88" cy="98.6" rx="4" ry="5" fill={CARD} />
+          <ellipse cx="84.5" cy="104" rx="2.6" ry="1.9" fill={CARD} {...thin} />
+          <ellipse cx="91.5" cy="104" rx="2.6" ry="1.9" fill={CARD} {...thin} />
+          <ellipse cx="88" cy="84.6" rx="8.6" ry="7.6" fill={fur} {...line} />
+          <path d="M81,79.8 C77,79.2 75.4,85.2 77.4,89.8 C79.4,90.8 81.4,87.2 82,83.2 Z M95,79.8 C99,79.2 100.6,85.2 98.6,89.8 C96.6,90.8 94.6,87.2 94,83.2 Z" fill={ear} {...line} />
+          <ellipse cx="88" cy="88.2" rx="4.4" ry="3.3" fill={CARD} />
+          {[84.4, 91.6].map((x) => (
+            <g key={x}>
+              <circle cx={x} cy="83.4" r="1.45" fill={NIGHT} />
+              <circle cx={x + 0.5} cy="82.9" r=".5" fill={CARD} />
+            </g>
+          ))}
+          <ellipse cx="88" cy="86.6" rx="1.7" ry="1.15" fill={NIGHT} />
+          <path d="M87.1,89.1 Q88,92.4 88.9,89.1 Z" fill="#f4a3b5" stroke={NIGHT} strokeWidth=".6" />
+          <path d="M86,88.4 Q87,89.6 88,88.4 Q89,89.6 90,88.4" fill="none" stroke={NIGHT} strokeWidth=".8" strokeLinecap="round" />
+          <path d="M81.6,91 Q88,94 94.4,91" fill="none" stroke={NIGHT} strokeWidth="3.4" strokeLinecap="round" />
+          <path d="M81.6,91 Q88,94 94.4,91" fill="none" stroke={FLUO} strokeWidth="1.8" strokeLinecap="round" />
+          <circle cx="88" cy="93.8" r="1.4" fill={SUN} {...thin} />
+        </>
+      );
+    }
     case "gecko": {
-      // Vu de dessus, accroché à l'épaule, tête vers le haut (repère local centré sur le ventre).
+      // Vu de dessus, couché le long de l'épaule, tête vers le cou (repère local centré sur le ventre, tête vers −y).
+      // Retourné (scale −1) pour que la queue s'enroule vers le haut, dans le cercle.
       // Pattes et queue : un trait encre puis le même trait vert, plus fin, par-dessus (contour fin).
       const limbs = "M-3,-4 L-8,-6 L-9,-10.5 M3,-4 L8,-6 L9,-10.5 M-3,4 L-8.5,2.5 L-10,6.5 M3,4 L8.5,2.5 L10,6.5 M0,7 C0,13 -3,15.5 -6.5,14.5 C-10,13.5 -10.5,9 -8,8.2 C-6,7.6 -5,9.2 -6.2,10.6";
       return (
-        <g transform="translate(88 91) rotate(15)">
+        <g transform="translate(80.5 100) rotate(-62) scale(-1 1)">
           <path d={limbs} fill="none" stroke={NIGHT} strokeWidth="5.4" strokeLinecap="round" strokeLinejoin="round" />
           <path d={limbs} fill="none" stroke={LEAF} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
           {[[-9, -10.5], [9, -10.5], [-10, 6.5], [10, 6.5]].map(([x, y]) => <circle key={`${x}${y}`} cx={x} cy={y} r="1.9" fill={LEAF} {...thin} />)}
@@ -803,50 +840,154 @@ function Pet({ id }) {
         </g>
       );
     }
-    case "penguin":
+    // Grenouille assise, de face : gros yeux sur le dessus, grand sourire, joues roses, taches foncées.
+    case "frog": {
+      const [skin, dark, belly] = ["#62bf4c", "#3c8f37", "#e2efb0"];
       return (
         <>
-          <ellipse cx="90" cy="96" rx="8.5" ry="12" fill={NIGHT} {...line} />
-          <ellipse cx="89" cy="99" rx="5.5" ry="8.5" fill={CARD} />
-          <circle cx="87" cy="88" r="1.8" fill={CARD} />
-          <circle cx="87.3" cy="88" r=".8" fill={NIGHT} />
-          <path d="M84,91 L80,92.5 L84,94 Z" fill={SUN} {...thin} />
-          <path d="M85,108 h5 M91,108 h5" stroke={SUN} strokeWidth="2.4" strokeLinecap="round" />
+          <path d="M79,93 C74.2,93.4 73,99.6 76.2,101.8 C78.2,103 81.2,101.6 82,99 Z M91.2,93 C96,93.4 97.2,99.6 94,101.8 C92,103 89,101.6 88.2,99 Z" fill={skin} {...line} />
+          <path d="M79.6,101 L72.8,103.2 Q73.6,105.4 75.6,104.6 Q77,106 78.6,104.8 Q80.6,105.2 81.2,103 Z M90.6,101 L97.4,103.2 Q96.6,105.4 94.6,104.6 Q93.2,106 91.6,104.8 Q89.6,105.2 89,103 Z" fill={skin} {...thin} />
+          <ellipse cx="85.1" cy="95.6" rx="8.4" ry="7.6" fill={skin} {...line} />
+          <ellipse cx="85.1" cy="98.2" rx="5.2" ry="4.6" fill={belly} />
+          <ellipse cx="81.2" cy="103.4" rx="2.3" ry="1.4" fill={skin} {...thin} />
+          <ellipse cx="89" cy="103.4" rx="2.3" ry="1.4" fill={skin} {...thin} />
+          <circle cx="80.6" cy="82.6" r="3.4" fill={skin} {...line} />
+          <circle cx="89.6" cy="82.6" r="3.4" fill={skin} {...line} />
+          <ellipse cx="85.1" cy="88" rx="8.8" ry="6.2" fill={skin} {...line} />
+          {[80.6, 89.6].map((x) => (
+            <g key={x}>
+              <circle cx={x} cy="82.4" r="2.3" fill={CARD} />
+              <circle cx={x + (x < 85 ? 0.4 : -0.4)} cy="82.7" r="1.25" fill={NIGHT} />
+              <circle cx={x + (x < 85 ? 0.8 : 0)} cy="82.1" r=".45" fill={CARD} />
+            </g>
+          ))}
+          <path d="M75.6,97.4 h.1 M94.6,97.4 h.1 M79,100.2 h.1 M91.2,100.2 h.1" stroke={dark} strokeWidth="1.8" strokeLinecap="round" />
+          <circle cx="78.4" cy="89.6" r="1.5" fill="#f4a3b5" opacity=".85" />
+          <circle cx="91.8" cy="89.6" r="1.5" fill="#f4a3b5" opacity=".85" />
+          <path d="M84,86.6 h.1 M86.2,86.6 h.1" stroke={NIGHT} strokeWidth=".9" strokeLinecap="round" />
+          <path d="M79.2,89.4 Q85.1,93.6 91,89.4" fill="none" stroke={NIGHT} strokeWidth="1.1" strokeLinecap="round" />
         </>
       );
-    case "kangaroo":
+    }
+    // Pingouin debout, de face : masque blanc en cœur, joues roses, écharpe orange.
+    case "penguin": {
+      const coat = "#262b3b";
       return (
         <>
-          <ellipse cx="92" cy="102" rx="9" ry="11" fill="#c08550" {...line} />
-          <path d="M86,82 L84,70 L89,78 Z M93,82 L94,70 L90,78 Z" fill="#c08550" {...line} />
-          <ellipse cx="88" cy="86" rx="6" ry="7" fill="#c08550" {...line} />
-          <circle cx="86" cy="85" r="1.2" fill={NIGHT} />
-          <path d="M86,104 Q92,110 98,104" fill="#a96d3c" {...thin} />
-          <circle cx="92" cy="102" r="3" fill="#c08550" {...thin} />
+          <path d="M79.4,87.5 C75.6,90.6 74.8,96 76,99.4 C78.4,98.6 80.2,95 80.4,90.6 Z M96.6,87.5 C100.4,90.6 101.2,96 100,99.4 C97.6,98.6 95.8,95 95.6,90.6 Z" fill={coat} {...thin} />
+          <path d="M82.6,103 Q81.6,105.4 84,105.6 Q86.4,105.8 87,103.4 Z M89,103.4 Q89.6,105.8 92,105.6 Q94.4,105.4 93.4,103 Z" fill={SUN} {...thin} />
+          <path d="M88,76.5 C94.6,76.5 98,82.5 98,90.5 C98,98.5 94.2,103.5 88,103.5 C81.8,103.5 78,98.5 78,90.5 C78,82.5 81.4,76.5 88,76.5 Z" fill={coat} {...line} />
+          <path d="M88,82.2 C86.4,79.2 81.2,79.4 81.2,84.4 C81.2,86.6 81.8,88.4 82.6,89.6 C81.2,92.2 80.8,95.4 81.4,97.6 C82.4,101 85,102.4 88,102.4 C91,102.4 93.6,101 94.6,97.6 C95.2,95.4 94.8,92.2 93.4,89.6 C94.2,88.4 94.8,86.6 94.8,84.4 C94.8,79.4 89.6,79.2 88,82.2 Z" fill={CARD} />
+          {[85, 91].map((x) => (
+            <g key={x}>
+              <ellipse cx={x} cy="84.6" rx="1.2" ry="1.45" fill={NIGHT} />
+              <circle cx={x + 0.4} cy="84.1" r=".45" fill={CARD} />
+            </g>
+          ))}
+          <circle cx="83.2" cy="87.6" r="1.3" fill="#f4a3b5" opacity=".6" />
+          <circle cx="92.8" cy="87.6" r="1.3" fill="#f4a3b5" opacity=".6" />
+          <path d="M86.2,86.6 Q88,85.6 89.8,86.6 Q88.8,88.8 88,89.4 Q87.2,88.8 86.2,86.6 Z" fill={SUN} {...thin} />
+          <path d="M80,90.2 Q88,94.6 96,90.2 L96.2,93 Q88,97.4 79.8,93 Z" fill={FLUO} {...thin} />
+          <path d="M91.4,94 L93,101 L95.8,100.2 L94.4,93.2 Z" fill={FLUO} {...thin} />
         </>
       );
-    case "llama":
+    }
+    // Kangourou de face, son petit qui sort la tête de la poche.
+    case "kangaroo": {
+      const [fur, light, tail] = ["#c08550", "#e6bf8c", "M95.6,100.6 C99.8,101.4 102.6,99 103.2,95.2"];
       return (
         <>
-          <path d="M86,118 L86,90 Q86,80 92,80 Q98,80 98,90 L98,118 Z" fill="#efe6d2" {...line} />
-          <path d="M88,82 L87,73 L91,79 Z M96,82 L97,73 L93,79 Z" fill="#efe6d2" {...line} />
-          <ellipse cx="92" cy="86" rx="6" ry="6.5" fill="#efe6d2" {...line} />
-          <circle cx="90" cy="85" r="1.2" fill={NIGHT} />
-          <circle cx="94" cy="85" r="1.2" fill={NIGHT} />
-          <path d="M86,100 H98 V108 H86 Z" fill={FLUO} {...thin} />
-          <path d="M86,104 H98" stroke={SUN} strokeWidth="1.6" />
+          <path d={tail} fill="none" stroke={NIGHT} strokeWidth="6" strokeLinecap="round" />
+          <path d={tail} fill="none" stroke={fur} strokeWidth="3.6" strokeLinecap="round" />
+          <ellipse cx="86.6" cy="103.6" rx="3" ry="1.8" fill={fur} {...thin} />
+          <ellipse cx="93.4" cy="103.6" rx="3" ry="1.8" fill={fur} {...thin} />
+          <path d="M90,83 C95,83 98,88.5 98.2,94.5 C98.4,100.5 95,104 90,104 C85,104 81.6,100.5 81.8,94.5 C82,88.5 85,83 90,83 Z" fill={fur} {...line} />
+          <ellipse cx="90" cy="96" rx="5.3" ry="6.6" fill={light} />
+          <ellipse cx="88.4" cy="92.6" rx=".9" ry="1.7" fill={fur} {...thin} />
+          <ellipse cx="91.6" cy="92.6" rx=".9" ry="1.7" fill={fur} {...thin} />
+          <circle cx="90" cy="95.4" r="2.5" fill={fur} {...thin} />
+          <path d="M89.1,95.1 h.1 M90.9,95.1 h.1" stroke={NIGHT} strokeWidth=".9" strokeLinecap="round" />
+          <path d="M84.8,96 Q90,99 95.2,96 L94.8,100.2 Q90,103.4 85.2,100.2 Z" fill="#d9a46a" {...thin} />
+          {["M85,88.6 Q83.6,91.6 85.4,93.4", "M95,88.6 Q96.4,91.6 94.6,93.4"].map((d) => (
+            <g key={d}>
+              <path d={d} fill="none" stroke={NIGHT} strokeWidth="3.4" strokeLinecap="round" />
+              <path d={d} fill="none" stroke={fur} strokeWidth="1.8" strokeLinecap="round" />
+            </g>
+          ))}
+          <path d="M86.4,75 C84.2,72 83.6,68 84.6,66 C86.8,67.6 88.2,71 88,74.4 Z M93.6,75 C95.8,72 96.4,68 95.4,66 C93.2,67.6 91.8,71 92,74.4 Z" fill={fur} {...line} />
+          <path d="M86.2,73.4 C85.2,71.6 84.9,69.4 85.3,68.2 C86.4,69.2 87.1,71.2 87,73 Z M93.8,73.4 C94.8,71.6 95.1,69.4 94.7,68.2 C93.6,69.2 92.9,71.2 93,73 Z" fill={light} />
+          <ellipse cx="90" cy="78.6" rx="5.4" ry="5.8" fill={fur} {...line} />
+          <ellipse cx="90" cy="81.4" rx="3.3" ry="2.5" fill={light} />
+          <path d="M88.8,79.8 Q90,79.2 91.2,79.8 Q90.6,81 90,81.1 Q89.4,81 88.8,79.8 Z" fill={NIGHT} />
+          <path d="M88.9,82.3 Q90,83.1 91.1,82.3" fill="none" stroke={NIGHT} strokeWidth=".8" strokeLinecap="round" />
+          {[87.6, 92.4].map((x) => (
+            <g key={x}>
+              <circle cx={x} cy="77.2" r="1" fill={NIGHT} />
+              <circle cx={x + 0.35} cy="76.85" r=".35" fill={CARD} />
+            </g>
+          ))}
         </>
       );
+    }
+    // Licorne assise, de face : corne dorée, crinière et queue arc-en-ciel, sabots dorés, éclats qui scintillent.
+    case "unicorn": {
+      const [coat, lilac, tail] = ["#f6effc", "#9b7be0", "M81.6,100.4 C77.4,101 75.2,98.2 76.4,95"];
+      return (
+        <>
+          <path d={tail} fill="none" stroke={NIGHT} strokeWidth="6.4" strokeLinecap="round" />
+          <path d={tail} fill="none" stroke={PINK} strokeWidth="4" strokeLinecap="round" />
+          <path d={tail} fill="none" stroke={SUN} strokeWidth="1.6" strokeLinecap="round" />
+          <ellipse cx="89" cy="97.4" rx="8" ry="7.6" fill={coat} {...line} />
+          <ellipse cx="85.4" cy="104" rx="2.6" ry="1.9" fill={SUN} {...thin} />
+          <ellipse cx="92.6" cy="104" rx="2.6" ry="1.9" fill={SUN} {...thin} />
+          <path d="M82.4,80 L81.2,73.6 L86.2,77.4 Z M95.6,80 L96.8,73.6 L91.8,77.4 Z" fill={coat} {...line} />
+          <path d="M83.1,78.4 L82.6,75.4 L85,77.2 Z M94.9,78.4 L95.4,75.4 L93,77.2 Z" fill={PINK} opacity=".7" />
+          <ellipse cx="89" cy="84.6" rx="8.2" ry="7.4" fill={coat} {...line} />
+          <circle cx="85.6" cy="78.4" r="2.3" fill={PINK} {...thin} />
+          <circle cx="92.4" cy="78.4" r="2.3" fill={lilac} {...thin} />
+          <path d="M86.9,78.2 L89,66.2 L91.1,78.2 Z" fill={SUN} {...thin} />
+          <path d="M87.3,75.4 L90.5,74.2 M87.8,72.6 L90.1,71.7 M88.3,69.8 L89.6,69.2" stroke="#c48a12" strokeWidth=".8" strokeLinecap="round" />
+          {[[96.6, 81.4, SUN], [97.4, 86, LEAF], [96.6, 90.4, "#4aa3df"]].map(([x, y, c]) => (
+            <circle key={y} cx={x} cy={y} r="2.4" fill={c} {...thin} />
+          ))}
+          <ellipse cx="89" cy="88.6" rx="4.8" ry="3" fill="#f9c9dd" />
+          <path d="M87.4,88.3 h.1 M90.6,88.3 h.1" stroke={NIGHT} strokeWidth="1" strokeLinecap="round" />
+          {[84.8, 93.2].map((x) => (
+            <g key={x}>
+              <ellipse cx={x} cy="83.6" rx="1.3" ry="1.6" fill={NIGHT} />
+              <circle cx={x + 0.45} cy="83" r=".5" fill={CARD} />
+            </g>
+          ))}
+          <circle cx="82.6" cy="86.8" r="1.4" fill={PINK} opacity=".45" />
+          <circle cx="95.2" cy="86.8" r="1.4" fill={PINK} opacity=".45" />
+          <path d={sparkle(98, 70.6, 2.3)} fill={SUN} {...twinkle(0)} />
+          <path d={sparkle(78.6, 77.8, 1.7)} fill={PINK} {...twinkle(1.5)} />
+          <path d={sparkle(101.8, 81.4, 1.5)} fill={SUN} {...twinkle(3)} />
+        </>
+      );
+    }
+    // Pigeon voyageur perché, de profil : cou irisé, œil orange, une lettre au bec.
     case "pigeon":
       return (
         <>
-          <ellipse cx="91" cy="99" rx="8.5" ry="9.5" fill="#9aa3ad" {...line} />
-          <path d="M84,92 Q91,95 97,91" fill="none" stroke="#7a5cc4" strokeWidth="3" />
-          <circle cx="88" cy="86" r="6" fill="#9aa3ad" {...line} />
-          <circle cx="87" cy="85" r="1.2" fill={FLUO} />
-          <path d="M83,86 L79,87.5 L83,89 Z" fill="#5c5647" {...thin} />
-          <rect x="74" y="86" width="8" height="6" fill={CARD} {...thin} />
-          <path d="M74,86 L78,89.5 L82,86" fill="none" stroke={NIGHT} strokeWidth=".9" />
+          <path d="M97.6,90.4 L104,94.2 L102.4,97.6 L96.4,94.6 Z" fill="#8a939e" {...thin} />
+          <path d="M101.9,93.3 L104,94.2 L102.4,97.6 L100.3,96.8 Z" fill={NIGHT} />
+          <path d="M88.6,95.2 l-.6,2.2 M91.8,96 l-.4,2.2" stroke="#e07a86" strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M87.6,75.8 C92,77 97,82 99.8,88.4 C100.6,90.4 100.4,92.6 98.6,94 C95.6,96.6 90.4,97.8 87,95.8 C83.4,93.6 82.2,88.6 83.4,83.8 C84,81.2 85.2,79 86.4,77.4 Z" fill="#a7b0ba" {...line} />
+          <path d="M84.4,79.6 C86.6,79.2 89.4,80.4 90.4,82.6 C89.2,85.6 86.4,88 83.2,88.4 C82.8,85.4 83.2,82 84.4,79.6 Z" fill="#4fae8e" />
+          <path d="M83.2,88.4 C86.4,88 89.2,85.6 90.4,82.6 C91.4,83.6 91.6,85 91,86.4 C89.6,89 86.6,90.6 83.8,90.6 Z" fill="#7a5cc4" />
+          <path d="M89.6,82.4 C94.4,82.6 98.8,86.8 101.4,93.2 C97.2,95.4 92.2,95 89.8,91.6 C88.4,89.4 88.4,85 89.6,82.4 Z" fill="#b6bec7" {...thin} />
+          <path d="M91.2,89.8 C93.4,90.6 95.2,91.6 96.4,93 M90.6,87.2 C92.8,88 94.8,89.2 96,90.6" fill="none" stroke={NIGHT} strokeWidth="1" strokeLinecap="round" />
+          <circle cx="85.2" cy="76.6" r="4.4" fill="#8f99a4" {...line} />
+          <circle cx="84" cy="75.8" r="1.35" fill={FLUO} />
+          <circle cx="83.9" cy="75.8" r=".6" fill={NIGHT} />
+          <g transform="rotate(-8 74.3 79.2)">
+            <rect x="70.3" y="76.4" width="8" height="5.4" fill={CARD} {...thin} />
+            <path d="M70.3,76.4 L74.3,79.4 L78.3,76.4" fill="none" stroke={NIGHT} strokeWidth=".9" strokeLinejoin="round" />
+            <circle cx="74.3" cy="79.4" r="1.1" fill="#d42a3a" />
+          </g>
+          <path d="M81.1,77 L77.6,78.2 L81.1,79.2 Z" fill="#5c5647" {...thin} />
+          <ellipse cx="81.5" cy="77.1" rx="1.1" ry=".65" fill={CARD} />
         </>
       );
     default:

@@ -48,7 +48,7 @@ const T = (iso) => Date.parse(iso);
   assert.ok(!p.badges.includes("marathon"));
   assert.equal(p.stats.dayStreak, 7);
   assert.equal(p.balance, p.xp - ITEM.get("cap").price - ITEM.get("bob").price);
-  const retired = ["chapka", "ski", "aviator", "binary", "hawaii"]; // retirés le 23/10/2026
+  const retired = ["chapka", "ski", "aviator", "binary", "hawaii", "llama"]; // retirés le 23/10/2026
   assert.equal(computeProgress([perfect, ...week], retired, ["ski"]).balance, p.xp, "articles retirés du catalogue : remboursés");
   assert.equal(p.level, levelOf(p.xp));
 

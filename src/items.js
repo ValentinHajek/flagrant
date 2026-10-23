@@ -68,10 +68,12 @@ export const ITEMS = [
 
   item("pet", "parrot", "Perroquet", 1200, 4, "rare"),
   item("pet", "cat", "Chat", 1200, 4, "rare"),
-  item("pet", "gecko", "Gecko", 1350, 5, "rare"),
+  item("pet", "dog", "Chien", 1200, 4, "rare"),
+  item("pet", "gecko", "Gecko", 1350, 5, "epique"),
+  item("pet", "frog", "Grenouille", 1500, 6, "epique"),
   item("pet", "penguin", "Pingouin", 1500, 6, "epique"),
   item("pet", "kangaroo", "Kangourou", 1800, 7, "epique"),
-  item("pet", "llama", "Lama", 2250, 9, "legendaire"),
+  item("pet", "unicorn", "Licorne", 2400, 9, "legendaire"),
   item("pet", "pigeon", "Pigeon voyageur", 1200, 1, "epique", "cartographe"),
 
   item("bg", "bg-sun", "Fond soleil", 90, 1, "commune"),
