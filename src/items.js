@@ -55,6 +55,7 @@ export const ITEMS = [
 
   item("pet", "parrot", "Perroquet", 1200, 4, "rare"),
   item("pet", "cat", "Chat", 1200, 4, "rare"),
+  item("pet", "gecko", "Gecko", 1350, 5, "rare"),
   item("pet", "penguin", "Pingouin", 1500, 6, "epique"),
   item("pet", "kangaroo", "Kangourou", 1800, 7, "epique"),
   item("pet", "llama", "Lama", 2250, 9, "legendaire"),
@@ -66,6 +67,7 @@ export const ITEMS = [
   item("bg", "bg-stamp", "Tampon de passeport", 600, 2, "rare"),
   item("bg", "bg-map", "Carte du monde", 750, 3, "rare"),
   item("bg", "bg-stars", "Ciel étoilé", 1200, 6, "epique"),
+  item("bg", "bg-rainbow", "Arc-en-ciel pailleté", 1500, 7, "epique"),
   item("bg", "bg-sunrise", "Lever de soleil", 0, 1, "legendaire", "assidu"),
 ];
 

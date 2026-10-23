@@ -16,6 +16,22 @@ const MULLET_HATTED = "M37,52 C34,34 45,26 60,26 C75,26 86,34 83,52 C80,43 75,38
 const MULLET_TOP = "M37,52 C33,30 45,17 60,18 C75,17 87,30 83,52 C80,43 75,38 67,38 C63,34 55,33 50,36 C44,38 40,44 37,52 Z";
 
 /* ---------- Fonds ---------- */
+// Étoile à 4 branches, la même que celle du ciel étoilé, centrée en (x, y), rayon s.
+const sparkle = (x, y, s) => {
+  const [a, b] = [s * 0.28, s * 0.72];
+  return `M${x},${y - s} l${a},${b} l${b},${a} l${-b},${a} l${-a},${b} l${-a},${-b} l${-b},${-a} l${b},${-a} Z`;
+};
+// Paillettes de l'arc-en-ciel : [x, y, taille] autour de la tête (le reste est caché par l'avatar).
+const GLITTER = [
+  [20, 30, 5.5], [99, 22, 5], [13, 64, 4.5], [107, 58, 5], [43, 9, 3.5], [79, 8, 3.5], [30, 46, 3], [92, 40, 3],
+  [23, 82, 3.5], [101, 79, 3], [61, 5, 2.2], [9, 44, 2.2], [111, 39, 2.2], [34, 21, 2], [87, 27, 2], [8, 79, 2],
+  [113, 73, 2], [51, 18, 1.8], [71, 17, 1.8], [26, 62, 2.2], [95, 63, 1.8], [16, 88, 2.4], [104, 90, 2], [39, 10, 1.6],
+];
+const GLITTER_DOTS = [
+  [28, 11], [69, 4], [16, 51], [104, 47], [38, 33], [84, 35], [6, 57], [114, 62], [19, 73], [99, 69], [47, 4], [92, 12],
+  [40, 26], [80, 25], [60, 13], [14, 36], [106, 30], [8, 68], [112, 51], [29, 90], [93, 92], [31, 72], [89, 77], [21, 19],
+];
+
 const BACKGROUNDS = {
   none: <rect width="120" height="120" fill={DEEP} />,
   "bg-sun": <rect width="120" height="120" fill={SUN} />,
@@ -49,6 +65,16 @@ const BACKGROUNDS = {
         <circle key={k} cx={x} cy={y} r={k % 3 ? 1 : 1.8} fill={k % 4 ? CARD : SUN} />
       ))}
       <path d="M86,30 l2,5 l5,2 l-5,2 l-2,5 l-2,-5 l-5,-2 l5,-2 Z" fill={SUN} />
+    </>
+  ),
+  "bg-rainbow": (
+    <>
+      <rect width="120" height="120" fill="#bfe3f4" />
+      {[FLUO, "#ffa12b", "#ffe14d", LEAF, INK, "#7a5cc4"].map((c, k) => (
+        <circle key={c} cx="60" cy="118" r={96 - k * 8} fill="none" stroke={c} strokeWidth="8.5" />
+      ))}
+      {GLITTER.map(([x, y, s], k) => <path key={k} d={sparkle(x, y, s)} fill={k % 3 ? CARD : SUN} />)}
+      {GLITTER_DOTS.map(([x, y], k) => <circle key={k} cx={x} cy={y} r={k % 2 ? 0.8 : 1.2} fill={CARD} />)}
     </>
   ),
   "bg-sunrise": (
@@ -462,6 +488,27 @@ function Pet({ id }) {
           <path d="M89,91 L90,92 L91,91" fill="none" stroke={FLUO} strokeWidth="1" />
         </>
       );
+    case "gecko": {
+      // Vu de dessus, accroché à l'épaule, tête vers le haut (repère local centré sur le ventre).
+      // Pattes et queue : un trait encre puis le même trait vert, plus fin, par-dessus (contour fin).
+      const limbs = "M-3,-4 L-8,-6 L-9,-10.5 M3,-4 L8,-6 L9,-10.5 M-3,4 L-8.5,2.5 L-10,6.5 M3,4 L8.5,2.5 L10,6.5 M0,7 C0,13 -3,15.5 -6.5,14.5 C-10,13.5 -10.5,9 -8,8.2 C-6,7.6 -5,9.2 -6.2,10.6";
+      return (
+        <g transform="translate(88 91) rotate(15)">
+          <path d={limbs} fill="none" stroke={NIGHT} strokeWidth="5.4" strokeLinecap="round" strokeLinejoin="round" />
+          <path d={limbs} fill="none" stroke={LEAF} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          {[[-9, -10.5], [9, -10.5], [-10, 6.5], [10, 6.5]].map(([x, y]) => <circle key={`${x}${y}`} cx={x} cy={y} r="1.9" fill={LEAF} {...thin} />)}
+          <ellipse cx="0" cy="0.5" rx="4.8" ry="8.5" fill={LEAF} {...line} />
+          <ellipse cx="0" cy="-12.5" rx="5.4" ry="6" fill={LEAF} {...line} />
+          {[-4, 4].map((x) => (
+            <g key={x}>
+              <circle cx={x} cy="-14" r="2.3" fill={SUN} {...thin} />
+              <ellipse cx={x} cy="-14" rx=".6" ry="1.6" fill={NIGHT} />
+            </g>
+          ))}
+          {[[0, -3], [-1.8, 1.5], [1.8, 4.5]].map(([x, y]) => <circle key={y} cx={x} cy={y} r="1.1" fill={FLUO} />)}
+        </g>
+      );
+    }
     case "penguin":
       return (
         <>
