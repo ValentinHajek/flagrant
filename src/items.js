@@ -25,11 +25,13 @@ export const ITEMS = [
   item("hat", "beret", "Béret", 360, 2, "commune"),
   item("hat", "beanie", "Bonnet à pompon", 450, 3, "rare"),
   item("hat", "cowboy", "Chapeau de cowboy", 750, 4, "rare"),
-  item("hat", "chapka", "Chapka", 900, 5, "rare"),
+  item("hat", "flowers", "Couronne de fleurs", 900, 5, "rare"),
   item("hat", "tophat", "Haut-de-forme", 1350, 7, "epique"),
+  item("hat", "beer", "Casque à bière", 2700, 9, "legendaire"),
   item("hat", "crown", "Couronne", 3000, 10, "legendaire"),
   item("hat", "laurel", "Couronne de laurier", 1200, 1, "epique", "sans-faute"),
   item("hat", "pilot", "Casque d'aviateur", 1200, 1, "epique", "pile-poil"),
+  item("hat", "space-helmet", "Casque d'astronaute", 1200, 1, "epique", "centurion"),
 
   item("glasses", "round", "Lunettes rondes", 180, 1, "commune"),
   item("glasses", "aviator", "Aviateur", 450, 2, "rare"),
@@ -86,12 +88,13 @@ export const BASE = {
     ["mulet", "Mulet"],
     ["chauve", "Chauve"],
   ],
-  hairColor: ["#17140d", "#5a3a22", "#b5652b", "#e8c25a", "#d9d2c4", "#2340c4"],
+  hairColor: ["#17140d", "#5a3a22", "#b5652b", "#e8c25a", "#d9d2c4", "#2340c4", "#d42a3a", "#f27ab0"],
   eyes: [
     ["ronds", "Ronds"],
     ["rieurs", "Rieurs"],
     ["decides", "Décidés"],
     ["clin", "Clin d'œil"],
+    ["pas-content", "Pas content"],
   ],
 };
 

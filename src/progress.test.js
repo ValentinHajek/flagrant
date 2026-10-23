@@ -48,6 +48,7 @@ const T = (iso) => Date.parse(iso);
   assert.ok(!p.badges.includes("marathon"));
   assert.equal(p.stats.dayStreak, 7);
   assert.equal(p.balance, p.xp - ITEM.get("cap").price - ITEM.get("bob").price);
+  assert.equal(computeProgress([perfect, ...week], ["chapka"]).balance, p.xp, "article retiré du catalogue (la chapka) : remboursé");
   assert.equal(p.level, levelOf(p.xp));
 
   // Achats : raisons de refus, dans l'ordre où le joueur les comprend
@@ -140,9 +141,9 @@ for (const i of ITEMS.filter((i) => i.badge)) assert.ok(BADGE.has(i.badge) && i.
 
 // Tenue : valeurs inconnues et articles non possédés écartés
 assert.deepEqual(cleanLook({ skin: "<script>", hat: "crown", glasses: "round", top: "cap" }, ["round", "cap"]), { ...DEFAULT_LOOK, glasses: "round" });
-// 8 coupes et 4 expressions, acceptées telles quelles (le serveur valide avec la même fonction)
+// 8 coupes et 5 regards, acceptés tels quels (le serveur valide avec la même fonction)
 assert.equal(BASE.hair.length, 8);
-assert.equal(BASE.eyes.length, 4);
-assert.deepEqual(cleanLook({ hair: "chauve", eyes: "clin" }, []), { ...DEFAULT_LOOK, hair: "chauve", eyes: "clin" });
+assert.equal(BASE.eyes.length, 5);
+assert.deepEqual(cleanLook({ hair: "chauve", eyes: "pas-content", hairColor: "#f27ab0" }, []), { ...DEFAULT_LOOK, hair: "chauve", eyes: "pas-content", hairColor: "#f27ab0" });
 assert.equal(cleanLook({ hair: "rase" }, []).hair, DEFAULT_LOOK.hair, "l'ancienne coupe Rasé (remplacée par le mulet) revient à la coupe par défaut");
 console.log("progress OK");

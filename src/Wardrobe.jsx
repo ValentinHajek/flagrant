@@ -10,7 +10,7 @@ import { sound } from "./sound.js";
 
 const card = "rounded-[20px] border-[2.5px] border-night bg-paper";
 const TABS = [["base", "Toi"], ...SLOTS];
-const HAIR_COLORS = ["Noir", "Châtain", "Roux", "Blond", "Gris", "Bleu"];
+const HAIR_COLORS = ["Noir", "Châtain", "Roux", "Blond", "Gris", "Bleu", "Rouge", "Rose"];
 
 // Barre d'expérience du niveau en cours. from : remplissage de départ (0 à 1), pour l'animer après une partie.
 export function XpBar({ progress: p, from, delay = 0 }) {
@@ -92,6 +92,8 @@ export default function Wardrobe({ profile, setProfile, progress, focus, onBack,
   // Gains de la roue pas encore récupérés (l'enregistrement a échoué) : un article au choix dans la rareté gagnée.
   const bons = Object.entries(progress.vouchers).filter(([r, n]) => n > 0 && ITEMS.some((i) => i.rarity === r && !i.badge && !owned.includes(i.id)));
   const preview = tried ? { ...look, [tried.slot]: tried.id } : look;
+  // Vignettes des boucles sans chapeau : le casque d'astronaute cache les oreilles
+  const shown = tab === "earrings" ? { ...look, hat: null } : look;
 
   const wear = (change) => {
     const next = { ...profile, look: { ...look, ...change } };
@@ -126,7 +128,7 @@ export default function Wardrobe({ profile, setProfile, progress, focus, onBack,
           <Logo size={30} />
         </button>
         <Kicker>
-          {owned.length} / {ITEMS.length} articles
+          {ITEMS.filter((i) => owned.includes(i.id)).length} / {ITEMS.length} articles
         </Kicker>
         <button
           onClick={onBadges}
@@ -247,7 +249,7 @@ export default function Wardrobe({ profile, setProfile, progress, focus, onBack,
                     ))}
                   </div>
                 </Field>
-                <Field label="Expression">
+                <Field label="Regard">
                   <div className={grid}>
                     {BASE.eyes.map(([id, label]) => (
                       <Choice key={id} look={{ ...look, eyes: id, glasses: null }} label={label} selected={look.eyes === id} onClick={() => wear({ eyes: id })} />
@@ -257,13 +259,13 @@ export default function Wardrobe({ profile, setProfile, progress, focus, onBack,
               </div>
             ) : (
               <div className={grid}>
-                <Choice look={{ ...look, [tab]: null }} label="Rien" selected={!look[tab]} onClick={() => wear({ [tab]: null })} />
+                <Choice look={{ ...shown, [tab]: null }} label="Rien" selected={!look[tab]} onClick={() => wear({ [tab]: null })} />
                 {ITEMS.filter((i) => i.slot === tab).map((it) => {
                   const has = owned.includes(it.id);
                   const lock = !has && lockOf(it, progress);
                   const bon = !has && !it.badge && progress.vouchers[it.rarity] > 0;
                   return (
-                    <Choice key={it.id} look={{ ...look, [tab]: it.id }} label={it.name} selected={look[tab] === it.id} trying={trying === it.id} onClick={() => pick(it)}>
+                    <Choice key={it.id} look={{ ...shown, [tab]: it.id }} label={it.name} selected={look[tab] === it.id} trying={trying === it.id} onClick={() => pick(it)}>
                       <span className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${RARITY[it.rarity].color}`}>{RARITY[it.rarity].label}</span>
                       {look[tab] === it.id ? (
                         <span className="rounded-full bg-ink px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-paper">Porté</span>

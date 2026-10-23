@@ -3,7 +3,7 @@ import { useId } from "react";
 import { DEFAULT_LOOK } from "./items.js";
 
 const INK = "#2340c4", FLUO = "#ff5a1e", LEAF = "#00a95c", SUN = "#f2b632", NIGHT = "#17140d";
-const PAPER = "#f1ecdd", DEEP = "#e7e0cc", CARD = "#fffaf0";
+const PAPER = "#f1ecdd", DEEP = "#e7e0cc", CARD = "#fffaf0", PINK = "#f27ab0";
 const line = { stroke: NIGHT, strokeWidth: 2.2, strokeLinejoin: "round", strokeLinecap: "round" };
 const thin = { ...line, strokeWidth: 1.2 };
 
@@ -257,8 +257,15 @@ function Face({ eyes, mood }) {
       <circle cx={x + 0.9} cy="54" r=".8" fill={CARD} />
     </g>
   );
+  // Pas content : la paupière cache le haut de l'œil
+  const lidded = (x) => (
+    <g key={x}>
+      <path d={`M${x - 2.7},55 A2.7,2.7 0 0 0 ${x + 2.7},55 Z`} fill={NIGHT} />
+      <path d={`M${x - 3.8},54.6 H${x + 3.8}`} {...line} />
+    </g>
+  );
   // Yeux gauche puis droit ; clin d'œil = l'œil gauche fermé
-  const [left, right] = eyes === "rieurs" ? [closed, closed] : eyes === "clin" ? [closed, open] : [open, open];
+  const [left, right] = eyes === "rieurs" ? [closed, closed] : eyes === "clin" ? [closed, open] : eyes === "pas-content" ? [lidded, lidded] : [open, open];
   return (
     <>
       <circle cx="45" cy="63" r="3.6" fill={FLUO} opacity=".35" />
@@ -266,8 +273,12 @@ function Face({ eyes, mood }) {
       {left(51)}
       {right(69)}
       {eyes === "decides" && <path d="M45,48 L55,50 M75,48 L65,50" {...line} />}
+      {eyes === "pas-content" && <path d="M45,47 L55,51 M75,47 L65,51" {...line} />}
+      {/* Pas content : il boude même après une bonne partie */}
       {mood === "sad" ? (
         <path d="M53,70 Q60,63 67,70" fill="none" {...line} />
+      ) : eyes === "pas-content" ? (
+        <path d="M55,69.5 Q60,66 65,69.5" fill="none" {...line} />
       ) : mood === "neutral" ? (
         <path d="M54,67 Q60,69 66,67" fill="none" {...line} />
       ) : (
@@ -369,6 +380,13 @@ function Glasses({ id }) {
 }
 
 /* ---------- Chapeaux (haut du crâne vers y = 30) ---------- */
+// Feuille en amande, de (x, y) vers l'angle deg (degrés, sens de l'écran), longueur len, largeur ≈ w.
+const leaf = (x, y, deg, len, w) => {
+  const [dx, dy] = [Math.cos((deg * Math.PI) / 180), Math.sin((deg * Math.PI) / 180)];
+  const [mx, my] = [x + (dx * len) / 2, y + (dy * len) / 2];
+  return `M${x},${y} Q${mx - dy * w},${my + dx * w} ${x + dx * len},${y + dy * len} Q${mx + dy * w},${my - dx * w} ${x},${y} Z`;
+};
+
 function Hat({ id }) {
   switch (id) {
     case "cap":
@@ -380,12 +398,13 @@ function Hat({ id }) {
           <circle cx="60" cy="21" r="2" fill={FLUO} {...thin} />
         </>
       );
+    // Calotte aussi large que la tête, bord qui tombe tout autour
     case "bob":
       return (
         <>
-          <path d="M41,40 C42,24 78,24 79,40 Z" fill={SUN} {...line} />
-          <path d="M41,37 Q60,33 79,37 L79,41 Q60,37 41,41 Z" fill={INK} />
-          <path d="M28,43 Q60,34 92,43 Q90,50 60,48 Q30,50 28,43 Z" fill={SUN} {...line} />
+          <path d="M38,44 C37,29 45,22 60,22 C75,22 83,29 82,44 Z" fill={SUN} {...line} />
+          <path d="M38.5,36 Q60,32 81.5,36 L82,42 Q60,38 38,42 Z" fill={INK} />
+          <path d="M38,42 Q60,38 82,42 Q91,44 96,49 Q60,52 24,49 Q29,44 38,42 Z" fill={SUN} {...line} />
         </>
       );
     case "beret":
@@ -404,23 +423,44 @@ function Hat({ id }) {
           <circle cx="60" cy="15" r="6" fill={CARD} {...line} />
         </>
       );
+    // Calotte pincée aussi large que la tête
     case "cowboy":
       return (
         <g transform="translate(0 -4)">
-          <path d="M44,45 C44,22 52,19 60,24 C68,19 76,22 76,45 Z" fill="#b07a45" {...line} />
-          <path d="M44,33 H76 V38 H44 Z" fill={NIGHT} />
+          <path d="M40,45 C39,24 50,17 60,23 C70,17 81,24 80,45 Z" fill="#b07a45" {...line} />
+          <path d="M40.7,34 H79.3 L80,39 H40 Z" fill={NIGHT} />
           <path d="M22,38 Q30,46 60,44 Q90,46 98,38 Q94,51 60,50 Q26,51 22,38 Z" fill="#b07a45" {...line} />
         </g>
       );
-    case "chapka":
+    case "flowers": {
+      // Fleurs le long d'un arc sur le haut de la tête, la plus grosse au milieu, feuilles entre elles.
+      const at = (t) => [37 * (1 - t) ** 2 + 120 * t * (1 - t) + 83 * t * t, 45 * (1 - t) ** 2 + 30 * t * (1 - t) + 45 * t * t];
+      const blooms = [[0.04, FLUO, 4.8], [0.27, CARD, 5.4], [0.5, PINK, 6.2], [0.73, CARD, 5.4], [0.96, FLUO, 4.8]];
       return (
         <>
-          <path d="M34,42 L32,64 Q36,68 41,63 L41,44 Z" fill={DEEP} {...line} />
-          <path d="M86,42 L88,64 Q84,68 79,63 L79,44 Z" fill={DEEP} {...line} />
-          <path d="M38,40 C38,24 48,18 60,18 C72,18 82,24 82,40 Z" fill="#7a4e2d" {...line} />
-          <path d="M35,42 Q60,33 85,42 L85,47 Q60,39 35,47 Z" fill={DEEP} {...line} />
+          {[0.15, 0.39, 0.61, 0.85].map((t, k) => {
+            const [x, y] = at(t);
+            const out = (Math.atan2(y - 54, x - 60) * 180) / Math.PI; // vers l'extérieur de la tête
+            return <path key={t} d={leaf(x, y, out + (k % 2 ? 30 : -30), 8.5, 5)} fill={LEAF} {...thin} />;
+          })}
+          {blooms.map(([t, color, r], k) => {
+            const [x, y] = at(t);
+            const petals = [0, 1, 2, 3, 4].map((j) => {
+              const a = ((k * 17 - 90 + j * 72) * Math.PI) / 180;
+              return [x + Math.cos(a) * r * 0.62, y + Math.sin(a) * r * 0.62];
+            });
+            // Contour puis remplissage par-dessus : un seul trait autour de la fleur
+            return (
+              <g key={t}>
+                {petals.map(([px, py], j) => <circle key={j} cx={px} cy={py} r={r * 0.55} fill={color} {...thin} />)}
+                {petals.map(([px, py], j) => <circle key={`f${j}`} cx={px} cy={py} r={r * 0.55} fill={color} />)}
+                <circle cx={x} cy={y} r={r * 0.36} fill={color === SUN ? FLUO : SUN} {...thin} />
+              </g>
+            );
+          })}
         </>
       );
+    }
     case "tophat":
       return (
         <>
@@ -439,14 +479,21 @@ function Hat({ id }) {
         </>
       );
     case "laurel": {
-      const leaves = Array.from({ length: 6 }, (_, k) => 200 + k * 13);
-      const leaf = (deg, side) => {
-        const a = (deg * Math.PI) / 180;
-        const x = 60 + side * Math.cos(a) * 25;
-        const y = 50 + Math.sin(a) * 25;
-        return <ellipse key={`${side}${deg}`} cx={x} cy={y} rx="5" ry="2.4" transform={`rotate(${side * (deg - 90)} ${x} ${y})`} fill={LEAF} {...thin} />;
-      };
-      return <>{leaves.map((d) => leaf(d, 1))}{leaves.map((d) => leaf(d, -1))}<circle cx="60" cy="25" r="2" fill={SUN} {...thin} /></>;
+      // Laurier doré : une branche par côté, de la tempe au haut du front, feuilles alternées dehors / dedans
+      // (degrés sur un cercle autour de la tête ; la branche de droite est celle de gauche en miroir).
+      const p = (deg) => [60 + 26 * Math.cos((deg * Math.PI) / 180), 52 + 26 * Math.sin((deg * Math.PI) / 180)];
+      const leaves = [166, 180.5, 195, 209.5, 224, 238.5, 253].flatMap((deg, k) => {
+        const [x, y] = p(deg);
+        return [leaf(x, y, deg + 58, 11.5 - k * 0.6, 4.4), leaf(x, y, deg + 122, 11.5 - k * 0.6, 4.4)];
+      });
+      const branch = (
+        <>
+          <path d={`M${p(160)} A26,26 0 0 1 ${p(260)}`} fill="none" stroke={NIGHT} strokeWidth="1.6" strokeLinecap="round" />
+          {leaves.map((d, k) => <path key={k} d={d} fill={SUN} {...thin} />)}
+          <path d={leaf(...p(260), 350, 7, 4)} fill={SUN} {...thin} />
+        </>
+      );
+      return <>{branch}<g transform="translate(120 0) scale(-1 1)">{branch}</g></>;
     }
     case "pilot":
       return (
@@ -457,6 +504,42 @@ function Hat({ id }) {
           <circle cx="69" cy="34" r="6" fill="#9fd3e6" stroke={SUN} strokeWidth="2.2" />
         </>
       );
+    // Coque blanche autour de la tête (les cheveux restent dedans), visière teintée avec un reflet, col sur le cou
+    case "space-helmet":
+      return (
+        <>
+          <path d="M29,53 a31,31 0 1,0 62,0 a31,31 0 1,0 -62,0 Z M40,58 a20,17 0 1,0 40,0 a20,17 0 1,0 -40,0 Z" fillRule="evenodd" fill="#f4f4f4" {...line} />
+          <ellipse cx="60" cy="58" rx="20" ry="17" fill="#9fd3e6" fillOpacity=".15" />
+          <path d="M44,52 Q47,45 55,43" fill="none" stroke={CARD} strokeWidth="2.4" strokeLinecap="round" />
+          <path d="M80,32 Q87,40 88,52" fill="none" stroke={DEEP} strokeWidth="3" strokeLinecap="round" />
+          <ellipse cx="60" cy="85" rx="18" ry="5" fill="#c9c9c9" {...line} />
+          <circle cx="35" cy="45" r="2.6" fill={FLUO} {...thin} />
+        </>
+      );
+    // Une canette de chaque côté (la droite est la gauche en miroir), les tuyaux descendent jusqu'à la bouche
+    case "beer": {
+      const tube = "M26,42 C24,56 36,69 53,68";
+      const can = (
+        <>
+          <path d={tube} fill="none" stroke={NIGHT} strokeWidth="4" strokeLinecap="round" />
+          <path d={tube} fill="none" stroke="#ffd66b" strokeWidth="2" strokeLinecap="round" />
+          <rect x="30" y="30" width="8" height="5" fill={NIGHT} />
+          <rect x="20" y="23" width="12" height="19" rx="2.5" fill={SUN} />
+          <path d="M20,30 H32 V35 H20 Z" fill={FLUO} />
+          <rect x="20" y="23" width="12" height="19" rx="2.5" fill="none" {...line} />
+          <ellipse cx="26" cy="23.5" rx="5" ry="1.6" fill={DEEP} {...thin} />
+        </>
+      );
+      return (
+        <>
+          {can}
+          <g transform="translate(120 0) scale(-1 1)">{can}</g>
+          <path d="M37,45 C36,25 47,17 60,17 C73,17 84,25 83,45 Z" fill={INK} {...line} />
+          <path d="M35,42 Q60,36 85,42 L85,47 Q60,41 35,47 Z" fill="#16299e" {...line} />
+          <path d="M48,22 Q60,18 72,22" fill="none" stroke={CARD} strokeWidth="2.2" strokeLinecap="round" opacity=".55" />
+        </>
+      );
+    }
     default:
       return null;
   }
@@ -578,26 +661,24 @@ function Pet({ id }) {
 
 // mood : "happy" | "neutral" | "sad". mirror : tourné vers la gauche (pour le face-à-face en duel).
 // Sans title, l'avatar est décoratif (à côté d'un pseudo, dans un bouton déjà nommé…).
-// Chapeaux à bord dont la calotte est plus étroite que le dessus des cheveux longs : ils s'arrêtent sous le bord (y).
-const BRIM = { bob: 44, cowboy: 40, tophat: 36 };
+// Couvre-chefs que les cheveux ne doivent pas traverser, quelle que soit la coupe : on ne garde que les cheveux
+// sous le bord ou le haut du chapeau (y), ou dans le casque d'astronaute ; le reste serait caché par le chapeau.
+const below = (y) => <rect y={y} width="120" height={120 - y} />;
+const HAIR_CLIP = { cap: below(23), bob: below(44), cowboy: below(40), tophat: below(36), pilot: below(23), beer: below(19), "space-helmet": <circle cx="60" cy="53" r="31" /> };
 
 export default function Avatar({ look = DEFAULT_LOOK, size = 96, mood = "happy", mirror = false, className = "", title }) {
   const clip = useId();
   const hairClip = useId();
   const l = { ...DEFAULT_LOOK, ...look };
-  const brim = (l.hair === "long" || l.hair === "mi-long") && BRIM[l.hat]; // les autres coupes tiennent déjà sous la calotte
-  const hair = (el) => (brim ? <g clipPath={`url(#${hairClip})`}>{el}</g> : el);
+  const hatClip = HAIR_CLIP[l.hat];
+  const hair = (el) => (hatClip ? <g clipPath={`url(#${hairClip})`}>{el}</g> : el);
   return (
     <svg viewBox="0 0 120 120" width={size} height={size} className={`shrink-0 ${className}`} role={title ? "img" : undefined} aria-label={title} aria-hidden={!title}>
       <circle cx="63" cy="63" r="57" fill={FLUO} opacity=".9" />
       <clipPath id={clip}>
         <circle cx="60" cy="60" r="57" />
       </clipPath>
-      {brim && (
-        <clipPath id={hairClip}>
-          <rect x="0" y={brim} width="120" height={120 - brim} />
-        </clipPath>
-      )}
+      {hatClip && <clipPath id={hairClip}>{hatClip}</clipPath>}
       <g clipPath={`url(#${clip})`}>
         <g transform={mirror ? "translate(120 0) scale(-1 1)" : undefined}>
           {BACKGROUNDS[l.bg] ?? BACKGROUNDS.none}
