@@ -21,14 +21,16 @@ export async function api(path, { method = "GET", body } = {}) {
   return data;
 }
 
-// Envoie les parties jouées sur cet appareil (une seule fois) puis rapatrie celles jouées ailleurs.
+// Envoie les parties jouées sur cet appareil (une seule fois, puis une autre si elle a été révisée depuis)
+// et rapatrie celles jouées ailleurs. Le serveur fait foi pour les parties qu'il a (révision faite sur un autre appareil).
 export async function syncHistory() {
   const local = loadHistory();
   const sent = new Set(load("synced", []));
-  const todo = local.filter((g) => !sent.has(g.id));
+  const key = (g) => (g.revisedAt ? `${g.id}:revision` : g.id);
+  const todo = local.filter((g) => !sent.has(key(g)));
   if (todo.length) await api("/games", { method: "POST", body: { games: todo } });
   const { games } = await api("/games");
-  const merged = new Map([...games, ...local].map((g) => [g.id, g]));
+  const merged = new Map([...local, ...games].map((g) => [g.id, g]));
   saveHistory([...merged.values()].sort((a, b) => a.at - b.at));
-  save("synced", [...merged.keys()]);
+  save("synced", [...merged.values()].map(key));
 }

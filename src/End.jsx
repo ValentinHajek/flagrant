@@ -6,7 +6,8 @@ import { DuelResult } from "./Duels.jsx";
 import { InkTitle, Kicker, Stamp, Tampon } from "./brand.jsx";
 import { fmtKm } from "./geo.js";
 import { ITEMS } from "./items.js";
-import { BADGE } from "./progress.js";
+import { BADGE, WHEELS } from "./progress.js";
+import { WheelSpin } from "./Quest.jsx";
 import { PTS_CASH, flagUrl } from "./quiz.js";
 import { sound } from "./sound.js";
 import { XpBar } from "./Wardrobe.jsx";
@@ -124,13 +125,16 @@ function BadgeUnlocked({ badges, look }) {
 }
 
 // Ce que la partie rapporte : tampons (détail des bonus), expérience, badges et articles débloqués.
-function Rewards({ reward: { before, after, gain }, badges, look, mood, onWardrobe, onBadges }) {
+// won : article gagné à la roue de la quête.
+function Rewards({ reward: { before, after, gain }, badges, won, look, mood, onWardrobe, onBadges }) {
   const unlocked = ITEMS.filter((i) => (i.badge ? badges.some((b) => b.id === i.badge) : i.level > before.level && i.level <= after.level));
   const lines = [
     ["Score", gain.score],
     ["Bonus sans-faute", gain.perfect],
     ["Bonus série", gain.streak],
     ["Tampon du jour", gain.daily],
+    ["Quête du jour", gain.quest],
+    ...(gain.spin?.prize ? [[WHEELS[gain.spin.wheel].name, gain.spin.prize]] : []),
     ...badges.map((b) => [`Badge « ${b.name} »`, b.reward]),
   ].filter(([, n]) => n > 0);
   const total = lines.reduce((t, [, n]) => t + n, 0);
@@ -166,6 +170,7 @@ function Rewards({ reward: { before, after, gain }, badges, look, mood, onWardro
           </div>
           <p className="text-sm font-medium text-muted">
             {lines.length ? lines.map(([label, n]) => `${label} +${n}`).join(" · ") : "Pas de tampon cette fois. La prochaine sera la bonne !"}
+            {won && ` · ${WHEELS[gain.spin.wheel].name} : ${won.name}`}
           </p>
         </div>
       </div>
@@ -198,7 +203,7 @@ function Rewards({ reward: { before, after, gain }, badges, look, mood, onWardro
   );
 }
 
-export default function End({ results, all = [], best, isRecord, reward, duel, practice, look, onAgain, onPractise, onMenu, onStats, onWardrobe, onBadges }) {
+export default function End({ results, all = [], best, isRecord, reward, duel, practice, look, owned, onWin, onAgain, onPractise, onMenu, onStats, onWardrobe, onBadges }) {
   const bonus = results.reduce((s, r) => s + (r.bonus ?? 0), 0);
   const score = results.reduce((s, r) => s + r.points, 0) + bonus;
   const max = results.length * PTS_CASH;
@@ -207,6 +212,22 @@ export default function End({ results, all = [], best, isRecord, reward, duel, p
   const zoomRef = useRef(null);
   const newBadges = reward ? reward.after.badges.filter((id) => !reward.before.badges.includes(id)).map((id) => BADGE.get(id)) : [];
   const [zoom, setZoom] = useState(null); // { country, type } : la réponse donnée, affichée en grand
+  // Partie qui boucle la quête du jour : la roue d'abord, puis les tampons (sinon le gain serait dévoilé avant le tour).
+  const spin = reward?.gain?.spin;
+  const [spun, setSpun] = useState(!spin);
+  const [won, setWon] = useState(null);
+  const wheel = spin && (
+    <WheelSpin
+      spin={spin}
+      look={look}
+      owned={owned}
+      onWin={onWin}
+      onClose={(gift) => {
+        setWon(gift);
+        setSpun(true);
+      }}
+    />
+  );
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -216,7 +237,7 @@ export default function End({ results, all = [], best, isRecord, reward, duel, p
   // Un seul son par écran de fin : le badge (joué à l'ouverture de sa fenêtre), sinon le niveau, le record ou le score posé,
   // calés sur les tampons « Niveau » (1,7 s) et « Record » ou la fin du décompte (1,1 s).
   useEffect(() => {
-    if (newBadges.length) return;
+    if (newBadges.length || spin) return; // la fenêtre du badge ou de la roue a son propre son
     const levelUp = reward && reward.after.level > reward.before.level;
     const t = setTimeout(() => sound(levelUp ? "niveau" : isRecord ? "record" : "fin"), levelUp ? 1750 : 1150);
     return () => clearTimeout(t);
@@ -245,6 +266,9 @@ export default function End({ results, all = [], best, isRecord, reward, duel, p
             Tout trouvé du premier coup en {practice} tour{practice > 1 ? "s" : ""}. Juste de l'entraînement : ça ne compte pas dans les stats.
           </p>
         </div>
+        {/* Révision qui boucle la quête du jour */}
+        {reward && spun && <Rewards reward={reward} badges={[]} won={won} look={look} mood="happy" onWardrobe={onWardrobe} onBadges={onBadges} />}
+        {wheel}
         {buttons}
       </div>
     );
@@ -298,8 +322,9 @@ export default function End({ results, all = [], best, isRecord, reward, duel, p
         ))}
       </div>
 
-      {reward && <Rewards reward={reward} badges={newBadges} look={look} mood={score / max >= 0.6 ? "happy" : score / max >= 0.3 ? "neutral" : "sad"} onWardrobe={onWardrobe} onBadges={onBadges} />}
-      {newBadges.length > 0 && <BadgeUnlocked badges={newBadges} look={look} />}
+      {reward && spun && <Rewards reward={reward} badges={newBadges} won={won} look={look} mood={score / max >= 0.6 ? "happy" : score / max >= 0.3 ? "neutral" : "sad"} onWardrobe={onWardrobe} onBadges={onBadges} />}
+      {wheel}
+      {spun && newBadges.length > 0 && <BadgeUnlocked badges={newBadges} look={look} />}
 
       {buttons}
       {misses > 0 && (

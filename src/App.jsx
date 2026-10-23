@@ -6,12 +6,12 @@ import Game from "./Game.jsx";
 import { API_ENABLED, api, getSession, setSession, syncHistory } from "./api.js";
 import { parseWorld } from "./geo.js";
 import Home from "./Home.jsx";
-import { loadProfile, saveProfile, syncProfile } from "./profile.js";
+import { buyItem, loadProfile, saveProfile, syncProfile } from "./profile.js";
 import { computeProgress } from "./progress.js";
 import Stats from "./Stats.jsx";
 import { COUNTS, DEFAULT_COUNT, DUEL_MAX, MODES, PTS_CASH, buildQuiz, fromSeries, shuffle, toSeries, total } from "./quiz.js";
 import { sound } from "./sound.js";
-import { loadHistory, recordGame, toEntry, withLocalPlays } from "./stats.js";
+import { loadHistory, recordGame, saveHistory, toEntry, withLocalPlays } from "./stats.js";
 import { bestKey, load, save } from "./storage.js";
 import Wardrobe from "./Wardrobe.jsx";
 
@@ -46,7 +46,7 @@ export default function App() {
   const [history, setHistory] = useState(loadHistory);
   const [profile, setProfileState] = useState(loadProfile);
   // shortcut: l'XP se recalcule sur les 500 dernières parties gardées en local ; au-delà, stocker le total d'XP.
-  const progress = useMemo(() => computeProgress(history, profile.owned), [history, profile.owned]);
+  const progress = useMemo(() => computeProgress(history, profile.owned, profile.vouchered), [history, profile.owned, profile.vouchered]);
 
   const setProfile = (p) => {
     setProfileState(p);
@@ -153,20 +153,35 @@ export default function App() {
     setServerDuels((list) => list.map((x) => (x.id === duel.id ? { ...x, declined: true } : x)));
   };
 
-  // Révision : on rejoue les erreurs (et les carrés) en boucle jusqu'à tout trouver du premier coup. Ne compte nulle part.
-  const practise = (results, round = 1) => {
+  // Révision : on rejoue les erreurs (et les carrés) en boucle jusqu'à tout trouver du premier coup. Ne compte nulle part,
+  // sauf pour la quête du jour. source : id de la partie révisée.
+  const practise = (results, round = 1, source = end?.game) => {
     const questions = shuffle(results.filter((r) => r.points < PTS_CASH).map(({ country, type }) => ({ country, type })));
     if (!questions.length) {
-      setEnd({ results, practice: round - 1 });
+      setEnd({ results, practice: round - 1, reward: revised(source) });
       return setScreen("end");
     }
     sound("depart");
-    setQuiz({ scope: quiz.scope, questions, id: Date.now(), practice: round });
+    setQuiz({ scope: quiz.scope, questions, id: Date.now(), practice: round, source });
     setScreen("game");
   };
 
+  // Révision finie : datée sur sa partie (une seule fois) et envoyée au serveur. Renvoie le gain si elle boucle la quête.
+  const revised = (id) => {
+    const games = loadHistory();
+    const g = games.find((x) => x.id === id);
+    if (!g || g.revisedAt) return null;
+    g.revisedAt = Date.now();
+    saveHistory(games);
+    setHistory(games);
+    if (getSession()) syncHistory().catch(() => {}); // sinon, ce sera envoyé à la prochaine synchro
+    const after = computeProgress(games, profile.owned, profile.vouchered);
+    const gain = after.perGame.get(`${id}:revision`);
+    return gain ? { before: progress, after, gain } : null;
+  };
+
   const finish = (results) => {
-    if (quiz.practice) return practise(results, quiz.practice + 1);
+    if (quiz.practice) return practise(results, quiz.practice + 1, quiz.source);
     const { duel } = quiz;
     // Un défi se range avec les parties de son mode, même s'il diffère des réglages de l'accueil.
     const game = duel ? { mode: duel.mode, territories: duel.territories, count: results.length } : settings;
@@ -179,8 +194,8 @@ export default function App() {
     const next = loadHistory();
     setHistory(next);
     if (getSession()) syncHistory().then(() => duel && refreshDuels()).catch(() => {}); // sinon, ce sera envoyé à la prochaine synchro
-    const after = computeProgress(next, profile.owned);
-    setEnd({ results, best, isRecord: score > best && score > 0, reward: { before: progress, after, gain: after.perGame.get(entry.id) }, duel });
+    const after = computeProgress(next, profile.owned, profile.vouchered);
+    setEnd({ results, best, isRecord: score > best && score > 0, reward: { before: progress, after, gain: after.perGame.get(entry.id) }, duel, game: entry.id });
     setScreen("end");
   };
 
@@ -217,6 +232,8 @@ export default function App() {
                   {...end}
                   all={all}
                   look={profile.look}
+                  owned={profile.owned}
+                  onWin={(id) => buyItem(profile, id, null, true).then(setProfile)}
                   onAgain={start}
                   onPractise={() => practise(end.results)}
                   onMenu={() => setScreen("home")}

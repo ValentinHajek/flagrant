@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import Avatar from "./Avatar.jsx";
 import { InkTitle, Kicker, Logo, Stamp, Tampon } from "./brand.jsx";
 import { ITEMS } from "./items.js";
-import { BADGES, DAILY_BONUS } from "./progress.js";
+import { BADGES, DAILY_BONUS, QUEST_BONUS, WHEELS } from "./progress.js";
 import { PTS_CARRE, PTS_CASH } from "./quiz.js";
 import { XpBar } from "./Wardrobe.jsx";
 
@@ -15,6 +15,7 @@ const EARN = [
   ["Sans-faute", "+50 % du score pour une partie d'au moins 10 questions sans aucune erreur."],
   ["Série", "+1 toutes les 3 bonnes réponses d'affilée au-delà de 5, sur ta meilleure série de la partie."],
   ["Tampon du jour", `+${DAILY_BONUS} pour ta première partie de la journée.`],
+  ["Quête du jour", `+${QUEST_BONUS} et un tour de roue pour les 2 objectifs du jour : une partie dans 2 modes, ou dans un mode plus une révision menée jusqu'au « Tout bon ! ». La roue donne des tampons ou un article que tu n'as pas encore, même verrouillé (les légendaires sont les plus rares). Elle passe en argent à ${WHEELS[1].from} jours de quête d'affilée, en or à ${WHEELS[2].from}.`],
   ["Badges", "Un bonus unique pour chaque badge débloqué."],
 ];
 

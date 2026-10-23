@@ -5,7 +5,7 @@ import Avatar from "./Avatar.jsx";
 import { InkTitle, Kicker, Logo, Medal, Stamp, Tampon } from "./brand.jsx";
 import { BASE, ITEM, ITEMS, RARITY, SLOTS } from "./items.js";
 import { buyItem, saveLook } from "./profile.js";
-import { BADGE, DAILY_BONUS, cannotBuy } from "./progress.js";
+import { BADGE, DAILY_BONUS, cannotBuy, cannotClaim } from "./progress.js";
 import { sound } from "./sound.js";
 
 const card = "rounded-[20px] border-[2.5px] border-night bg-paper";
@@ -88,6 +88,9 @@ export default function Wardrobe({ profile, setProfile, progress, focus, onBack,
   const { owned, look } = profile;
   const tried = ITEM.get(trying);
   const reason = tried && cannotBuy(tried, progress, owned);
+  const claim = tried && !cannotClaim(tried, progress, owned); // un gain de la roue pas encore récupéré couvre l'article essayé
+  // Gains de la roue pas encore récupérés (l'enregistrement a échoué) : un article au choix dans la rareté gagnée.
+  const bons = Object.entries(progress.vouchers).filter(([r, n]) => n > 0 && ITEMS.some((i) => i.rarity === r && !i.badge && !owned.includes(i.id)));
   const preview = tried ? { ...look, [tried.slot]: tried.id } : look;
 
   const wear = (change) => {
@@ -101,10 +104,10 @@ export default function Wardrobe({ profile, setProfile, progress, focus, onBack,
     if (owned.includes(it.id)) wear({ [it.slot]: it.id });
     else setTrying(trying === it.id ? null : it.id);
   };
-  // Acheté = porté tout de suite.
-  const buy = () =>
+  // Acheté (ou récupéré comme gain de la roue) = porté tout de suite.
+  const buy = (voucher = false) =>
     run(async () => {
-      const p = await buyItem(profile, tried.id, reason);
+      const p = await buyItem(profile, tried.id, voucher ? null : reason, voucher);
       const next = { ...p, look: { ...look, [tried.slot]: tried.id } };
       setProfile(next);
       setTrying(null);
@@ -135,9 +138,15 @@ export default function Wardrobe({ profile, setProfile, progress, focus, onBack,
       </header>
       <InkTitle className="text-[clamp(3.5rem,15vw,6.5rem)]">Vestiaire.</InkTitle>
       <p className="-mt-2 max-w-xl font-medium text-muted">
-        Chaque partie rapporte des tampons : ton score, plus des bonus (sans-faute, série, {DAILY_BONUS} pour la première partie du jour) et les badges. Monter de
+        Chaque partie rapporte des tampons : ton score, plus des bonus (sans-faute, série, {DAILY_BONUS} pour la première partie du jour), la quête du jour et les badges. Monter de
         niveau débloque de nouveaux articles.
       </p>
+      {bons.length > 0 && (
+        <p className="rounded-2xl border-2 border-dashed border-leaf bg-paper px-4 py-3 text-sm font-semibold text-night">
+          Gagné à la roue, pas encore récupéré : {bons.map(([r, n]) => `${n} article${n > 1 ? "s" : ""} « ${RARITY[r].label} »`).join(", ")}. Touche un article de
+          cette rareté, même verrouillé, puis « Récupérer mon gain » : il est à toi sans dépenser de tampons.
+        </p>
+      )}
 
       <div className="grid items-start gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
         {/* Reste visible pendant qu'on fait défiler les articles : c'est là qu'on voit l'essayage */}
@@ -164,8 +173,13 @@ export default function Wardrobe({ profile, setProfile, progress, focus, onBack,
                     ×
                   </button>
                 </div>
+                {claim && (
+                  <Stamp onClick={() => buy(true)} disabled={busy} className="px-4 py-2 text-sm">
+                    Récupérer mon gain
+                  </Stamp>
+                )}
                 {reason ? (
-                  <p className="text-sm font-semibold text-fluo">
+                  !claim && <p className="text-sm font-semibold text-fluo">
                     {reason}
                     {tried.badge && !progress.badges.includes(tried.badge) && (
                       <button onClick={onBadges} className="ml-1.5 cursor-pointer text-ink underline underline-offset-2">
@@ -174,7 +188,7 @@ export default function Wardrobe({ profile, setProfile, progress, focus, onBack,
                     )}
                   </p>
                 ) : (
-                  <Stamp onClick={buy} disabled={busy} className="px-4 py-2 text-sm">
+                  <Stamp variant={claim ? "ghost" : "primary"} onClick={() => buy()} disabled={busy} className="px-4 py-2 text-sm">
                     {tried.price ? (
                       <>
                         Acheter · {tried.price}
@@ -247,6 +261,7 @@ export default function Wardrobe({ profile, setProfile, progress, focus, onBack,
                 {ITEMS.filter((i) => i.slot === tab).map((it) => {
                   const has = owned.includes(it.id);
                   const lock = !has && lockOf(it, progress);
+                  const bon = !has && !it.badge && progress.vouchers[it.rarity] > 0;
                   return (
                     <Choice key={it.id} look={{ ...look, [tab]: it.id }} label={it.name} selected={look[tab] === it.id} trying={trying === it.id} onClick={() => pick(it)}>
                       <span className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${RARITY[it.rarity].color}`}>{RARITY[it.rarity].label}</span>
@@ -254,6 +269,8 @@ export default function Wardrobe({ profile, setProfile, progress, focus, onBack,
                         <span className="rounded-full bg-ink px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-paper">Porté</span>
                       ) : has ? (
                         <span className="text-xs font-semibold text-leaf">À toi</span>
+                      ) : bon ? (
+                        <span className="text-xs font-semibold text-leaf">Gain de la roue</span>
                       ) : lock ? (
                         <span className="flex items-center gap-1 text-xs font-semibold text-muted">
                           <Lock />

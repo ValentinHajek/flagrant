@@ -6,6 +6,7 @@ import Avatar from "./Avatar.jsx";
 import { Glyph, InkTitle, Kicker, Logo, Marquee, Medal, Motif, Stamp, Tampon } from "./brand.jsx";
 import { ChallengeButton, DuelInbox } from "./Duels.jsx";
 import { BADGES } from "./progress.js";
+import { QuestCard } from "./Quest.jsx";
 import { COUNTS, DUEL_MAX, MAP_PILE_KM, MAP_PROCHE_KM, PTS_CARRE, PTS_CASH, SECONDS, flagUrl, questionCount, shuffle, total } from "./quiz.js";
 import { enableSound, sound, soundEnabled } from "./sound.js";
 import { bestKey, load } from "./storage.js";
@@ -135,6 +136,10 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
           <LoginForm notice={notice} />
         </motion.section>
       )}
+
+      <motion.div variants={rise}>
+        <QuestCard progress={progress} onPick={(m) => setSettings({ ...settings, mode: m })} />
+      </motion.div>
 
       <motion.div variants={rise} className="flex flex-col gap-4 sm:pt-4">
         <Kicker>{questionCount(all, mode, territories, count)} questions · {SECONDS} s par question</Kicker>

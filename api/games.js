@@ -12,6 +12,7 @@ export const GET = route(async (request) => {
 });
 
 // Envoi de parties jouées sur l'appareil. Idempotent ; une partie invalide est ignorée sans bloquer les autres.
+// Une partie déjà enregistrée ne change plus, sauf sa date de révision (la première gardée).
 export const POST = route(async (request) => {
   const { d, user } = await requireUser(request);
   const list = (await body(request)).games;
@@ -19,7 +20,9 @@ export const POST = route(async (request) => {
   const games = list.map(cleanGame).filter(Boolean);
   if (games.length) {
     // Filtre sur userId : une partie d'un autre joueur au même id ne peut pas être écrasée (doublon d'_id refusé).
-    const ops = games.map(({ _id, ...g }) => ({ updateOne: { filter: { _id, userId: user._id }, update: { $setOnInsert: { ...g, userId: user._id } }, upsert: true } }));
+    const ops = games.map(({ _id, revisedAt, ...g }) => ({
+      updateOne: { filter: { _id, userId: user._id }, update: { $setOnInsert: { ...g, userId: user._id }, ...(revisedAt && { $min: { revisedAt } }) }, upsert: true },
+    }));
     await d.collection("games").bulkWrite(ops, { ordered: false }).catch((e) => {
       if (!e.writeErrors?.length || e.writeErrors.some((w) => w.code !== 11000)) throw e;
     });

@@ -1,20 +1,24 @@
 import { ITEM } from "../src/items.js";
-import { cannotBuy, computeProgress } from "../src/progress.js";
+import { cannotBuy, cannotClaim, computeProgress } from "../src/progress.js";
 import { HttpError, body, json, preflight, requireUser, route } from "./_lib.js";
 
 export const OPTIONS = preflight;
 
-// Achat d'un article : le solde est recalculé à partir des parties enregistrées, jamais pris au navigateur.
-// L'écriture n'a lieu que si le compte n'a pas bougé depuis la lecture (rev), sinon deux achats
-// simultanés pourraient dépenser les mêmes tampons.
+// Achat d'un article, ou gain de la roue de la quête (voucher) : solde et gains sont recalculés à partir des parties
+// enregistrées, jamais pris au navigateur. L'écriture n'a lieu que si le compte n'a pas bougé depuis la lecture (rev),
+// sinon deux achats simultanés pourraient dépenser les mêmes tampons (ou le même gain).
 export const POST = route(async (request) => {
   const { d, user } = await requireUser(request);
-  const item = ITEM.get(String((await body(request)).item ?? ""));
-  const owned = user.owned ?? [];
+  const data = await body(request);
+  const item = ITEM.get(String(data.item ?? ""));
+  const voucher = data.voucher === true;
+  const { owned = [], vouchered = [] } = user;
   const games = await d.collection("games").find({ userId: user._id }).toArray();
-  const reason = cannotBuy(item, computeProgress(games, owned), owned);
+  const progress = computeProgress(games, owned, vouchered);
+  const reason = voucher ? cannotClaim(item, progress, owned) : cannotBuy(item, progress, owned);
   if (reason) throw new HttpError(400, reason);
-  const res = await d.collection("users").updateOne({ _id: user._id, rev: user.rev ?? { $exists: false } }, { $push: { owned: item.id }, $inc: { rev: 1 } });
+  const push = voucher ? { owned: item.id, vouchered: item.id } : { owned: item.id };
+  const res = await d.collection("users").updateOne({ _id: user._id, rev: user.rev ?? { $exists: false } }, { $push: push, $inc: { rev: 1 } });
   if (!res.modifiedCount) throw new HttpError(409, "Ton vestiaire vient de changer, réessaie");
-  return json(request, { owned: [...owned, item.id] });
+  return json(request, { owned: [...owned, item.id], vouchered: voucher ? [...vouchered, item.id] : vouchered });
 });

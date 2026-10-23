@@ -110,6 +110,7 @@ export const publicMe = (u) => ({
   friendCode: u.friendCode,
   email: u.email,
   owned: u.owned ?? [],
+  vouchered: u.vouchered ?? [], // gagnés à la roue de la quête
   look: cleanLook(u.look, u.owned ?? []),
 });
 
@@ -158,10 +159,12 @@ export function cleanGame(g) {
     [...g.hit, ...g.missed].every(isCode) &&
     (g.streak === undefined || int(g.streak, 0, g.hit.length)) &&
     (g.bonus === undefined || int(g.bonus, 0, maxCombo(g.top))) && // combo : pas plus que si tous les flash étaient d'affilée
-    (g.duel === undefined || (typeof g.duel === "string" && /^[\w-]{8,64}$/.test(g.duel)));
+    (g.duel === undefined || (typeof g.duel === "string" && /^[\w-]{8,64}$/.test(g.duel))) &&
+    // Révision des erreurs menée jusqu'au bout (quête du jour) : après la partie, et seulement s'il y avait à réviser.
+    (g.revisedAt === undefined || (Number.isFinite(g.revisedAt) && g.revisedAt >= g.at && g.revisedAt < Date.now() + 864e5 && g.top < g.n));
   if (!ok) return null;
   const { id, at, mode, n, score, max, top, mid, hit, missed } = g;
-  return { _id: id, at, mode, territories: g.territories === true, n, score, max, top, mid, hit, missed, streak: g.streak ?? 0, ...(g.bonus && { bonus: g.bonus }), ...(g.duel && { duel: g.duel }) };
+  return { _id: id, at, mode, territories: g.territories === true, n, score, max, top, mid, hit, missed, streak: g.streak ?? 0, ...(g.bonus && { bonus: g.bonus }), ...(g.duel && { duel: g.duel }), ...(g.revisedAt && { revisedAt: g.revisedAt }) };
 }
 
 // Lien de connexion par e-mail. Sans SMTP (dev local), le lien s'affiche dans la console du serveur.

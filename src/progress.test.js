@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { BASE, ITEM, ITEMS, cleanLook, DEFAULT_LOOK } from "./items.js";
-import { BADGE, DAILY_BONUS, RESCALE_AT, cannotBuy, computeProgress, gameReward, levelOf, titleOf } from "./progress.js";
+import { BADGE, DAILY_BONUS, QUEST_BONUS, RESCALE_AT, WHEELS, cannotBuy, cannotClaim, computeProgress, gameReward, levelOf, questOf, questStatus, titleOf } from "./progress.js";
 import { PTS_CARRE, PTS_CASH } from "./quiz.js";
 
 // Niveaux : 50, 150, 300, 500…
@@ -58,6 +58,72 @@ const T = (iso) => Date.parse(iso);
   assert.equal(cannotBuy(ITEM.get("laurel"), { ...p, balance: 1199 }, []), "Pas assez de tampons", "un exclusif se paie");
   assert.equal(cannotBuy(ITEM.get("crown"), p, []), "Niveau 10 requis");
   assert.equal(cannotBuy(ITEM.get("cap"), { ...p, balance: 10 }, []), "Pas assez de tampons");
+}
+
+// Quête du jour : les 2 objectifs du jour (une partie dans un mode, ou une révision finie) → bonus + tour de roue,
+// meilleure roue avec la série
+{
+  const at = (k, h = 10) => Date.UTC(2026, 9, 23 + k, h); // vers midi à Paris, k jours après le lancement
+  const play = (task, t) => (task === "revision" ? g(t, { revisedAt: t + 6e4 }) : g(t, { mode: task })); // révision : d'une partie Drapeaux
+  const quest = (k) => questOf(new Date(at(k)).toISOString().slice(0, 10)).map((task, i) => play(task, at(k, 10 + i)));
+  const spins = (games) => {
+    const { perGame } = computeProgress(games);
+    return games.flatMap((x) => [perGame.get(x.id).spin, perGame.get(`${x.id}:revision`)?.spin]).filter(Boolean);
+  };
+
+  assert.equal(computeProgress(questOf("2026-10-22").map((task) => play(task, T("2026-10-22T10:00Z")))).quests.size, 0, "rien avant le lancement");
+  const [first, second] = quest(0);
+  assert.equal(spins([first]).length, 0, "un seul des deux modes");
+  const p = computeProgress([first, second]);
+  const gain = p.perGame.get(second.id);
+  assert.deepEqual([gain.quest, gain.spin.streak, gain.spin.wheel], [QUEST_BONUS, 1, 0]);
+  assert.equal(gain.spin.prize, WHEELS[0].slices[gain.spin.slot].tampons ?? 0);
+  assert.equal(gain.total, gain.score + QUEST_BONUS + gain.spin.prize);
+  assert.equal(spins([first, second, ...quest(0)]).length, 1, "une seule quête par jour");
+  // Même tirage côté serveur, où les parties ont un _id
+  assert.equal(computeProgress([first, second].map(({ id, ...x }) => ({ _id: id, ...x }))).xp, p.xp);
+
+  // Roue argent au 3e jour d'affilée, or au 7e ; un jour sauté remet la série à 1
+  const week = [0, 1, 2, 3, 4, 5, 6, 7, 9].flatMap(quest);
+  assert.deepEqual(spins(week).map((s) => [s.streak, s.wheel]), [[1, 0], [2, 0], [3, 1], [4, 1], [5, 1], [6, 1], [7, 2], [8, 2], [1, 0]]);
+
+  // Accueil : la série d'hier tient jusqu'à ce soir, la roue promise suit
+  const two = [0, 1].flatMap(quest);
+  assert.deepEqual(questStatus(computeProgress(two), at(2, 6)), { modes: questOf("2026-10-25"), played: new Set(), done: null, streak: 2, wheel: 1 });
+  const s = questStatus(computeProgress([...two, quest(2)[0]]), at(2, 20));
+  assert.deepEqual([s.played.size, s.done, s.streak], [1, null, 2]);
+  assert.equal(questStatus(computeProgress([...two, ...quest(2)]), at(2, 20)).done.streak, 3);
+  assert.deepEqual([questStatus(computeProgress(two), at(3)).streak, questStatus(computeProgress(two), at(3)).wheel], [0, 0], "série perdue");
+
+  // Révision : comptée le jour où elle est finie (ici le lendemain de la partie), gain sur « id:revision »
+  assert.deepEqual(questOf("2026-10-24"), ["capital", "revision"]);
+  const late = g(at(0, 21), { revisedAt: at(1, 9) }); // partie à 23 h, révision finie le lendemain
+  const day1 = [late, play("capital", at(1, 10))];
+  const rev = computeProgress(day1).perGame.get(`${late.id}:revision`);
+  assert.equal(spins(day1).length, 1);
+  assert.equal(rev, undefined, "la partie Capitales boucle la quête, pas la révision");
+  const revFirst = computeProgress([play("capital", at(1, 8)), late]).perGame.get(`${late.id}:revision`);
+  assert.deepEqual([revFirst.quest, revFirst.total], [QUEST_BONUS, QUEST_BONUS + revFirst.spin.prize], "révision qui boucle la quête : bonus + roue");
+  assert.equal(spins([play("tld", at(0)), play("revision", at(0, 12))]).length, 0, "pas de révision au programme ce jour-là");
+  assert.equal(computeProgress(day1.map(({ id, ...x }) => ({ _id: id, ...x }))).xp, computeProgress(day1).xp, "même calcul côté serveur");
+
+  // Roue : chances sur 100. Une case article donne un article de sa rareté, sans payer, même pas encore débloqué ;
+  // jamais un exclusif de badge, et une case gagnée = un seul article.
+  for (const w of WHEELS) assert.equal(w.slices.reduce((t, x) => t + x.p, 0), 100, w.name);
+  let won;
+  for (let k = 0; !won?.spin.item; k++) {
+    const games = quest(0).map((x, i) => ({ ...x, id: `bon${k}-${i}` }));
+    won = { games, spin: spins(games)[0] };
+  }
+  const rarity = won.spin.item;
+  const pv = computeProgress(won.games);
+  assert.deepEqual([won.spin.prize, pv.vouchers[rarity]], [0, 1]);
+  const [it, other] = ITEMS.filter((i) => i.rarity === rarity && !i.badge).sort((a, b) => b.level - a.level);
+  assert.equal(cannotClaim(it, pv, []), null, "même verrouillé, même sans les tampons");
+  const claimed = computeProgress(won.games, [it.id], [it.id]);
+  assert.deepEqual([claimed.balance, claimed.vouchers[rarity]], [pv.balance, 0], "gratuit, et le bon est utilisé");
+  assert.match(cannotClaim(other, claimed, [it.id]), /gagné à la roue/);
+  assert.match(cannotClaim(ITEMS.find((i) => i.badge), pv, []), /exclusif/);
 }
 
 // Catalogue : ids uniques, exclusifs reliés à un badge existant et payants

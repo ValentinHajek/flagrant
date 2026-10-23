@@ -2,7 +2,8 @@
 // Usage : MONGODB_URI=mongodb://127.0.0.1:27017 pnpm test:api
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
-import { DEFAULT_LOOK } from "../src/items.js";
+import { DEFAULT_LOOK, ITEMS } from "../src/items.js";
+import { computeProgress, questStatus } from "../src/progress.js";
 
 process.env.MONGODB_URI ??= "mongodb://127.0.0.1:27017";
 process.env.MONGODB_DB = `flagrant_test_${Date.now()}`;
@@ -71,6 +72,11 @@ try {
   const mine = await call("games", "GET", { token: a.session });
   assert.equal(mine.data.games.length, 1);
   assert.deepEqual(mine.data.games[0], { ...g1 }, "partie relue à l'identique");
+  // Révision finie après coup (quête du jour) : la date rejoint la partie déjà enregistrée, la première est gardée.
+  await call("games", "POST", { token: a.session, body: { games: [{ ...g1, revisedAt: g1.at + 2000 }] } });
+  await call("games", "POST", { token: a.session, body: { games: [{ ...g1, revisedAt: g1.at + 5000 }] } });
+  assert.equal((await call("games", "GET", { token: a.session })).data.games[0].revisedAt, g1.at + 2000);
+  assert.equal((await call("games", "POST", { token: a.session, body: { games: [game({ revisedAt: Date.now() - 864e5 })] } })).data.accepted, 0, "révision avant la partie");
 
   // Amis : pas d'accès aux parties d'un inconnu, accès réciproque après ajout par code.
   const b = await signIn("lea@example.com", "2.2.2.2");
@@ -108,6 +114,23 @@ try {
   assert.deepEqual([dressed.data.me.look.hat, dressed.data.me.look.hair], ["cap", "boucles"]);
   await call("friends", "POST", { token: c.session, body: { code: b.me.friendCode } });
   assert.equal((await call("me", "GET", { token: b.session })).data.friends.find((f) => f.pseudo === "Chloe").look.hat, "cap", "tenue visible des amis");
+
+  // Roue de la quête du jour : une case article gagnée donne un article de sa rareté sans payer, même verrouillé, une seule fois.
+  const v = await signIn("vic@example.com", "4.4.4.4");
+  const now = Date.now() - 1000;
+  const tasks = questStatus(computeProgress([]), now).modes;
+  let quest, spin;
+  for (let k = 0; !spin?.item; k++) {
+    quest = tasks.map((t, i) => game({ id: `quete-${k}-${i}`, at: now + i, ...(t === "revision" ? { revisedAt: now + 500 } : { mode: t }) }));
+    spin = [...computeProgress(quest).perGame.values()].find((x) => x.spin)?.spin;
+  }
+  assert.equal((await call("games", "POST", { token: v.session, body: { games: quest } })).data.accepted, 2);
+  const [it, other] = ITEMS.filter((i) => i.rarity === spin.item && !i.badge).sort((a, b) => b.level - a.level);
+  assert.equal((await call("shop", "POST", { token: v.session, body: { item: it.id } })).status, 400, "à l'achat : niveau ou tampons manquants");
+  const claimed = await call("shop", "POST", { token: v.session, body: { item: it.id, voucher: true } });
+  assert.deepEqual([claimed.status, claimed.data.owned, claimed.data.vouchered], [200, [it.id], [it.id]]);
+  assert.match((await call("shop", "POST", { token: v.session, body: { item: other.id, voucher: true } })).data.error, /gagné à la roue/, "une case gagnée, un article");
+  assert.deepEqual((await call("me", "GET", { token: v.session })).data.me.vouchered, [it.id]);
 
   // Défis : seulement entre amis, même série pour les deux, score = première partie liée au défi.
   const series = ["FR", "BE", "DE", "IT", "ES"].map((code) => ({ code, type: "flag", choices: ["PT", "NL", "LU"].map((x) => (x === code ? "CH" : x)) }));

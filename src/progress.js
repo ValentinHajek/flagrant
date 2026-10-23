@@ -1,6 +1,6 @@
 // Gamification : tampons gagnés, niveaux, badges et solde. Tout se déduit de l'historique des parties
 // (et des articles achetés), donc le serveur refait exactement le même calcul pour valider les achats.
-import { ITEM } from "./items.js";
+import { ITEM, RARITY } from "./items.js";
 import { MAP_PILE_KM, total } from "./quiz.js";
 
 // Barème divisé par 3 pour les parties jouées depuis le 22 oct. 2026 à 17 h 30 (heure de Paris) :
@@ -10,6 +10,33 @@ export const DAILY_BONUS = 10;
 const OLD_DAILY_BONUS = 20;
 const PARIS_DAY = new Intl.DateTimeFormat("fr-CA", { timeZone: "Europe/Paris" }); // AAAA-MM-JJ
 const dayNumber = (day) => Date.UTC(...day.split("-").map((v, k) => (k === 1 ? v - 1 : +v))) / 864e5;
+
+// Quête du jour : deux objectifs, les mêmes pour tout le monde, à remplir le même jour (heure de Paris) : une partie
+// dans un mode, ou « revision » (une révision menée jusqu'au « Tout bon ! »). Elle rapporte QUEST_BONUS et un tour
+// de roue, meilleure quand la série de quêtes (jours d'affilée) s'allonge.
+// Les jours passés se recalculent avec ces listes : ne jamais les modifier, seulement en ajouter pour des jours à venir.
+export const QUEST_FROM = "2026-10-23"; // lancement : rien de rétroactif
+export const QUEST_BONUS = 50;
+const QUESTS = [
+  ["flag", "tld"], ["capital", "map"], ["mix", "revision"], ["flag", "capital"], ["tld", "map"], ["capital", "revision"], ["map", "mix"], ["flag", "mix"],
+  ["tld", "revision"], ["tld", "capital"], ["flag", "map"], ["map", "revision"], ["capital", "mix"], ["tld", "mix"], ["flag", "revision"],
+];
+export const questOf = (day) => QUESTS[dayNumber(day) % QUESTS.length];
+// Cases de la roue, dans l'ordre du cadran. p : chances sur 100 (et part du cadran) ; tampons gagnés, ou item : un article
+// de cette rareté que le joueur n'a pas, même pas encore débloqué (lequel : tiré par la roue à l'écran, le serveur vérifie
+// seulement la rareté). from : jours de quête d'affilée pour y avoir droit.
+export const WHEELS = [
+  { from: 1, name: "Roue bronze", slices: [{ p: 34, tampons: 10 }, { p: 17, item: "commune" }, { p: 26, tampons: 20 }, { p: 7, item: "rare" }, { p: 15, tampons: 40 }, { p: 1, item: "epique" }] },
+  { from: 3, name: "Roue argent", slices: [{ p: 28, tampons: 20 }, { p: 16, item: "commune" }, { p: 22, tampons: 40 }, { p: 13, item: "rare" }, { p: 14, tampons: 80 }, { p: 5, item: "epique" }, { p: 2, item: "legendaire" }] },
+  { from: 7, name: "Roue or", slices: [{ p: 24, tampons: 40 }, { p: 12, item: "commune" }, { p: 20, tampons: 80 }, { p: 15, item: "rare" }, { p: 14, tampons: 150 }, { p: 10, item: "epique" }, { p: 5, item: "legendaire" }] },
+];
+export const wheelFor = (streak) => WHEELS.findLastIndex((w) => streak >= w.from);
+// Case tirée de la partie qui termine la quête (id local, _id côté serveur) : la même partout, impossible à relancer.
+const hash = (seed) => [...seed].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0, 2166136261);
+const slotOf = (slices, seed) => {
+  let r = hash(seed) % 100;
+  return slices.findIndex((s) => (r -= s.p) < 0);
+};
 
 // Niveau L atteint à 25·L·(L−1) d'expérience : 50, 150, 300, 500, 750…
 export const levelFloor = (level) => 25 * level * (level - 1);
@@ -65,9 +92,11 @@ export const BADGES = [
 ];
 export const BADGE = new Map(BADGES.map((b) => [b.id, b]));
 
-export function computeProgress(games, owned = []) {
+// vouchered : articles gagnés à la roue (ni payés, ni décomptés du solde).
+export function computeProgress(games, owned = [], vouchered = []) {
   const s = { games: 0, modes: new Set(), perfect: false, bestStreak: 0, flags: new Set(), tlds: new Set(), mapTop: 0, mapGames: 0, marathon: false };
   const days = new Set();
+  const quests = new Map(); // numéro du jour → { played : objectifs remplis ; streak, wheel, slot, prize une fois la quête finie }
   const perGame = new Map();
   let fromGames = 0;
   for (const g of [...games].sort((a, b) => a.at - b.at)) {
@@ -91,6 +120,29 @@ export function computeProgress(games, owned = []) {
     }
     s.marathon ||= g.n >= 150;
   }
+  // Quêtes : chaque partie, et la révision complète d'une partie (revisedAt), dans l'ordre où elles ont eu lieu.
+  // Le gain va à ce qui boucle la quête : la partie, ou sa révision (clé « id:revision »).
+  const events = games.flatMap((g) => [[g.at, g.mode, g], ...(g.revisedAt ? [[g.revisedAt, "revision", g]] : [])]);
+  for (const [at, task, g] of events.sort((a, b) => a[0] - b[0])) {
+    const day = PARIS_DAY.format(at);
+    if (day < QUEST_FROM || !questOf(day).includes(task)) continue;
+    const n = dayNumber(day);
+    const q = quests.get(n) ?? { played: new Set() };
+    quests.set(n, q);
+    q.played.add(task);
+    if (q.streak || q.played.size < 2) continue;
+    const key = task === "revision" ? `${g.id ?? g._id}:revision` : g.id ?? g._id;
+    q.streak = (quests.get(n - 1)?.streak ?? 0) + 1;
+    q.wheel = wheelFor(q.streak);
+    q.slot = slotOf(WHEELS[q.wheel].slices, `${day}:${key}`);
+    const slice = WHEELS[q.wheel].slices[q.slot];
+    q.prize = slice.tampons ?? 0;
+    q.item = slice.item ?? null;
+    const gain = perGame.get(key) ?? { score: 0, perfect: 0, streak: 0, daily: 0, total: 0 };
+    perGame.set(key, { ...gain, quest: QUEST_BONUS, spin: q, total: gain.total + QUEST_BONUS + q.prize });
+    fromGames += QUEST_BONUS + q.prize;
+  }
+
   // Plus longue suite de jours consécutifs avec au moins une partie.
   const sorted = [...days].map(dayNumber).sort((a, b) => a - b);
   s.dayStreak = sorted.reduce((best, d, k) => {
@@ -100,9 +152,34 @@ export function computeProgress(games, owned = []) {
 
   const badges = BADGES.filter((b) => b.test(s)).map((b) => b.id);
   const xp = fromGames + badges.reduce((t, id) => t + BADGE.get(id).reward, 0);
-  const spent = owned.reduce((t, id) => t + (ITEM.get(id)?.price ?? 0), 0);
+  const spent = owned.filter((id) => !vouchered.includes(id)).reduce((t, id) => t + (ITEM.get(id)?.price ?? 0), 0);
+  // Cases article gagnées à la roue et pas encore récupérées, par rareté.
+  const vouchers = Object.fromEntries(Object.keys(RARITY).map((r) => [r, 0]));
+  for (const q of quests.values()) if (q.item) vouchers[q.item]++;
+  for (const id of vouchered) if (ITEM.has(id)) vouchers[ITEM.get(id).rarity]--;
   const level = levelOf(xp);
-  return { xp, level, title: titleOf(level), floor: levelFloor(level), next: levelFloor(level + 1), balance: xp - spent, badges, perGame, stats: s };
+  return { xp, level, title: titleOf(level), floor: levelFloor(level), next: levelFloor(level + 1), balance: xp - spent, badges, perGame, quests, vouchers, stats: s };
+}
+
+// Quête d'aujourd'hui : modes à jouer, déjà joués, faite ou non, série en cours (celle d'hier tient jusqu'à minuit)
+// et roue du jour : celle qui a tourné, ou celle promise si la quête est finie avant minuit.
+export function questStatus(progress, now = Date.now()) {
+  const day = PARIS_DAY.format(now);
+  const n = dayNumber(day);
+  const today = progress.quests.get(n);
+  const done = today?.streak ? today : null;
+  const streak = done?.streak ?? progress.quests.get(n - 1)?.streak ?? 0;
+  return { modes: questOf(day), played: today?.played ?? new Set(), done, streak, wheel: done?.wheel ?? wheelFor(streak + 1) };
+}
+
+// Raison qui empêche de récupérer cet article comme gain d'une case article de la roue, ou null.
+// Niveau et solde ne comptent pas.
+export function cannotClaim(item, progress, owned) {
+  if (!item) return "Article inconnu";
+  if (item.badge) return "Article exclusif : pas à la roue";
+  if (owned.includes(item.id)) return "Déjà dans ton vestiaire";
+  if (!(progress.vouchers[item.rarity] > 0)) return `Pas d'article « ${RARITY[item.rarity].label} » gagné à la roue`;
+  return null;
 }
 
 // Raison qui empêche l'achat, ou null si c'est possible.
