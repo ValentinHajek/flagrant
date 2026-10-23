@@ -476,18 +476,34 @@ function Pet({ id }) {
           <circle cx="87" cy="84" r="1.2" fill={NIGHT} />
         </>
       );
-    case "cat":
+    case "cat": {
+      // Chat noir assis : grosse tête, grands yeux verts, oreilles et truffe roses. Queue en S, dans le cercle.
+      const [fur, pink, tail] = ["#2b2b2b", "#f4a3b5", "M94.5,102 Q101,101 100.5,95 Q100.2,91.5 102,90"];
       return (
         <>
-          <path d="M99,104 Q108,100 104,92" fill="none" stroke="#2b2b2b" strokeWidth="3" strokeLinecap="round" />
-          <ellipse cx="91" cy="102" rx="9" ry="8" fill="#2b2b2b" {...line} />
-          <path d="M83,84 L84,76 L89,81 Z M97,84 L96,76 L91,81 Z" fill="#2b2b2b" {...line} />
-          <circle cx="90" cy="88" r="7.5" fill="#2b2b2b" {...line} />
-          <circle cx="87" cy="87" r="1.6" fill={SUN} />
-          <circle cx="93" cy="87" r="1.6" fill={SUN} />
-          <path d="M89,91 L90,92 L91,91" fill="none" stroke={FLUO} strokeWidth="1" />
+          <path d={tail} fill="none" stroke={NIGHT} strokeWidth="5.2" strokeLinecap="round" />
+          <path d={tail} fill="none" stroke={fur} strokeWidth="3" strokeLinecap="round" />
+          <ellipse cx="88" cy="97" rx="8" ry="8.5" fill={fur} {...line} />
+          <ellipse cx="84.5" cy="104" rx="2.6" ry="1.9" fill={fur} {...thin} />
+          <ellipse cx="91.5" cy="104" rx="2.6" ry="1.9" fill={fur} {...thin} />
+          <path d="M79.6,81 L80.2,72.5 L86,77.2 Z M96.4,81 L95.8,72.5 L90,77.2 Z" fill={fur} {...line} />
+          <path d="M81.4,78.5 L81.7,75 L84.2,77 Z M94.6,78.5 L94.3,75 L91.8,77 Z" fill={pink} />
+          <ellipse cx="88" cy="84.5" rx="8.8" ry="7.6" fill={fur} {...line} />
+          <circle cx="82.5" cy="87.4" r="1.5" fill={pink} opacity=".5" />
+          <circle cx="93.5" cy="87.4" r="1.5" fill={pink} opacity=".5" />
+          {[84.4, 91.6].map((x) => (
+            <g key={x}>
+              <ellipse cx={x} cy="84" rx="2.3" ry="2.6" fill="#7ed957" />
+              <ellipse cx={x} cy="84.3" rx="1" ry="1.7" fill={NIGHT} />
+              <circle cx={x + 0.8} cy="83" r=".75" fill={CARD} />
+            </g>
+          ))}
+          <path d="M87,87.4 H89 L88,88.5 Z" fill={pink} />
+          <path d="M86.4,89.2 Q87.2,90.2 88,89 Q88.8,90.2 89.6,89.2" fill="none" stroke={CARD} strokeWidth=".7" strokeLinecap="round" opacity=".8" />
+          <path d="M81.5,87 L77,86.2 M81.5,88.6 L77.2,89.4 M94.5,87 L99,86.2 M94.5,88.6 L98.8,89.4" stroke={CARD} strokeWidth=".6" strokeLinecap="round" opacity=".7" />
         </>
       );
+    }
     case "gecko": {
       // Vu de dessus, accroché à l'épaule, tête vers le haut (repère local centré sur le ventre).
       // Pattes et queue : un trait encre puis le même trait vert, plus fin, par-dessus (contour fin).
