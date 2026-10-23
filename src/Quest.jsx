@@ -20,79 +20,86 @@ const TASKS = { ...MODE_NAMES, revision: "Révision" };
 const nextWheel = (wheel, streak) => WHEELS[wheel + 1] && { ...WHEELS[wheel + 1], left: WHEELS[wheel + 1].from - streak };
 
 const Flame = ({ lit, className }) => (
-  <svg viewBox="0 0 16 16" className={`${className} ${lit ? "text-fluo" : "text-muted/40"}`} fill="currentColor" aria-hidden>
+  <svg viewBox="0 0 16 16" className={`${className} ${lit ? "text-fluo" : "text-paper/40"}`} fill="currentColor" aria-hidden>
     <path d="M8 1c.5 2.6 4.2 4.4 4.2 8.4a4.2 4.2 0 0 1-8.4 0c0-2 1.2-3.3 2-4.2.2 1.5.9 2.3 1.7 2.6C7.2 5.6 7.3 3.3 8 1z" />
   </svg>
 );
 
-export function QuestCard({ progress, onPick }) {
-  const q = questStatus(progress);
-  const wheel = WHEELS[q.wheel].name.toLowerCase();
-  const mode = q.modes.find((m) => m !== "revision");
-  const goal = q.modes.includes("revision")
-    ? `Une partie en ${TASKS[mode]}, puis « Réviser mes erreurs » jusqu'au « Tout bon ! »`
-    : "Une partie dans chacun de ces modes";
-  const next = nextWheel(q.wheel, q.done ? q.streak : q.streak + 1);
-  const count = q.modes.filter((m) => q.played.has(m)).length;
-  // Ombre orange tant que la quête du jour reste à faire : c'est le premier truc à voir en arrivant.
+// Une ligne du billet : case cochée et nom barré une fois l'objectif rempli. Un mode se joue d'un clic ;
+// la révision se lance depuis la fin d'une partie, donc pas de bouton pour elle.
+function QuestLine({ task, ok, onPlay }) {
+  const status = ok ? "Validé" : task === "revision" ? "Après une partie" : "Jouer →";
+  const body = (
+    <>
+      <span className={`grid size-[22px] shrink-0 place-items-center rounded-md border-[2.5px] ${ok ? "border-leaf bg-leaf" : "border-night"}`}>
+        {ok && (
+          <svg viewBox="0 0 12 12" className="size-3" fill="none" stroke="#fffaf0" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M2 6.5 5 9.2 10 3" />
+          </svg>
+        )}
+      </span>
+      <span className={`font-display text-[26px] uppercase leading-none ${ok ? "text-night/45 line-through decoration-fluo decoration-[3px]" : "text-ink"}`}>{TASKS[task]}</span>
+      <span className={`ml-auto text-right text-[9px] font-bold uppercase tracking-[0.16em] ${ok ? "text-leaf" : "text-fluo"}`}>{status}</span>
+    </>
+  );
+  const line = "-mx-1.5 flex w-[calc(100%+0.75rem)] items-center gap-2.5 rounded-lg px-1.5 py-1 text-left";
   return (
-    <section
-      aria-labelledby="quest-title"
-      className={`flex gap-4 rounded-[20px] border-[2.5px] border-night bg-paper p-4 sm:gap-5 sm:p-5 ${q.done ? "shadow-print" : "shadow-[6px_7px_0_var(--color-fluo)]"}`}
-    >
-      <div className="flex w-16 shrink-0 flex-col items-center justify-center gap-0.5 border-r-2 border-dashed border-night/15 pr-4 text-center sm:w-20">
-        <Flame lit={q.streak > 0} className="size-8" />
-        <span className="font-display text-4xl leading-none text-ink tabular-nums">{q.streak}</span>
-        <span className="text-[10px] font-semibold uppercase leading-tight tracking-[0.12em] text-muted">{q.streak > 1 ? "jours" : "jour"} de série</span>
-      </div>
-      <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-        <div className="flex items-baseline gap-2">
-          <h2 id="quest-title" className="font-display text-xl uppercase leading-tight text-night">
+    <li>
+      {task === "revision" ? (
+        <div className={line}>{body}</div>
+      ) : (
+        <button onClick={() => onPlay(task)} className={`${line} cursor-pointer transition-colors hover:bg-ink/[0.07] focus-visible:outline-3 focus-visible:outline-fluo`}>
+          {body}
+        </button>
+      )}
+    </li>
+  );
+}
+
+// Le billet du jour : les deux objectifs, composté une fois la quête faite ; sur le talon, la série et un trou
+// poinçonné par jour de quête sur les 7 derniers jours.
+export function QuestCard({ progress, onPlay }) {
+  const q = questStatus(progress);
+  const [y, m, d] = q.day.split("-").map(Number);
+  const number = (Date.UTC(y, m - 1, d) - Date.UTC(y, 0, 0)) / 864e5; // numéro du jour dans l'année
+  return (
+    <section aria-labelledby="quest-title" className="relative flex rounded-2xl border-[2.5px] border-night bg-[#fffaf0] shadow-print">
+      <div className="relative flex min-w-0 flex-1 flex-col gap-3 py-3.5 pl-4 pr-3.5">
+        <div className="flex items-baseline justify-between gap-2">
+          <h2 id="quest-title" className="whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.24em] text-ink">
             Quête du jour
           </h2>
-          <span className={`ml-auto shrink-0 font-display text-lg ${q.done ? "text-leaf" : "text-fluo"}`}>
-            {q.done ? "Faite ✓" : `${count}/2`}
-            {!q.done && <span className="sr-only"> objectifs faits</span>}
+          <span className="whitespace-nowrap text-[10px] font-semibold tracking-[0.2em] text-muted max-[379px]:hidden">N° {number}</span>
+        </div>
+        <ul className="flex flex-col gap-1.5">
+          {q.modes.map((task) => (
+            <QuestLine key={task} task={task} ok={q.played.has(task)} onPlay={onPlay} />
+          ))}
+        </ul>
+        <p className="text-[11px] font-semibold text-muted">À la clé : +{QUEST_BONUS} tampons et un tour de roue</p>
+        {q.done && (
+          <span aria-hidden className="pointer-events-none absolute bottom-2.5 right-3 -rotate-12 rounded-lg border-[3px] border-fluo bg-[#fffaf0]/85 px-2 py-0.5 font-display text-lg uppercase tracking-[0.06em] text-fluo sm:text-[22px]">
+            Composté
           </span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {q.modes.map((m) => {
-            const ok = q.played.has(m);
-            const chip = `flex items-center gap-1.5 rounded-full border-2 px-3.5 py-1.5 font-display text-base uppercase tracking-wide ${ok ? "border-leaf bg-leaf text-paper" : "border-ink text-ink"}`;
-            // La révision se lance depuis la fin d'une partie : pas de bouton ici.
-            return m === "revision" ? (
-              <span key={m} className={chip}>
-                {ok && <span aria-hidden>✓</span>}
-                {TASKS[m]}
-                <span className="sr-only">{ok ? " : faite" : " : à faire"}</span>
-              </span>
-            ) : (
-              <button
-                key={m}
-                onClick={() => onPick(m)}
-                aria-label={`${TASKS[m]} : ${ok ? "fait" : "choisir ce mode"}`}
-                className={`${chip} cursor-pointer transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-fluo ${ok ? "" : "hover:bg-ink hover:text-paper"}`}
-              >
-                {ok && <span aria-hidden>✓</span>}
-                {TASKS[m]}
-              </button>
-            );
-          })}
-        </div>
-        <p className="text-sm font-medium text-muted">
-          {q.done ? (
-            <>
-              <b className="text-leaf">Bravo&nbsp;!</b> +{QUEST_BONUS} et {wheel} : {q.done.item ? `un article ${ARTICLE[q.done.item]}` : `+${q.done.prize}`}. Reviens demain
-              pour continuer ta série.
-            </>
-          ) : (
-            <>
-              {goal} aujourd'hui : +{QUEST_BONUS} tampons et un tour de {wheel}.
-            </>
-          )}
-          {next && ` ${next.name} dans ${plural(next.left, "jour")} de quête d'affilée.`}
-        </p>
+        )}
       </div>
+      <div className="flex w-24 shrink-0 flex-col items-center justify-center gap-1 rounded-r-[13.5px] border-l-[2.5px] border-dashed border-night/35 bg-ink px-2 py-3.5 text-center text-paper">
+        <Flame lit={q.streak > 0} className="size-6" />
+        <span className="font-display text-[46px] leading-[0.9]">{q.streak}</span>
+        <span className="text-[9px] font-bold uppercase leading-tight tracking-[0.18em]">
+          {q.streak > 1 ? "jours" : "jour"}
+          <br />
+          d'affilée
+        </span>
+        <div className="mt-1.5 flex gap-[3px]" aria-hidden>
+          {q.week.map((ok, k) => (
+            <span key={k} className={`size-2 rounded-full border-[1.5px] border-paper ${ok ? "bg-paper" : ""}`} />
+          ))}
+        </div>
+      </div>
+      {/* Encoches du billet, de part et d'autre du pointillé */}
+      <span aria-hidden className="absolute -top-[15px] right-[82px] size-[26px] rounded-full border-[2.5px] border-night bg-paper [clip-path:inset(12px_0_0_0)]" />
+      <span aria-hidden className="absolute -bottom-[15px] right-[82px] size-[26px] rounded-full border-[2.5px] border-night bg-paper [clip-path:inset(0_0_12px_0)]" />
     </section>
   );
 }

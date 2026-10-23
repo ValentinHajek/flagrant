@@ -89,7 +89,15 @@ const T = (iso) => Date.parse(iso);
 
   // Accueil : la série d'hier tient jusqu'à ce soir, la roue promise suit
   const two = [0, 1].flatMap(quest);
-  assert.deepEqual(questStatus(computeProgress(two), at(2, 6)), { modes: questOf("2026-10-25"), played: new Set(), done: null, streak: 2, wheel: 1 });
+  assert.deepEqual(questStatus(computeProgress(two), at(2, 6)), {
+    day: "2026-10-25",
+    modes: questOf("2026-10-25"),
+    played: new Set(),
+    done: null,
+    streak: 2,
+    wheel: 1,
+    week: [false, false, false, false, true, true, false], // les 2 jours de quête avant aujourd'hui
+  });
   const s = questStatus(computeProgress([...two, quest(2)[0]]), at(2, 20));
   assert.deepEqual([s.played.size, s.done, s.streak], [1, null, 2]);
   assert.equal(questStatus(computeProgress([...two, ...quest(2)]), at(2, 20)).done.streak, 3);

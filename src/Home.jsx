@@ -70,7 +70,7 @@ const rise = {
   animate: { opacity: 1, y: 0, rotate: 0, transition: { type: "spring", stiffness: 260, damping: 22 } },
 };
 
-export default function Home({ all, settings, setSettings, onStart, loading, onStats, look, progress, onWardrobe, onBadges, notice, history, duels, onChallenge, onPlayDuel, onDeclineDuel }) {
+export default function Home({ all, settings, setSettings, onStart, onPlayMode, loading, onStats, look, progress, onWardrobe, onBadges, notice, history, duels, onChallenge, onPlayDuel, onDeclineDuel }) {
   const { mode, territories, count } = settings;
   const ribbon = useMemo(() => shuffle(all.filter((c) => c.souverain && c.tld)).slice(0, 18), [all]);
   const [soundOn, setSoundOn] = useState(soundEnabled);
@@ -138,7 +138,7 @@ export default function Home({ all, settings, setSettings, onStart, loading, onS
       )}
 
       <motion.div variants={rise}>
-        <QuestCard progress={progress} onPick={(m) => setSettings({ ...settings, mode: m })} />
+        <QuestCard progress={progress} onPlay={onPlayMode} />
       </motion.div>
 
       <motion.div variants={rise} className="flex flex-col gap-4 sm:pt-4">

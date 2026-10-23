@@ -126,12 +126,21 @@ export default function App() {
     save("settings", s);
   };
 
-  const start = () => {
-    if (needMap && !map) return;
+  // Lance une partie dans ce mode, qui devient celui de l'accueil (bouton « C'est parti » ou quête du jour).
+  const play = async (mode) => {
+    setSettings({ ...settings, mode });
     sound("depart"); // dans le clic même : sur iPhone, c'est ce geste qui autorise le son
-    setQuiz({ ...buildQuiz(all, settings.mode, settings.territories, settings.count), id: Date.now() });
+    if ((mode === "map" || mode === "mix") && !map) {
+      try {
+        await loadMap();
+      } catch {
+        return; // loadMap affiche déjà l'erreur
+      }
+    }
+    setQuiz({ ...buildQuiz(all, mode, settings.territories, settings.count), id: Date.now() });
     setScreen("game");
   };
+  const start = () => play(settings.mode);
 
   // Défi : la série vient du serveur (ou vient d'y partir) ; mêmes questions et mêmes leurres pour les deux joueurs.
   const playDuel = async (duel) => {
@@ -212,6 +221,7 @@ export default function App() {
                   settings={settings}
                   setSettings={setSettings}
                   onStart={start}
+                  onPlayMode={play}
                   loading={needMap && !map}
                   onStats={() => setScreen("stats")}
                   look={profile.look}

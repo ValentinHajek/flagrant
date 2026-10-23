@@ -161,15 +161,17 @@ export function computeProgress(games, owned = [], vouchered = []) {
   return { xp, level, title: titleOf(level), floor: levelFloor(level), next: levelFloor(level + 1), balance: xp - spent, badges, perGame, quests, vouchers, stats: s };
 }
 
-// Quête d'aujourd'hui : modes à jouer, déjà joués, faite ou non, série en cours (celle d'hier tient jusqu'à minuit)
-// et roue du jour : celle qui a tourné, ou celle promise si la quête est finie avant minuit.
+// Quête d'aujourd'hui : modes à jouer, déjà joués, faite ou non, série en cours (celle d'hier tient jusqu'à minuit),
+// roue du jour (celle qui a tourné, ou celle promise si la quête est finie avant minuit) et quêtes faites
+// ces 7 derniers jours, aujourd'hui en dernier.
 export function questStatus(progress, now = Date.now()) {
   const day = PARIS_DAY.format(now);
   const n = dayNumber(day);
   const today = progress.quests.get(n);
   const done = today?.streak ? today : null;
   const streak = done?.streak ?? progress.quests.get(n - 1)?.streak ?? 0;
-  return { modes: questOf(day), played: today?.played ?? new Set(), done, streak, wheel: done?.wheel ?? wheelFor(streak + 1) };
+  const week = [6, 5, 4, 3, 2, 1, 0].map((back) => Boolean(progress.quests.get(n - back)?.streak));
+  return { day, modes: questOf(day), played: today?.played ?? new Set(), done, streak, wheel: done?.wheel ?? wheelFor(streak + 1), week };
 }
 
 // Raison qui empêche de récupérer cet article comme gain d'une case article de la roue, ou null.
