@@ -67,8 +67,8 @@ export const ITEMS = [
   item("bg", "bg-stamp", "Tampon de passeport", 600, 2, "rare"),
   item("bg", "bg-map", "Carte du monde", 750, 3, "rare"),
   item("bg", "bg-stars", "Ciel étoilé", 1200, 6, "epique"),
-  item("bg", "bg-rainbow", "Arc-en-ciel pailleté", 1500, 7, "epique"),
-  item("bg", "bg-sunrise", "Lever de soleil", 0, 1, "legendaire", "assidu"),
+  item("bg", "bg-sunrise", "Lever de soleil", 1500, 7, "epique"),
+  item("bg", "bg-rainbow", "Arc-en-ciel pailleté", 0, 1, "legendaire", "assidu"),
 ];
 
 export const ITEM = new Map(ITEMS.map((i) => [i.id, i]));
