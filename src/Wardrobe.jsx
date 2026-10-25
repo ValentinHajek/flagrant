@@ -211,18 +211,27 @@ export default function Wardrobe({ profile, setProfile, progress, focus, onBack,
         </aside>
 
         <div className="flex min-w-0 flex-col gap-4">
-          <div role="tablist" aria-label="Rayons" className="flex flex-wrap gap-2">
-            {TABS.map(([id, label]) => (
-              <button
-                key={id}
-                role="tab"
-                aria-selected={tab === id}
-                onClick={() => setTab(id)}
-                className={`cursor-pointer rounded-full border-2 border-ink px-3 py-1 font-display text-sm uppercase transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-fluo ${tab === id ? "bg-ink text-paper" : "text-ink hover:bg-ink/10"}`}
-              >
-                {label}
-              </button>
-            ))}
+          <div className="flex flex-wrap items-center gap-2">
+            <div role="tablist" aria-label="Rayons" className="flex flex-wrap gap-2">
+              {TABS.map(([id, label]) => (
+                <button
+                  key={id}
+                  role="tab"
+                  aria-selected={tab === id}
+                  onClick={() => setTab(id)}
+                  className={`cursor-pointer rounded-full border-2 border-ink px-3 py-1 font-display text-sm uppercase transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-fluo ${tab === id ? "bg-ink text-paper" : "text-ink hover:bg-ink/10"}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => wear(Object.fromEntries(SLOTS.map(([slot]) => [slot, null])))}
+              disabled={SLOTS.every(([slot]) => !look[slot])}
+              className="ml-auto cursor-pointer rounded-full border-2 border-dashed border-fluo px-3 py-1 font-display text-sm uppercase text-fluo transition-colors hover:bg-fluo hover:text-paper focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-fluo disabled:cursor-default disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-fluo"
+            >
+              Tout enlever
+            </button>
           </div>
 
           <motion.div key={tab} role="tabpanel" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
