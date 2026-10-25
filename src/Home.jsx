@@ -261,7 +261,13 @@ export default function Home({ all, settings, setSettings, onStart, onPlayMode, 
         </motion.div>
       )}
 
-      <motion.div variants={rise} className="-mx-4 mt-4 border-y-[2.5px] border-night bg-paper-deep py-3 sm:-mx-10">
+      {/* Panneau cloué : 4 clous aux coins, légèrement de travers */}
+      <motion.div variants={rise} className="relative mt-4 -rotate-1 rounded-[14px] border-[2.5px] border-night bg-paper-deep px-7 py-3 shadow-print">
+        {["left-2 top-2", "right-2 top-2", "bottom-2 left-2", "bottom-2 right-2"].map((pos) => (
+          <span key={pos} aria-hidden className={`absolute ${pos} grid size-3 place-items-center rounded-full border-2 border-night bg-[#c9c2b3]`}>
+            <span className="h-0.5 w-1.5 rotate-45 rounded-full bg-night/70" />
+          </span>
+        ))}
         <Marquee>
           {ribbon.map((c) => (
             <span key={c.code} className="flex items-center gap-3">
