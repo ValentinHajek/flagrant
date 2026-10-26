@@ -159,7 +159,7 @@ function ScoreChart({ games, avg }) {
   );
 }
 
-// Duel : tes dernières parties et celles de ton ami, en courbes (la plus récente à droite pour les deux).
+// Duel : tes dernières parties et celles de l'autre joueur, en courbes (la plus récente à droite pour les deux).
 // Deux séries : légende obligatoire, valeur en bout de courbe, détail au survol ou au clavier (ligne repère).
 function DuelChart({ mine, theirs, myName, rivalName }) {
   const [hover, setHover] = useState(null);
@@ -264,11 +264,11 @@ function DuelChart({ mine, theirs, myName, rivalName }) {
 export default function Stats({ all, mode: initialMode, notice, history, setHistory, look, duels, onChallenge, onPlayDuel, onLoggedOut, onBack, onPlay }) {
   const [mode, setMode] = useState(initialMode);
   const [n, setN] = useState(0); // 0 = toutes les parties
-  const [account, setAccount] = useState(null); // { me, friends } une fois connecté
-  const [rival, setRival] = useState(null); // ami choisi pour le duel, avec ses parties
+  const [account, setAccount] = useState(null); // { me, players } une fois connecté
+  const [rival, setRival] = useState(null); // joueur choisi pour le duel, avec ses parties
   const byCode = useMemo(() => new Map(all.map((c) => [c.code, c])), [all]);
   const s = summarize(history, mode, n);
-  const rs = rival && summarize(rival.games, mode, n); // stats de l'ami dans ce mode (null s'il n'y a pas joué)
+  const rs = rival && summarize(rival.games, mode, n); // ses stats dans ce mode (null s'il n'y a pas joué)
   const myName = account?.me.pseudo ?? "Toi";
   const top = mode === "map" ? "pile" : "flash";
   const trend = s?.trend == null ? null : Math.round(s.trend * 100); // en points ; 0 = stable
@@ -284,10 +284,10 @@ export default function Stats({ all, mode: initialMode, notice, history, setHist
       .catch(() => {});
   }, []);
 
-  const pickRival = (friend) => {
-    if (rival?.id === friend.id) return setRival(null);
-    api(`/games?user=${friend.id}`)
-      .then(({ games }) => setRival({ ...friend, games }))
+  const pickRival = (player) => {
+    if (rival?.id === player.id) return setRival(null);
+    api(`/games?user=${player.id}`)
+      .then(({ games }) => setRival({ ...player, games }))
       .catch(() => setRival(null));
   };
 
@@ -307,7 +307,7 @@ export default function Stats({ all, mode: initialMode, notice, history, setHist
       </header>
       <InkTitle className="text-[clamp(3.5rem,15vw,6.5rem)]">Mes stats.</InkTitle>
 
-      {/* Ordinateur : stats à gauche, compte & amis à droite (reste visible au défilement) */}
+      {/* Ordinateur : stats à gauche, compte & joueurs à droite (reste visible au défilement) */}
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_330px]">
         <div className="flex min-w-0 flex-col gap-6">
           <div role="tablist" aria-label="Mode" className="flex rounded-full border-[2.5px] border-night bg-paper p-1 shadow-print">

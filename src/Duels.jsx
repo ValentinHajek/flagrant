@@ -1,4 +1,4 @@
-// Défis 1 contre 1 entre amis : même série pour les deux, chacun la joue quand bon lui semble.
+// Défis 1 contre 1 entre joueurs : même série pour les deux, chacun la joue quand bon lui semble.
 import { useRef, useState } from "react";
 import { useAction } from "./Account.jsx";
 import { api } from "./api.js";
@@ -64,28 +64,29 @@ export function DuelInbox({ duels, onPlay, onDecline }) {
   );
 }
 
-// « Défier un ami » : mode au choix (celui de l'accueil au départ), nombre de questions de l'accueil. n(mode) → questions.
+// « Défier un joueur » (n'importe lequel : tous se voient) : mode au choix (celui de l'accueil au départ), nombre de
+// questions de l'accueil. n(mode) → questions.
 export function ChallengeButton({ mode, n, disabled, onChallenge, onStats }) {
   const ref = useRef(null);
-  const [friends, setFriends] = useState(null);
+  const [players, setPlayers] = useState(null);
   const [choice, setChoice] = useState(mode);
   const [{ busy, error }, run] = useAction();
   const open = () => {
     setChoice(mode);
     ref.current.showModal();
     api("/me")
-      .then((r) => setFriends(r.friends))
-      .catch(() => setFriends([]));
+      .then((r) => setPlayers(r.players))
+      .catch(() => setPlayers([]));
   };
-  const pick = (f) =>
+  const pick = (p) =>
     run(async () => {
-      await onChallenge(f, choice);
+      await onChallenge(p, choice);
       ref.current?.close();
     });
   return (
     <>
       <Stamp variant="ghost" onClick={open} disabled={disabled} className="w-full py-3 text-lg">
-        Défier un ami
+        Défier un joueur
       </Stamp>
       <dialog
         ref={ref}
@@ -96,7 +97,7 @@ export function ChallengeButton({ mode, n, disabled, onChallenge, onStats }) {
         <div className="flex flex-col gap-4">
           <div>
             <h2 id="duel-pick" className="font-display text-3xl uppercase text-ink">
-              Défier un ami
+              Défier un joueur
             </h2>
             <p className="text-sm font-medium text-muted">Même série pour vous deux : tu joues tout de suite, ton adversaire quand ça l'arrange.</p>
           </div>
@@ -116,20 +117,21 @@ export function ChallengeButton({ mode, n, disabled, onChallenge, onStats }) {
           <p className="-mt-2 text-sm font-semibold text-ink">
             {MODE_NAMES[choice]} · {n(choice)} questions
           </p>
-          {friends === null ? (
-            <p className="font-medium text-muted">Chargement de tes amis…</p>
-          ) : friends.length ? (
-            <ul className="flex flex-col gap-2">
-              {friends.map((f, k) => (
-                <li key={f.id}>
+          {players === null ? (
+            <p className="font-medium text-muted">Chargement des joueurs…</p>
+          ) : players.length ? (
+            // Défile seul quand il y a du monde : le choix du mode reste visible. p-1.5 : place pour le contour du focus.
+            <ul className="-m-1.5 flex max-h-[min(50vh,22rem)] flex-col gap-2 overflow-y-auto p-1.5">
+              {players.map((p, k) => (
+                <li key={p.id}>
                   <button
                     autoFocus={k === 0}
-                    onClick={() => pick(f)}
+                    onClick={() => pick(p)}
                     disabled={busy}
                     className="flex w-full cursor-pointer items-center gap-3 rounded-2xl border-2 border-ink py-1.5 pl-1.5 pr-4 text-left text-lg font-semibold text-ink transition-colors hover:bg-ink hover:text-paper focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-fluo disabled:cursor-default disabled:opacity-50"
                   >
-                    <Avatar look={f.look} size={40} />
-                    {f.pseudo}
+                    <Avatar look={p.look} size={40} />
+                    {p.pseudo}
                     <span className="ml-auto font-display text-base uppercase">Défier →</span>
                   </button>
                 </li>
@@ -137,7 +139,7 @@ export function ChallengeButton({ mode, n, disabled, onChallenge, onStats }) {
             </ul>
           ) : (
             <p className="font-medium">
-              Ajoute d'abord un ami avec son code, dans{" "}
+              Personne d'autre n'a encore joué. Invite quelqu'un depuis{" "}
               <button onClick={onStats} className="cursor-pointer font-semibold text-ink underline underline-offset-2">
                 Mes stats
               </button>
@@ -154,7 +156,7 @@ export function ChallengeButton({ mode, n, disabled, onChallenge, onStats }) {
   );
 }
 
-// Stats, en cliquant sur un ami : le bilan de vos défis et les derniers en date.
+// Stats, en cliquant sur un joueur : le bilan de vos défis et les derniers en date.
 export function DuelRecord({ duels, rival, mode, onChallenge, onPlay }) {
   const [{ busy, error }, run] = useAction();
   const { wins, draws, losses } = duelRecord(duels);
@@ -212,7 +214,7 @@ export function DuelRecord({ duels, rival, mode, onChallenge, onPlay }) {
   );
 }
 
-// Fin d'un défi : le face-à-face si l'ami a déjà joué, sinon l'attente.
+// Fin d'un défi : le face-à-face si l'adversaire a déjà joué, sinon l'attente.
 export function DuelResult({ duel, score, look }) {
   const { rival, them } = duel;
   const [verdict, color] = them ? outcome(score, them.score) : [];

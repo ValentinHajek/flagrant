@@ -5,7 +5,7 @@ import { HttpError, body, json, limit, preflight, requireUser, route } from "./_
 
 export const OPTIONS = preflight;
 
-// Défis 1 contre 1 entre amis : le lanceur tire une série, chacun la joue quand il veut.
+// Défis 1 contre 1 entre joueurs : le lanceur tire une série, chacun la joue quand il veut.
 // Le score de chacun, c'est sa première partie synchronisée avec ce défi (champ duel des parties).
 
 const isCode = (c) => typeof c === "string" && /^[A-Z]{2}$/.test(c);
@@ -75,11 +75,13 @@ export const GET = route(async (request) => {
   });
 });
 
-// Lance un défi contre un ami avec la série tirée par le navigateur (même série pour les deux : rien à y gagner).
+// Lance un défi contre un autre joueur (friend : son id) avec la série tirée par le navigateur (même série pour les deux :
+// rien à y gagner).
 export const POST = route(async (request) => {
   const { d, user } = await requireUser(request);
   const data = await body(request);
-  if (!user.friends.includes(data.friend)) throw new HttpError(403, "Ce joueur n'est pas dans tes amis");
+  const rival = typeof data.friend === "string" && data.friend !== user._id && (await d.collection("users").findOne({ _id: data.friend }, { projection: { _id: 1 } }));
+  if (!rival) throw new HttpError(404, "Joueur introuvable");
   if (!MODES.includes(data.mode)) throw new HttpError(400, "Mode inconnu");
   const questions = cleanSeries(data.mode, data.questions);
   if (!questions) throw new HttpError(400, "Série de questions invalide");

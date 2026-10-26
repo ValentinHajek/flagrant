@@ -41,7 +41,7 @@ export function LoginForm({ notice }) {
   };
   return (
     <>
-      <p className="font-medium text-muted">Connecte-toi par e-mail pour retrouver tes stats sur tous tes appareils et te comparer à tes amis.</p>
+      <p className="font-medium text-muted">Connecte-toi par e-mail pour retrouver tes stats sur tous tes appareils, te comparer aux autres joueurs et les défier.</p>
       {sentTo ? (
         <p className="font-semibold text-leaf">C'est envoyé ! Ouvre le lien reçu à {sentTo} (valable 15 minutes).</p>
       ) : (
@@ -58,24 +58,20 @@ export function LoginForm({ notice }) {
 }
 
 function LoggedIn({ account, setAccount, look, rivalId, onPickRival, onLoggedOut }) {
-  const { me, friends } = account;
-  const [code, setCode] = useState("");
+  const { me, players } = account;
+  const [email, setEmail] = useState("");
   // null = pas en cours d'édition. Ouvert d'office tant que le pseudo est celui tiré de l'e-mail.
   const [pseudo, setPseudo] = useState(me.pseudoSet ? null : me.pseudo);
-  const [copied, setCopied] = useState(false);
   const [invited, setInvited] = useState(null);
   const [{ busy, error }, run] = useAction();
-  const isEmail = code.includes("@");
 
-  // Un code ami, ou un e-mail : l'ami reçoit alors une invitation (son compte est créé au besoin).
-  const addFriend = (e) => {
+  // Tous les joueurs se voient : l'invité reçoit juste un lien pour venir jouer.
+  const invite = (e) => {
     e.preventDefault();
     run(async () => {
-      const value = code.trim();
-      const { friend } = await api("/friends", { method: "POST", body: isEmail ? { email: value } : { code: value } });
-      setAccount({ ...account, friends: [...friends.filter((f) => f.id !== friend.id), friend] });
-      setInvited(isEmail ? value : null);
-      setCode("");
+      await api("/invite", { method: "POST", body: { email } });
+      setInvited(email.trim());
+      setEmail("");
     });
   };
   const savePseudo = (e) => {
@@ -85,10 +81,6 @@ function LoggedIn({ account, setAccount, look, rivalId, onPickRival, onLoggedOut
       setAccount({ ...account, me: r.me });
       setPseudo(null);
     });
-  };
-  const copy = async () => {
-    await navigator.clipboard?.writeText(me.friendCode).catch(() => {});
-    setCopied(true);
   };
   // Déconnexion : on synchronise d'abord, puis on vide l'historique et le vestiaire locaux pour ne pas
   // mélanger deux comptes (seule l'apparence de base de l'avatar reste).
@@ -116,7 +108,7 @@ function LoggedIn({ account, setAccount, look, rivalId, onPickRival, onLoggedOut
       ) : (
         <form onSubmit={savePseudo} className="flex flex-col gap-2">
           <label htmlFor="pseudo" className="font-semibold text-night">
-            {me.pseudoSet ? "Ton nouveau pseudo" : "Choisis ton pseudo : c'est ce que verront tes amis"}
+            {me.pseudoSet ? "Ton nouveau pseudo" : "Choisis ton pseudo : c'est ce que verront les autres joueurs"}
           </label>
           <div className="flex gap-2">
             <input id="pseudo" autoFocus value={pseudo} onChange={(e) => setPseudo(e.target.value)} maxLength={24} className={field} />
@@ -133,45 +125,32 @@ function LoggedIn({ account, setAccount, look, rivalId, onPickRival, onLoggedOut
       )}
       <p className="-mt-2 text-sm font-medium text-muted">Connecté avec {me.email}</p>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">Ton code ami</span>
-        <span className="rounded-xl border-2 border-dashed border-ink px-3 py-1 font-display text-2xl tracking-[0.12em] text-ink">{me.friendCode}</span>
-        <button onClick={copy} className="cursor-pointer text-sm font-semibold text-ink underline underline-offset-2">
-          {copied ? "copié ✓" : "copier"}
-        </button>
-      </div>
-
-      <form onSubmit={addFriend} className="flex gap-2">
-        <input
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          maxLength={254}
-          placeholder="Code ami ou e-mail"
-          aria-label="Code ami ou e-mail de l'ami à ajouter"
-          className={`${field} ${isEmail ? "" : "uppercase tracking-[0.12em]"}`}
-        />
-        <Stamp type="submit" disabled={busy || (isEmail ? code.trim().length < 6 : code.trim().length !== 6)} className="px-4 py-2 text-sm">
-          {isEmail ? "Inviter" : "Ajouter"}
-        </Stamp>
-      </form>
-      {invited && <p className="-mt-2 text-sm font-semibold text-leaf">Invitation envoyée à {invited} : vous êtes déjà amis !</p>}
-
-      {friends.length > 0 && (
+      {players.length > 0 ? (
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">Duel avec</span>
-          {friends.map((f) => (
+          {players.map((p) => (
             <button
-              key={f.id}
-              onClick={() => onPickRival(f)}
-              aria-pressed={rivalId === f.id}
-              className={`flex cursor-pointer items-center gap-1.5 rounded-full border-2 border-ink py-0.5 pl-0.5 pr-3 font-semibold transition-colors ${rivalId === f.id ? "bg-ink text-paper" : "text-ink hover:bg-ink/10"}`}
+              key={p.id}
+              onClick={() => onPickRival(p)}
+              aria-pressed={rivalId === p.id}
+              className={`flex cursor-pointer items-center gap-1.5 rounded-full border-2 border-ink py-0.5 pl-0.5 pr-3 font-semibold transition-colors ${rivalId === p.id ? "bg-ink text-paper" : "text-ink hover:bg-ink/10"}`}
             >
-              <Avatar look={f.look} size={26} />
-              {f.pseudo}
+              <Avatar look={p.look} size={26} />
+              {p.pseudo}
             </button>
           ))}
         </div>
+      ) : (
+        <p className="text-sm font-medium text-muted">Personne d'autre n'a encore joué : invite quelqu'un !</p>
       )}
+
+      <form onSubmit={invite} className="flex gap-2">
+        <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} maxLength={254} placeholder="E-mail d'un ami" aria-label="E-mail de la personne à inviter" className={field} />
+        <Stamp type="submit" disabled={busy || !email.trim()} className="px-4 py-2 text-sm">
+          Inviter
+        </Stamp>
+      </form>
+      {invited && <p className="-mt-2 text-sm font-semibold text-leaf">Invitation envoyée à {invited} ! Son avatar apparaîtra ici après sa première partie.</p>}
       {error && <p className="text-sm font-semibold text-fluo">{error}</p>}
       <button onClick={logout} disabled={busy} className="w-fit cursor-pointer text-sm font-semibold text-muted underline underline-offset-2">
         Se déconnecter
@@ -183,13 +162,13 @@ function LoggedIn({ account, setAccount, look, rivalId, onPickRival, onLoggedOut
 export function AccountCard(props) {
   return (
     <section className={`${card} flex flex-col gap-4 p-5`}>
-      <h3 className="font-display text-xl uppercase text-night">Compte & amis</h3>
+      <h3 className="font-display text-xl uppercase text-night">Compte & joueurs</h3>
       {props.account ? <LoggedIn {...props} /> : <LoginForm notice={props.notice} />}
     </section>
   );
 }
 
-// Toi contre ton ami sur le mode affiché. Étoile verte sur le meilleur de chaque ligne (sauf le nombre de parties).
+// Toi contre l'autre joueur sur le mode affiché. Étoile verte sur le meilleur de chaque ligne (sauf le nombre de parties).
 export function Duel({ mine, theirs, myName, myLook, rival, onClose }) {
   const rows = [
     ["Moyenne", (s) => s.avg, pc, true],
@@ -220,7 +199,7 @@ export function Duel({ mine, theirs, myName, myLook, rival, onClose }) {
       {!theirs && <p className="text-sm font-medium text-muted">{rival.pseudo} n'a pas encore joué dans ce mode.</p>}
       <div className="grid grid-cols-[1fr_auto_auto] items-baseline gap-x-6 gap-y-2">
         <span />
-        {/* Face-à-face : l'avatar de l'ami est retourné pour regarder vers le tien */}
+        {/* Face-à-face : l'avatar de l'autre joueur est retourné pour regarder vers le tien */}
         {[
           [myName, myLook, false],
           [rival.pseudo, rival.look, true],

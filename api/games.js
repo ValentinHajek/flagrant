@@ -2,11 +2,10 @@ import { HttpError, body, cleanGame, json, preflight, requireUser, route } from 
 
 export const OPTIONS = preflight;
 
-// Historique d'un joueur : le sien ou celui d'un ami, jamais celui d'un inconnu.
+// Historique d'un joueur : le sien ou celui d'un autre (tous les joueurs connectés se voient, pour se comparer).
 export const GET = route(async (request) => {
   const { d, user } = await requireUser(request);
   const id = new URL(request.url).searchParams.get("user") ?? user._id;
-  if (id !== user._id && !user.friends.includes(id)) throw new HttpError(403, "Ce joueur n'est pas dans tes amis");
   const games = await d.collection("games").find({ userId: id }, { projection: { userId: 0 } }).sort({ at: -1 }).limit(500).toArray();
   return json(request, { games: games.reverse().map(({ _id, ...g }) => ({ id: _id, ...g })) });
 });

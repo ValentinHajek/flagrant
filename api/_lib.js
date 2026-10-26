@@ -100,7 +100,8 @@ export async function limit(d, key, max, seconds) {
   if (doc.count > max) throw new HttpError(429, "Trop de demandes, réessaie un peu plus tard");
 }
 
-// Codes ami sans 0/O/1/I : lisibles et dictables. 32 symboles → tirage sans biais sur un octet.
+// shortcut: les codes ami ne servent plus (tous les joueurs se voient) mais l'index unique friendCode_1 existe en base :
+// sans code, deux nouveaux comptes se heurteraient sur null. À retirer avec un dropIndex("friendCode_1") en prod.
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const friendCode = () => Array.from(randomBytes(6), (b) => ALPHABET[b % 32]).join("");
 
@@ -109,7 +110,6 @@ export const publicMe = (u) => ({
   id: u._id,
   pseudo: u.pseudo,
   pseudoSet: u.pseudoSet === true,
-  friendCode: u.friendCode,
   email: u.email,
   owned: u.owned ?? [],
   vouchered: u.vouchered ?? [], // gagnés à la roue de la quête
@@ -123,7 +123,7 @@ export async function findOrCreateUser(d, email) {
   for (let k = 0; k < 5; k++) {
     const existing = await users.findOne({ email });
     if (existing) return existing;
-    const user = { _id: randomUUID(), email, pseudo, pseudoSet: false, friendCode: friendCode(), friends: [], owned: [], look: DEFAULT_LOOK, rev: 0, createdAt: new Date() };
+    const user = { _id: randomUUID(), email, pseudo, pseudoSet: false, friendCode: friendCode(), owned: [], look: DEFAULT_LOOK, rev: 0, createdAt: new Date() };
     try {
       await users.insertOne(user);
       return user;
@@ -170,7 +170,7 @@ export function cleanGame(g) {
 }
 
 // Lien de connexion par e-mail. Sans SMTP (dev local), le lien s'affiche dans la console du serveur.
-// Avec `inviter` (pseudo), c'est une invitation d'un ami : autre texte, lien valable 7 jours.
+// Avec `inviter` (pseudo), c'est une invitation d'un joueur : autre texte, lien valable 7 jours.
 export const devOutbox = [];
 let transport;
 const escapeHtml = (s) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -189,8 +189,8 @@ export async function sendLoginLink(email, link, inviter) {
     ...(inviter
       ? {
           subject: `${inviter} t'invite à jouer à Geoflash`,
-          text: `${inviter} t'a ajouté en ami sur Geoflash, le jeu des drapeaux et des cartes. Ton compte est prêt, clique pour venir jouer (lien valable 7 jours) :\n${link}\n\nSi tu ne connais pas cette personne, ignore ce message.`,
-          html: `<p><b>${escapeHtml(inviter)}</b> t'a ajouté en ami sur <b>Geoflash</b>, le jeu des drapeaux et des cartes. Ton compte est prêt, viens jouer (lien valable 7 jours) :</p>${button("Venir jouer")}<p style="color:#5c5647">Si tu ne connais pas cette personne, ignore ce message.</p>`,
+          text: `${inviter} t'invite sur Geoflash, le jeu des drapeaux et des cartes. Pas besoin de t'inscrire, clique pour venir jouer (lien valable 7 jours) :\n${link}\n\nSi tu ne connais pas cette personne, ignore ce message.`,
+          html: `<p><b>${escapeHtml(inviter)}</b> t'invite sur <b>Geoflash</b>, le jeu des drapeaux et des cartes. Pas besoin de t'inscrire, viens jouer (lien valable 7 jours) :</p>${button("Venir jouer")}<p style="color:#5c5647">Si tu ne connais pas cette personne, ignore ce message.</p>`,
         }
       : {
           subject: "Ton lien de connexion Geoflash",

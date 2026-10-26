@@ -3,10 +3,23 @@ import { HttpError, body, json, preflight, publicMe, requireUser, route } from "
 
 export const OPTIONS = preflight;
 
+// Le profil, et tous les autres joueurs (ceux qui ont au moins une partie enregistrée), du dernier actif au plus ancien.
+// shortcut: plafonné aux 100 derniers actifs, ajouter une recherche si la liste grossit.
 export const GET = route(async (request) => {
   const { d, user } = await requireUser(request);
-  const friends = await d.collection("users").find({ _id: { $in: user.friends } }, { projection: { pseudo: 1, look: 1, owned: 1 } }).toArray();
-  return json(request, { me: publicMe(user), friends: friends.map((f) => ({ id: f._id, pseudo: f.pseudo, look: cleanLook(f.look, f.owned ?? []) })) });
+  const active = await d
+    .collection("games")
+    .aggregate([
+      { $sort: { userId: 1, at: -1 } }, // + $first : un saut d'index (userId, at) par joueur, pas un parcours de toutes les parties
+      { $group: { _id: "$userId", last: { $first: "$at" } } },
+      { $match: { _id: { $ne: user._id } } },
+      { $sort: { last: -1 } },
+      { $limit: 100 },
+    ])
+    .toArray();
+  const people = await d.collection("users").find({ _id: { $in: active.map((a) => a._id) } }, { projection: { pseudo: 1, look: 1, owned: 1 } }).toArray();
+  const byId = new Map(people.map((p) => [p._id, { id: p._id, pseudo: p.pseudo, look: cleanLook(p.look, p.owned ?? []) }]));
+  return json(request, { me: publicMe(user), players: active.map((a) => byId.get(a._id)).filter(Boolean) });
 });
 
 // Modifie le pseudo et/ou la tenue (seulement avec des articles possédés).

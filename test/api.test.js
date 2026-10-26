@@ -18,7 +18,7 @@ const api = {
   session: await import("../api/session.js"),
   me: await import("../api/me.js"),
   games: await import("../api/games.js"),
-  friends: await import("../api/friends.js"),
+  invite: await import("../api/invite.js"),
   shop: await import("../api/shop.js"),
   duels: await import("../api/duels.js"),
 };
@@ -51,7 +51,6 @@ try {
   assert.equal(a.me.email, "val.hajek@example.com");
   assert.equal(a.me.pseudo, "Val Hajek");
   assert.equal(a.me.pseudoSet, false, "pseudo pas encore choisi");
-  assert.match(a.me.friendCode, /^[A-HJ-NP-Z2-9]{6}$/);
   assert.equal((await call("session", "POST", { body: { token: a.token } })).status, 400, "lien déjà utilisé");
   assert.equal((await call("login", "POST", { body: { email: "val.hajek@example.com" }, headers: { "x-forwarded-for": "1.1.1.1" } })).status, 429, "1 lien par minute");
 
@@ -78,28 +77,23 @@ try {
   assert.equal((await call("games", "GET", { token: a.session })).data.games[0].revisedAt, g1.at + 2000);
   assert.equal((await call("games", "POST", { token: a.session, body: { games: [game({ revisedAt: Date.now() - 864e5 })] } })).data.accepted, 0, "révision avant la partie");
 
-  // Amis : pas d'accès aux parties d'un inconnu, accès réciproque après ajout par code.
+  // Joueurs : pas besoin d'être amis, chacun voit ceux qui ont joué (sauf lui-même) et leurs parties.
   const b = await signIn("lea@example.com", "2.2.2.2");
   await call("games", "POST", { token: b.session, body: { games: [game({ mode: "map", score: 3, top: 1, mid: 0, hit: ["IT"], missed: ["MT", "SM"], streak: 1 })] } });
-  assert.equal((await call("games", "GET", { token: a.session, query: `?user=${b.me.id}` })).status, 403);
-  assert.equal((await call("friends", "POST", { token: a.session, body: { code: "ZZZZZZ" } })).status, 404);
-  assert.equal((await call("friends", "POST", { token: a.session, body: { code: a.me.friendCode } })).status, 400);
-  const added = await call("friends", "POST", { token: a.session, body: { code: b.me.friendCode.toLowerCase() } });
-  assert.deepEqual(added.data.friend, { id: b.me.id, pseudo: "Lea", look: DEFAULT_LOOK });
   assert.equal((await call("games", "GET", { token: a.session, query: `?user=${b.me.id}` })).data.games[0].mode, "map");
-  assert.deepEqual((await call("me", "GET", { token: b.session })).data.friends.map(({ id, pseudo }) => ({ id, pseudo })), [{ id: a.me.id, pseudo: "Val le Pro" }], "amitié réciproque");
+  assert.deepEqual((await call("me", "GET", { token: b.session })).data.players, [{ id: a.me.id, pseudo: "Val le Pro", look: DEFAULT_LOOK }]);
 
-  // Invitation par e-mail : compte créé, amitié immédiate, lien de connexion de 7 jours envoyé à l'invité.
-  assert.equal((await call("friends", "POST", { token: a.session, body: { email: "pas-un-mail" } })).status, 400);
-  assert.equal((await call("friends", "POST", { token: a.session, body: { email: a.me.email } })).status, 400);
-  const inv = await call("friends", "POST", { token: a.session, body: { email: "Nina@Example.com" } });
+  // Invitation par e-mail : lien de connexion de 7 jours ; l'invité n'apparaît qu'après sa première partie.
+  assert.equal((await call("invite", "POST", { token: a.session, body: { email: "pas-un-mail" } })).status, 400);
+  assert.equal((await call("invite", "POST", { token: a.session, body: { email: a.me.email } })).status, 400);
+  const inv = await call("invite", "POST", { token: a.session, body: { email: "Nina@Example.com" } });
   assert.equal(inv.status, 200, JSON.stringify(inv.data));
-  assert.equal(inv.data.friend.pseudo, "Nina");
   assert.deepEqual([devOutbox.at(-1).email, devOutbox.at(-1).inviter], ["nina@example.com", "Val le Pro"]);
   const nina = await call("session", "POST", { body: { token: new URL(devOutbox.at(-1).link).searchParams.get("login") } });
-  assert.equal(nina.data.me.id, inv.data.friend.id, "l'invitée se connecte sur le compte créé");
-  assert.ok((await call("me", "GET", { token: nina.data.session })).data.friends.some((f) => f.id === a.me.id), "amitié réciproque dès l'invitation");
-  assert.equal((await call("friends", "POST", { token: a.session, body: { email: "nina@example.com" } })).status, 429, "1 e-mail par minute");
+  assert.equal(nina.data.me.email, "nina@example.com", "l'invitée se connecte avec le lien");
+  assert.deepEqual((await call("me", "GET", { token: nina.data.session })).data.players.map((p) => p.pseudo).sort(), ["Lea", "Val le Pro"]);
+  assert.ok(!(await call("me", "GET", { token: a.session })).data.players.some((p) => p.id === nina.data.me.id), "pas encore joué : pas dans la liste");
+  assert.equal((await call("invite", "POST", { token: a.session, body: { email: "nina@example.com" } })).status, 429, "1 e-mail par minute");
 
   // Une partie d'un autre joueur ne peut pas être écrasée en réutilisant son id.
   await call("games", "POST", { token: b.session, body: { games: [{ ...g1, score: 0, top: 0, mid: 0, hit: [], missed: ["FR", "BE", "NE"] }] } });
@@ -124,8 +118,9 @@ try {
   assert.equal((await call("me", "PATCH", { token: c.session, body: { look: { hat: "crown" } } })).status, 400, "article non possédé");
   const dressed = await call("me", "PATCH", { token: c.session, body: { look: { hat: "cap", hair: "boucles" } } });
   assert.deepEqual([dressed.data.me.look.hat, dressed.data.me.look.hair], ["cap", "boucles"]);
-  await call("friends", "POST", { token: c.session, body: { code: b.me.friendCode } });
-  assert.equal((await call("me", "GET", { token: b.session })).data.friends.find((f) => f.pseudo === "Chloe").look.hat, "cap", "tenue visible des amis");
+  assert.equal((await call("me", "GET", { token: b.session })).data.players.find((p) => p.pseudo === "Chloe").look.hat, "cap", "tenue visible des autres joueurs");
+  await call("games", "POST", { token: a.session, body: { games: [game({ at: Date.now() + 60_000 })] } });
+  assert.equal((await call("me", "GET", { token: b.session })).data.players[0].id, a.me.id, "le dernier à avoir joué en tête");
 
   // Roue de la quête du jour : une case article gagnée donne un article de sa rareté sans payer, même verrouillé, une seule fois.
   const v = await signIn("vic@example.com", "4.4.4.4");
@@ -144,10 +139,13 @@ try {
   assert.match((await call("shop", "POST", { token: v.session, body: { item: other.id, voucher: true } })).data.error, /gagné à la roue/, "une case gagnée, un article");
   assert.deepEqual((await call("me", "GET", { token: v.session })).data.me.vouchered, [it.id]);
 
-  // Défis : seulement entre amis, même série pour les deux, score = première partie liée au défi.
+  // Défis : contre n'importe quel autre joueur, même série pour les deux, score = première partie liée au défi.
   const series = ["FR", "BE", "DE", "IT", "ES"].map((code) => ({ code, type: "flag", choices: ["PT", "NL", "LU"].map((x) => (x === code ? "CH" : x)) }));
   const challenge = (token, friend, over = {}) => call("duels", "POST", { token, body: { friend, mode: "flag", territories: false, questions: series, ...over } });
-  assert.equal((await challenge(a.session, c.me.id)).status, 403, "pas un ami");
+  assert.equal((await challenge(a.session, a.me.id)).status, 404, "pas contre soi-même");
+  assert.equal((await challenge(a.session, "inconnu")).status, 404);
+  assert.equal((await challenge(a.session, { $ne: null })).status, 404, "id de joueur forcément une chaîne");
+  assert.equal((await challenge(a.session, c.me.id)).status, 200, "pas besoin d'être amis");
   assert.equal((await challenge(a.session, b.me.id, { questions: series.slice(0, 4) })).status, 400, "série trop courte");
   assert.equal((await challenge(a.session, b.me.id, { questions: [...series.slice(1), series[1]] })).status, 400, "pays en double");
   assert.equal((await challenge(a.session, b.me.id, { mode: "map" })).status, 400, "pas de carré sur la carte");
