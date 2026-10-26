@@ -36,6 +36,8 @@ export function db() {
   return dbPromise;
 }
 
+export const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/;
+
 export const newToken = () => randomBytes(32).toString("base64url");
 export const hash = (token) => createHash("sha256").update(token).digest("hex");
 
@@ -168,21 +170,32 @@ export function cleanGame(g) {
 }
 
 // Lien de connexion par e-mail. Sans SMTP (dev local), le lien s'affiche dans la console du serveur.
+// Avec `inviter` (pseudo), c'est une invitation d'un ami : autre texte, lien valable 7 jours.
 export const devOutbox = [];
 let transport;
-export async function sendLoginLink(email, link) {
+const escapeHtml = (s) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+export async function sendLoginLink(email, link, inviter) {
   if (!process.env.SMTP_URL) {
     if (process.env.NODE_ENV === "production") throw new HttpError(500, "Envoi d'e-mail pas encore configuré");
-    devOutbox.push({ email, link });
+    devOutbox.push({ email, link, inviter });
     console.log(`[dev] lien de connexion pour ${email} : ${link}`);
     return;
   }
   transport ??= nodemailer.createTransport(process.env.SMTP_URL);
+  const button = (label) => `<p><a href="${link}" style="display:inline-block;padding:12px 20px;border-radius:999px;background:#ff5a1e;color:#fff;font-weight:bold;text-decoration:none">${label}</a></p>`;
   await transport.sendMail({
     from: process.env.MAIL_FROM,
     to: email,
-    subject: "Ton lien de connexion Geoflash",
-    text: `Clique pour te connecter à Geoflash (lien valable 15 minutes) :\n${link}\n\nSi tu n'as rien demandé, ignore ce message.`,
-    html: `<p>Clique pour te connecter à <b>Geoflash</b> (lien valable 15 minutes) :</p><p><a href="${link}" style="display:inline-block;padding:12px 20px;border-radius:999px;background:#ff5a1e;color:#fff;font-weight:bold;text-decoration:none">Me connecter</a></p><p style="color:#5c5647">Si tu n'as rien demandé, ignore ce message.</p>`,
+    ...(inviter
+      ? {
+          subject: `${inviter} t'invite à jouer à Geoflash`,
+          text: `${inviter} t'a ajouté en ami sur Geoflash, le jeu des drapeaux et des cartes. Ton compte est prêt, clique pour venir jouer (lien valable 7 jours) :\n${link}\n\nSi tu ne connais pas cette personne, ignore ce message.`,
+          html: `<p><b>${escapeHtml(inviter)}</b> t'a ajouté en ami sur <b>Geoflash</b>, le jeu des drapeaux et des cartes. Ton compte est prêt, viens jouer (lien valable 7 jours) :</p>${button("Venir jouer")}<p style="color:#5c5647">Si tu ne connais pas cette personne, ignore ce message.</p>`,
+        }
+      : {
+          subject: "Ton lien de connexion Geoflash",
+          text: `Clique pour te connecter à Geoflash (lien valable 15 minutes) :\n${link}\n\nSi tu n'as rien demandé, ignore ce message.`,
+          html: `<p>Clique pour te connecter à <b>Geoflash</b> (lien valable 15 minutes) :</p>${button("Me connecter")}<p style="color:#5c5647">Si tu n'as rien demandé, ignore ce message.</p>`,
+        }),
   });
 }

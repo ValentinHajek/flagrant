@@ -63,13 +63,18 @@ function LoggedIn({ account, setAccount, look, rivalId, onPickRival, onLoggedOut
   // null = pas en cours d'édition. Ouvert d'office tant que le pseudo est celui tiré de l'e-mail.
   const [pseudo, setPseudo] = useState(me.pseudoSet ? null : me.pseudo);
   const [copied, setCopied] = useState(false);
+  const [invited, setInvited] = useState(null);
   const [{ busy, error }, run] = useAction();
+  const isEmail = code.includes("@");
 
+  // Un code ami, ou un e-mail : l'ami reçoit alors une invitation (son compte est créé au besoin).
   const addFriend = (e) => {
     e.preventDefault();
     run(async () => {
-      const { friend } = await api("/friends", { method: "POST", body: { code } });
+      const value = code.trim();
+      const { friend } = await api("/friends", { method: "POST", body: isEmail ? { email: value } : { code: value } });
       setAccount({ ...account, friends: [...friends.filter((f) => f.id !== friend.id), friend] });
+      setInvited(isEmail ? value : null);
       setCode("");
     });
   };
@@ -137,11 +142,19 @@ function LoggedIn({ account, setAccount, look, rivalId, onPickRival, onLoggedOut
       </div>
 
       <form onSubmit={addFriend} className="flex gap-2">
-        <input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} maxLength={6} placeholder="Code de ton ami" aria-label="Code ami à ajouter" className={`${field} uppercase tracking-[0.12em]`} />
-        <Stamp type="submit" disabled={busy || code.trim().length !== 6} className="px-4 py-2 text-sm">
-          Ajouter
+        <input
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          maxLength={254}
+          placeholder="Code ami ou e-mail"
+          aria-label="Code ami ou e-mail de l'ami à ajouter"
+          className={`${field} ${isEmail ? "" : "uppercase tracking-[0.12em]"}`}
+        />
+        <Stamp type="submit" disabled={busy || (isEmail ? code.trim().length < 6 : code.trim().length !== 6)} className="px-4 py-2 text-sm">
+          {isEmail ? "Inviter" : "Ajouter"}
         </Stamp>
       </form>
+      {invited && <p className="-mt-2 text-sm font-semibold text-leaf">Invitation envoyée à {invited} : vous êtes déjà amis !</p>}
 
       {friends.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">

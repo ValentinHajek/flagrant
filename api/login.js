@@ -1,6 +1,4 @@
-import { HttpError, body, db, hash, json, limit, newToken, preflight, route, sendLoginLink } from "./_lib.js";
-
-const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/;
+import { EMAIL, HttpError, body, db, hash, json, limit, newToken, preflight, route, sendLoginLink } from "./_lib.js";
 
 export const OPTIONS = preflight;
 

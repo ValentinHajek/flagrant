@@ -89,6 +89,18 @@ try {
   assert.equal((await call("games", "GET", { token: a.session, query: `?user=${b.me.id}` })).data.games[0].mode, "map");
   assert.deepEqual((await call("me", "GET", { token: b.session })).data.friends.map(({ id, pseudo }) => ({ id, pseudo })), [{ id: a.me.id, pseudo: "Val le Pro" }], "amitié réciproque");
 
+  // Invitation par e-mail : compte créé, amitié immédiate, lien de connexion de 7 jours envoyé à l'invité.
+  assert.equal((await call("friends", "POST", { token: a.session, body: { email: "pas-un-mail" } })).status, 400);
+  assert.equal((await call("friends", "POST", { token: a.session, body: { email: a.me.email } })).status, 400);
+  const inv = await call("friends", "POST", { token: a.session, body: { email: "Nina@Example.com" } });
+  assert.equal(inv.status, 200, JSON.stringify(inv.data));
+  assert.equal(inv.data.friend.pseudo, "Nina");
+  assert.deepEqual([devOutbox.at(-1).email, devOutbox.at(-1).inviter], ["nina@example.com", "Val le Pro"]);
+  const nina = await call("session", "POST", { body: { token: new URL(devOutbox.at(-1).link).searchParams.get("login") } });
+  assert.equal(nina.data.me.id, inv.data.friend.id, "l'invitée se connecte sur le compte créé");
+  assert.ok((await call("me", "GET", { token: nina.data.session })).data.friends.some((f) => f.id === a.me.id), "amitié réciproque dès l'invitation");
+  assert.equal((await call("friends", "POST", { token: a.session, body: { email: "nina@example.com" } })).status, 429, "1 e-mail par minute");
+
   // Une partie d'un autre joueur ne peut pas être écrasée en réutilisant son id.
   await call("games", "POST", { token: b.session, body: { games: [{ ...g1, score: 0, top: 0, mid: 0, hit: [], missed: ["FR", "BE", "NE"] }] } });
   assert.equal((await call("games", "GET", { token: a.session })).data.games[0].score, 4);
